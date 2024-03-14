@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/chiragdhunna/chiragdhunna.github.io/static/css/main.f2a7e49d.css",
+    "main.js": "/chiragdhunna/chiragdhunna.github.io/static/js/main.2f21d3a3.js",
+    "static/js/787.512dd3f2.chunk.js": "/chiragdhunna/chiragdhunna.github.io/static/js/787.512dd3f2.chunk.js",
+    "index.html": "/chiragdhunna/chiragdhunna.github.io/index.html",
+    "main.f2a7e49d.css.map": "/chiragdhunna/chiragdhunna.github.io/static/css/main.f2a7e49d.css.map",
+    "main.2f21d3a3.js.map": "/chiragdhunna/chiragdhunna.github.io/static/js/main.2f21d3a3.js.map",
+    "787.512dd3f2.chunk.js.map": "/chiragdhunna/chiragdhunna.github.io/static/js/787.512dd3f2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f2a7e49d.css",
+    "static/js/main.2f21d3a3.js"
+  ]
+}
