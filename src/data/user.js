@@ -1,6 +1,6 @@
 const INFO = {
 	main: {
-		title: "Chirag Dhunna Portfolio",
+		title: "Chirag Dhunna",
 		name: "Chirag Dhunna",
 		email: "chiragdhunna2468@gmail.com",
 		logo: "../logo.png",
