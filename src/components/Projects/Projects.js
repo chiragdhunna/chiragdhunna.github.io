@@ -17,12 +17,23 @@ function Projects() {
           Here are a few projects I've worked on recently.
         </p>
         <Row style={{ justifyContent: "center", paddingBottom: "10px" }}>
+        
+        <Col md={4} className="project-card">
+            <ProjectCard
+              imgPath={musicMix}
+              isBlog={false}
+              title="Booking Calendar"
+              description="The Booking Calendar is an efficient and customizable online booking system built for Flutter apps. Leveraging Firebase for real-time data management, it allows users to seamlessly track bookings while handling conflicts with color coding. Ideal for services like sports and events, this tool enhances the booking experience effortlessly."
+              ghLink="https://github.com/chiragdhunna/Music_Mix"     
+            />
+          </Col>
+
           <Col md={4} className="project-card">
             <ProjectCard
               imgPath={uberEatsClone}
               isBlog={false}
               title="Uber Eats Clone"
-              description="Experience a seamless food ordering process with this React Native app clone of Uber Eats. Powered by Firebase, Yelp API, Places API, Redux, and Google Autocomplete, it offers real-time tracking, customizable filters, secure authentication, and smooth payments. Perfect for building your own food delivery app! 🍔🚀💻"
+              description="The Uber Eats clone is a feature-rich food delivery app developed with React Native. Powered by Firebase, Yelp API, and Google Autocomplete, it offers real-time order tracking, customizable filters, secure authentication, and smooth payment processing. Ideal for launching your own food delivery service!"
               ghLink="https://github.com/chiragdhunna/Uber_Eats_Clone"
             />
           </Col>
