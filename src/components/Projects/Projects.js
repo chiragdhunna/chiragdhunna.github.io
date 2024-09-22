@@ -4,6 +4,7 @@ import ProjectCard from "./ProjectCards";
 import Particle from "../Particle";
 import uberEatsClone from "../../Assets/Projects/uberEatsClone.png";
 import musicMix from "../../Assets/Projects/musicMix.jpeg";
+import bookingCalendar from "../../Assets/Projects/booking_calendar_logo.png";
 
 function Projects() {
   return (
@@ -18,9 +19,9 @@ function Projects() {
         </p>
         <Row style={{ justifyContent: "center", paddingBottom: "10px" }}>
         
-        <Col md={4} className="project-card">
+          <Col md={4} className="project-card">
             <ProjectCard
-              imgPath={musicMix}
+              imgPath={bookingCalendar}
               isBlog={false}
               title="Booking Calendar"
               description="The Booking Calendar is an efficient and customizable online booking system built for Flutter apps. Leveraging Firebase for real-time data management, it allows users to seamlessly track bookings while handling conflicts with color coding. Ideal for services like sports and events, this tool enhances the booking experience effortlessly."
