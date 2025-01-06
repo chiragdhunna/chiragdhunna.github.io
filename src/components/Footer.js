@@ -9,23 +9,18 @@ import { FaLinkedinIn } from "react-icons/fa";
 
 function Footer() {
   let date = new Date();
-  let year = date.getFullYear();
   return (
     <Container fluid className="footer">
       <Row>
-        <Col md="4" className="footer-copywright">
-          
-        </Col>
-        <Col md="4" className="footer-copywright">
-  
-        </Col>
+        <Col md="4" className="footer-copywright"></Col>
+        <Col md="4" className="footer-copywright"></Col>
         <Col md="4" className="footer-body">
           <ul className="footer-icons">
             <li className="social-icons">
               <a
                 href="https://github.com/chiragdhunna"
                 style={{ color: "white" }}
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <AiFillGithub />
@@ -35,7 +30,7 @@ function Footer() {
               <a
                 href="https://x.com/ChiragDhunna"
                 style={{ color: "white" }}
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <AiOutlineTwitter />
@@ -45,7 +40,7 @@ function Footer() {
               <a
                 href="https://www.linkedin.com/in/chiragdhunna/"
                 style={{ color: "white" }}
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaLinkedinIn />
@@ -55,7 +50,7 @@ function Footer() {
               <a
                 href="https://www.instagram.com/chiragdhunna/"
                 style={{ color: "white" }}
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <AiFillInstagram />

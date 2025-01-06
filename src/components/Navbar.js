@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
-import { Link } from "react-router-dom";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 import {
-  AiFillStar,
-  AiOutlineHome,
   AiOutlineFundProjectionScreen,
+  AiOutlineHome,
   AiOutlineUser,
 } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 import { CgFileDocument } from "react-icons/cg";
 
@@ -34,7 +33,6 @@ function NavBar() {
       className={navColour ? "sticky" : "navbar"}
     >
       <Container>
-      
         <Navbar.Toggle
           aria-controls="responsive-navbar-nav"
           onClick={() => {
