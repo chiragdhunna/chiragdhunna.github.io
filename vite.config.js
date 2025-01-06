@@ -7,4 +7,12 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  optimizeDeps: {
+    include: ["react-pdf", "pdfjs-dist"],
+  },
+  resolve: {
+    alias: {
+      "pdfjs-dist": "pdfjs-dist/legacy/build/pdf",
+    },
+  },
 });
