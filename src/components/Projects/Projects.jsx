@@ -5,6 +5,8 @@ import Particle from "../Particle";
 import uberEatsClone from "../../Assets/Projects/uberEatsClone.png";
 import musicMix from "../../Assets/Projects/musicMix.jpeg";
 import bookingCalendar from "../../Assets/Projects/booking_calendar_logo.png";
+import astrologyAppLogo from "../../Assets/Projects/astrology-app-logo.webp";
+import chatGoLogo from "../../Assets/Projects/chat_go_logo.jpeg";
 
 function Projects() {
   return (
@@ -20,6 +22,17 @@ function Projects() {
         <Row style={{ justifyContent: "center", paddingBottom: "10px" }}>
           <Col md={4} className="project-card">
             <ProjectCard
+              imgPath={chatGoLogo}
+              isBlog={false}
+              title="Chat Go"
+              description="Chat GO is a modern and feature-rich real-time chat application built with React Vite and Node.js. Utilizing WebSocket for seamless communication, it enables users to chat effortlessly while managing groups, requests, and profiles. Perfect for personal and professional use, this app connects communities seamlessly."
+              ghLink="https://github.com/chiragdhunna/chat_go"
+              demoLink="https://chatgo.chiragdhunna.com/"
+            />
+          </Col>
+
+          <Col md={4} className="project-card">
+            <ProjectCard
               imgPath={bookingCalendar}
               isBlog={false}
               title="Booking Calendar"
@@ -31,7 +44,7 @@ function Projects() {
 
           <Col md={4} className="project-card">
             <ProjectCard
-              imgPath="https://camo.githubusercontent.com/62bba5f446828cc3ac1062013850ff0acc778d3efda69c6a1205d67eba127177/68747470733a2f2f736f6369616c6966792e6769742e63692f6368697261676468756e6e612f417374726f6c6f67792d4170702f696d6167653f6465736372697074696f6e3d3126666f6e743d536f75726365253230436f646525323050726f26666f726b733d31266973737565733d31266c616e67756167653d31266e616d653d31266f776e65723d31267061747465726e3d536f6c69642670756c6c733d31267374617267617a6572733d31267468656d653d4175746f"
+              imgPath={astrologyAppLogo}
               isBlog={false}
               title="Astrology Application"
               description="This astrology platform leverages Flutter, Node.js, Express, and MongoDB to provide an immersive experience. With OTP authentication and real-time chat using sockets, it ensures secure interactions and data storage for users and astrologers. Designed to enrich the astrology experience, it blends technology with insight."
