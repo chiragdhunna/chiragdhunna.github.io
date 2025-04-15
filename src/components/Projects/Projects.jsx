@@ -59,14 +59,6 @@ const projects = [
     demoLink: "https://montra-backend-b45c.onrender.com/api/v1/docs/s",
   },
   {
-    categories: ["Full Stack", "Mobile"],
-    imgPath: astrologyAppLogo,
-    title: "Astrology Application",
-    description:
-      "This astrology platform leverages Flutter, Node.js, Express, and MongoDB for an immersive experience.",
-    ghLink: "https://github.com/chiragdhunna/Astrology-App",
-  },
-  {
     categories: ["Mobile"],
     imgPath: uberEatsClone,
     title: "Uber Eats Clone",
