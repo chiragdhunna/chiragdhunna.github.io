@@ -47,6 +47,7 @@ const projects = [
     description:
       "Montra is a smart financial manager app built with Flutter, helping users track expenses, income, budgets, and financial goals with an intuitive UI and interactive charts.",
     ghLink: "https://github.com/chiragdhunna/montra",
+    demoLink: "https://github.com/chiragdhunna/montra/releases/",
   },
   {
     categories: ["Backend"],
@@ -72,6 +73,7 @@ const projects = [
     description:
       "The Uber Eats clone is a robust food delivery app built with React Native.",
     ghLink: "https://github.com/chiragdhunna/Uber_Eats_Clone",
+    demoLink: "https://github.com/chiragdhunna/uber_eats_clone/releases/",
   },
   {
     categories: ["Mobile"],
