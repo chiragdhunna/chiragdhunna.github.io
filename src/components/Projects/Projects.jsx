@@ -74,6 +74,7 @@ const projects = [
     description:
       "Music Mix is a dynamic and feature-rich music player app crafted for Android devices.",
     ghLink: "https://github.com/chiragdhunna/Music_Mix",
+    demoLink: "https://github.com/chiragdhunna/gpt_jr/releases/",
   },
   {
     categories: ["Mobile"],
