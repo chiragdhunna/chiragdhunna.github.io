@@ -10,7 +10,7 @@ import chatGoLogo from "../../Assets/Projects/chat_go_logo.jpeg";
 import chatGoBackend from "../../Assets/chatgo backend.png";
 import montraBackend from "../../Assets/montra backend.png";
 import montraLogo from "../../Assets/montra logo.png";
-import gptJrLogo from "../../Assets/GPT Jr.svg";
+import gptJrLogo from "../../Assets/Projects/gptJr.png";
 
 const projects = [
   {
