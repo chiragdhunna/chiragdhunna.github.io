@@ -74,7 +74,6 @@ const projects = [
     description:
       "Music Mix is a dynamic and feature-rich music player app crafted for Android devices.",
     ghLink: "https://github.com/chiragdhunna/Music_Mix",
-    demoLink: "https://github.com/chiragdhunna/gpt_jr/releases/",
   },
   {
     categories: ["Mobile"],
@@ -83,6 +82,7 @@ const projects = [
     description:
       "GPT Jr is a Flutter app integrating ChatGPT and DALL·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     ghLink: "https://github.com/chiragdhunna/GPT-Jr",
+    demoLink: "https://github.com/chiragdhunna/gpt_jr/releases/",
   },
 ];
 
