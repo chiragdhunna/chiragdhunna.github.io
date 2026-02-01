@@ -34,7 +34,7 @@ function ResumeNew() {
     setError("Error loading PDF. Please try again later.");
   };
 
-  const pdf = "/Chirag_Dhunna.pdf";
+  const pdf = "/CHIRAG_DHUNNA.pdf";
 
   return (
     <div>
