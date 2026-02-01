@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { Container, Row, Col, ButtonGroup, Button } from "react-bootstrap";
 import ProjectCard from "./ProjectCards";
 import Particle from "../Particle";
-import uberEatsClone from "../../Assets/Projects/uberEatsClone.png";
-import musicMix from "../../Assets/Projects/musicMix.jpeg";
-import bookingCalendar from "../../Assets/Projects/booking_calendar_logo.png";
-import astrologyAppLogo from "../../Assets/Projects/astrology-app-logo.webp";
-import chatGoLogo from "../../Assets/Projects/chat_go_logo.jpeg";
-import chatGoBackend from "../../Assets/chatgo backend.png";
-import montraBackend from "../../Assets/montra backend.png";
-import montraLogo from "../../Assets/montra logo.png";
-import gptJrLogo from "../../Assets/Projects/gptJr.png";
+import uberEatsClone from "../../assets/Projects/uberEatsClone.png";
+import musicMix from "../../assets/Projects/musicMix.jpeg";
+import bookingCalendar from "../../assets/Projects/booking_calendar_logo.png";
+import astrologyAppLogo from "../../assets/Projects/astrology-app-logo.webp";
+import chatGoLogo from "../../assets/Projects/chat_go_logo.jpeg";
+import chatGoBackend from "../../assets/chatgo backend.png";
+import montraBackend from "../../assets/montra backend.png";
+import montraLogo from "../../assets/montra logo.png";
+import gptJrLogo from "../../assets/Projects/gptJr.png";
 
 const projects = [
   {

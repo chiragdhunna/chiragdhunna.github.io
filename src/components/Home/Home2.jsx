@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import myImg from "../../Assets/avatar.svg";
+import myImg from "../../assets/avatar.svg";
 import Tilt from "react-parallax-tilt";
 import {
   AiFillGithub,
@@ -32,9 +32,7 @@ function Home2() {
               <i>
                 <b className="purple">Mobile Applications and Products </b> and
                 also in areas related to{" "}
-                <b className="purple">
-                  Automation and AI.
-                </b>
+                <b className="purple">Automation and AI.</b>
               </i>
               <br />
               <br />
@@ -50,7 +48,7 @@ function Home2() {
               <i>
                 <b className="purple"> React.js and Next.js</b>
               </i>*/}
-            </p> 
+            </p>
           </Col>
           <Col md={4} className="myAvtar">
             <Tilt>
