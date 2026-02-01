@@ -29,5 +29,6 @@
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.2.2"
-  }
+  },
+  "homepage": "https://<username>.github.io/<repository-name>"
 }
