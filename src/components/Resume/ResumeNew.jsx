@@ -10,6 +10,12 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 const pdfjsVersion = pdfjs.version;
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
 
+// OVERLEAF SETUP:
+// Option 1: Use local PDF (synced via GitHub Actions)
+// Option 2: Use direct Overleaf link (uncomment and add your project ID)
+// const OVERLEAF_PROJECT_ID = "YOUR_PROJECT_ID_HERE";
+// const OVERLEAF_PDF = `https://www.overleaf.com/download/project/${OVERLEAF_PROJECT_ID}/build/output.pdf?compileGroup=standard`;
+
 function ResumeNew() {
   const [width, setWidth] = useState(1200);
   const [error, setError] = useState(null);
@@ -34,6 +40,8 @@ function ResumeNew() {
     setError("Error loading PDF. Please try again later.");
   };
 
+  // Use local PDF (synced from Overleaf via GitHub Actions)
+  // Or replace with OVERLEAF_PDF to load directly from Overleaf
   const pdf = "/CHIRAG_DHUNNA.pdf";
 
   return (

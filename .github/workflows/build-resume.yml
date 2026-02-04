@@ -1,42 +1,41 @@
-name: Build Resume PDF
+name: Sync Resume from Overleaf
 
 on:
-  push:
-    branches: [main, master]
-    paths:
-      - "resume/**"
-      - ".github/workflows/build-resume.yml"
-  workflow_dispatch:
+  schedule:
+    # Runs daily at midnight UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install LaTeX
+      - name: Download PDF from Overleaf
         run: |
-          sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended cm-super dvipng
+          # Replace YOUR_PROJECT_ID with your actual Overleaf project ID
+          # Get this from: Share -> Turn on link sharing -> Copy the ID from the URL
+          OVERLEAF_PROJECT_ID="${{ secrets.OVERLEAF_PROJECT_ID }}"
 
-      - name: Compile LaTeX to PDF
-        run: |
-          cd resume
-          pdflatex -interaction=nonstopmode -halt-on-error resume.tex
-          # Run twice to ensure references are updated
-          pdflatex -interaction=nonstopmode -halt-on-error resume.tex
+          if [ -z "$OVERLEAF_PROJECT_ID" ]; then
+            echo "Error: OVERLEAF_PROJECT_ID secret not set"
+            echo "Go to Settings > Secrets and variables > Actions > New repository secret"
+            echo "Name: OVERLEAF_PROJECT_ID"
+            echo "Value: Your Overleaf project ID (from the share link)"
+            exit 1
+          fi
 
-      - name: Copy PDF to public folder
-        run: |
           mkdir -p public
-          cp resume/resume.pdf public/CHIRAG_DHUNNA.pdf
+          curl -L "https://www.overleaf.com/download/project/${OVERLEAF_PROJECT_ID}/build/output.pdf?compileGroup=standard&clsiserverid=clsi-pre-emp-n2d-c-f-5n5r" \
+            -o public/CHIRAG_DHUNNA.pdf
 
       - name: Commit and push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto-generate resume PDF from LaTeX"
+          commit_message: "Auto-sync resume PDF from Overleaf"
           file_pattern: public/CHIRAG_DHUNNA.pdf
           commit_options: "--no-verify"
         env:
