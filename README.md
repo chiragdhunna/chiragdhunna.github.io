@@ -30,11 +30,13 @@ This is a self-developed personal portfolio website designed to showcase profess
 - **Smooth Animations** - Particle effects and parallax animations for an engaging experience
 - **Multi-page Navigation** - Home, About, Projects, and Resume sections
 - **Interactive Elements** - Hover effects, typewriter animations, and smooth scrolling
+- **Automated Resume Sync** - Automatically syncs resume from Overleaf via GitHub Actions
 - **PDF Resume Download** - View and download resume in PDF format
 - **GitHub Integration** - Display GitHub activity calendar
 - **Tech Stack Showcase** - Visual representation of technical skills
 - **Project Portfolio** - Showcase your projects with descriptions and links
 - **Dark Theme** - Modern dark theme for a professional appearance
+- **CI/CD Pipeline** - Automated deployment to GitHub Pages with GitHub Actions
 
 ## 🛠️ Tech Stack
 
@@ -69,7 +71,12 @@ This is a self-developed personal portfolio website designed to showcase profess
 
 ```
 chiragdhunna.github.io/
+├── .github/
+│   └── workflows/
+│       ├── build-resume.yml # Syncs resume from Overleaf
+│       └── deploy.yml       # Deploys to GitHub Pages
 ├── public/
+│   ├── CHIRAG_DHUNNA.pdf   # Auto-synced resume PDF
 │   ├── _redirects          # Vercel/Netlify redirects
 │   ├── manifest.json       # PWA manifest
 │   ├── robots.txt          # SEO robots file
@@ -188,33 +195,50 @@ npm run build
 **Build Process:**
 
 1. Vite compiles React components
-2. Assets are optimized and hashed
-3. Production bundle is created in the `dist/` directory
+2. AAutomated Deployment with GitHub Actions (Recommended)
 
-## 🌐 Deployment
+This project uses GitHub Actions for automated deployment and resume synchronization.
 
-### GitHub Pages (Recommended)
+#### Workflows
 
-This project is configured for GitHub Pages deployment.
+**1. Resume Sync Workflow** (`.github/workflows/build-resume.yml`)
+
+- Automatically syncs your resume from Overleaf to the repository
+- Runs daily at midnight UTC
+- Can be triggered manually from the Actions tab
+- Downloads compiled PDF from Overleaf and commits to `public/CHIRAG_DHUNNA.pdf`
+
+**Setup:**
+
+1. Make your Overleaf project public (Share → Turn on link sharing)
+2. Copy the project ID from the share URL
+3. Add GitHub Secret: `OVERLEAF_PROJECT_ID` (Settings → Secrets and variables → Actions)
+4. The workflow will automatically sync your resume daily
+
+**2. Deploy Workflow** (`.github/workflows/deploy.yml`)
+
+- Automatically builds and deploys to GitHub Pages on every push to `master`
+- Builds the React app with Vite
+- Deploys to `gh-pages` branch
+- Your site is live at `https://chiragdhunna.github.io`
 
 **Prerequisites:**
 
 - Repository named `chiragdhunna.github.io` (username.github.io pattern)
 - Repository pushed to GitHub
+- GitHub Actions enabled
 
-**Deployment Steps:**
+**Manual Deployment:**
 
-1. **Automatic Deployment (if configured)**
+```bash
+npm run deploy
+```
 
-   ```bash
-   npm run deploy
-   ```
+This command:
 
-   This command:
-   - Runs `npm run build` automatically (via predeploy script)
-   - Builds the production bundle
-   - Deploys the `dist/` folder to the `gh-pages` branch
-   - Your site is live at `https://chiragdhunna.github.io`
+- Runs `npm run build` automatically (via predeploy script)
+- Builds the production bundle
+- Deploys the `dist/` folder to the `gh-pages` branch
 
 2. **Manual Deployment**
    ```bash
@@ -243,7 +267,28 @@ This project is configured for GitHub Pages deployment.
 
 1. Build the project: `npm run build`
 2. Upload the `dist/` folder to your hosting provider
-3. Configure your hosting provider to serve `index.html` for all routes
+
+## 🤖 GitHub Actions Workflows
+
+### Automated Resume Sync
+
+Your resume is automatically synchronized from Overleaf:
+
+1. **Edit your resume** in Overleaf
+2. **Automatic sync** runs daily at midnight UTC
+3. **Manual trigger** available in GitHub Actions tab
+4. **PDF updates** automatically in `public/CHIRAG_DHUNNA.pdf`
+5. **Website deploys** automatically with the latest resume
+
+### Continuous Deployment
+
+Every push to the `master` branch automatically:
+
+1. Builds the React application
+2. Optimizes assets
+3. Deploys to GitHub Pages
+4. Makes your site live at `https://chiragdhunna.github.io`
+5. Configure your hosting provider to serve `index.html` for all routes
 
 ## 📜 Available Scripts
 
@@ -296,18 +341,27 @@ This project is configured for GitHub Pages deployment.
 
 1. **Home Section** - Edit [src/components/Home/Home.jsx](src/components/Home/Home.jsx)
    - Change introduction text
+
+### Update Resume
+
+Your resume is automatically synced from Overleaf:
+
+1. **Edit in Overleaf** - Make changes to your LaTeX resume in Overleaf
+2. **Automatic Sync** - GitHub Actions downloads the latest PDF daily
+3. **Manual Trigger** - Go to Actions → "Sync Resume from Overleaf" → Run workflow
+4. **No Manual Upload** - No need to download or commit PDF files manually
    - Update social links
    - Modify tagline
 
-2. **About Section** - Edit [src/components/About/About.jsx](src/components/About/About.jsx)
+5. **About Section** - Edit [src/components/About/About.jsx](src/components/About/About.jsx)
    - Update bio
    - Modify skills and tools
 
-3. **Projects** - Edit [src/components/Projects/Projects.jsx](src/components/Projects/Projects.jsx)
+6. **Projects** - Edit [src/components/Projects/Projects.jsx](src/components/Projects/Projects.jsx)
    - Add/remove projects
    - Update project descriptions and links
 
-4. **Resume** - Edit [src/components/Resume/ResumeNew.jsx](src/components/Resume/ResumeNew.jsx)
+7. **Resume** - Edit [src/components/Resume/ResumeNew.jsx](src/components/Resume/ResumeNew.jsx)
    - Update resume content
    - Add resume file
 
@@ -371,7 +425,32 @@ npm run dev -- --port 3001
 
 ```bash
 # Clear node_modules and reinstall
-rm -rf node_modules package-lock.json
+## 🔄 Resume Workflow
+
+This project features an automated resume synchronization system:
+
+**How It Works:**
+1. Edit your resume in [Overleaf](https://www.overleaf.com)
+2. GitHub Actions automatically downloads the latest compiled PDF
+3. PDF is committed to `public/CHIRAG_DHUNNA.pdf`
+4. Deployment workflow automatically deploys the updated site
+5. Your website displays the latest resume
+
+**Setup Instructions:**
+1. Share your Overleaf project (Share → Turn on link sharing → Anyone can view)
+2. Copy your Overleaf project ID from the share URL
+3. Add it as a GitHub Secret named `OVERLEAF_PROJECT_ID`
+4. The workflow runs automatically daily or can be triggered manually
+
+**Benefits:**
+- ✅ Edit resume in familiar LaTeX environment
+- ✅ Automatic PDF compilation and deployment
+- ✅ No manual file downloads or uploads
+- ✅ Version controlled and always up-to-date
+
+---
+
+**Last Updated:** February 4lock.json
 npm install
 npm run build
 ```
