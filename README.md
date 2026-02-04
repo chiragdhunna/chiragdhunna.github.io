@@ -2,6 +2,8 @@
 
 A modern, responsive personal portfolio website built with React.js, showcasing projects, skills, and professional experience.
 
+🌐 **[View Live Portfolio](https://chiragdhunna.github.io)**
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
