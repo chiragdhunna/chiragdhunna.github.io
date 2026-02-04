@@ -1,0 +1,288 @@
+\documentclass[10pt, letterpaper]{article}
+
+% Packages:
+\usepackage[
+    ignoreheadfoot,
+    top=0.5 cm,
+    bottom=0.5 cm,
+    left=1.5 cm,
+    right=1.5 cm,
+    footskip=1.0 cm,
+]{geometry}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{primaryColor}{RGB}{0, 0, 0}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{amsmath}
+\usepackage[
+    pdftitle={Chirag Dhunna Resume},
+    pdfauthor={Chirag Dhunna},
+    pdfcreator={Chirag Dhunna},
+    colorlinks=true,
+    urlcolor=primaryColor
+]{hyperref}
+\usepackage[pscoord]{eso-pic}
+\usepackage{calc}
+\usepackage{bookmark}
+\usepackage{lastpage}
+\usepackage{changepage}
+\usepackage{paracol}
+\usepackage{ifthen}
+\usepackage{needspace}
+\usepackage{iftex}
+\usepackage{xcolor}
+\definecolor{highlightColor}{HTML}{0066ff}
+\ifPDFTeX
+    \input{glyphtounicode}
+    \pdfgentounicode=1
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+    \usepackage{lmodern}
+\else
+    \usepackage{charter}
+\fi
+
+% Some settings:
+\raggedright
+\AtBeginEnvironment{adjustwidth}{\partopsep0pt}
+\pagestyle{empty}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\topskip}{0pt}
+\setlength{\columnsep}{0.15cm}
+\pagenumbering{gobble}
+\titleformat{\section}{\needspace{4\baselineskip}\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule]
+
+\titlespacing{\section}{
+    -1pt
+}{
+    0.3 cm
+}{
+    0.2 cm
+}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\small$\bullet$}}$}
+\newenvironment{highlights}{
+    \begin{itemize}[
+        topsep=0.10 cm,
+        parsep=0.10 cm,
+        partopsep=0pt,
+        itemsep=0pt,
+        leftmargin=0 cm + 10pt
+    ]
+}{
+    \end{itemize}
+}
+
+\newenvironment{highlightsforbulletentries}{
+    \begin{itemize}[
+        topsep=0.10 cm,
+        parsep=0.10 cm,
+        partopsep=0pt,
+        itemsep=0pt,
+        leftmargin=10pt
+    ]
+}{
+    \end{itemize}
+}
+
+\newenvironment{onecolentry}{
+    \begin{adjustwidth}{
+        0 cm + 0.00001 cm
+    }{
+        0 cm + 0.00001 cm
+    }
+}{
+    \end{adjustwidth}
+}
+
+\newenvironment{twocolentry}[2][]{
+    \onecolentry
+    \def\secondColumn{#2}
+    \setcolumnwidth{\fill, 4.5 cm}
+    \begin{paracol}{2}
+}{
+    \switchcolumn \raggedleft \secondColumn
+    \end{paracol}
+    \endonecolentry
+}
+
+\newenvironment{threecolentry}[3][]{
+    \onecolentry
+    \def\thirdColumn{#3}
+    \setcolumnwidth{, \fill, 4.5 cm}
+    \begin{paracol}{3}
+    {\raggedright #2} \switchcolumn
+}{
+    \switchcolumn \raggedleft \thirdColumn
+    \end{paracol}
+    \endonecolentry
+}
+
+\newenvironment{header}{
+    \setlength{\topsep}{0pt}\par\kern\topsep\centering\linespread{1.5}
+}{
+    \par\kern\topsep
+}
+
+\newcommand{\placelastupdatedtext}{%
+  \AddToShipoutPictureFG*{%
+    \put(
+        \LenToUnit{\paperwidth-2 cm-0 cm+0.05cm},
+        \LenToUnit{\paperheight-1.0 cm}
+    ){\vtop{{\null}\makebox[0pt][c]{
+        \small\color{gray}\textit{Last updated in August 2024}\hspace{\widthof{Last updated in August 2024}}
+    }}}%
+  }%
+}
+
+% save the original href command in a new command:
+\let\hrefWithoutArrow\href
+
+% new command for external links:
+
+\begin{document}
+    \newcommand{\AND}{\unskip
+        \cleaders\copy\ANDbox\hskip\wd\ANDbox
+        \ignorespaces
+    }
+    \newsavebox\ANDbox
+    \sbox\ANDbox{$|$}
+
+    \begin{header}
+        \fontsize{25 pt}{25 pt}\selectfont \textcolor{highlightColor}{CHIRAG DHUNNA}
+
+        \vspace{2 pt}
+
+        \normalsize
+        \mbox{\hrefWithoutArrow{mailto:chiragdhunna2468@gmail.com}{chiragdhunna2468@gmail.com}}%
+        \kern 5.0 pt%
+        \AND%
+        \kern 5.0 pt%
+        \mbox{\hrefWithoutArrow{tel:+919353348691}{+91 935 334 8691}}%
+        \kern 5.0 pt%
+        \AND%
+        \kern 5.0 pt%
+        \mbox{\hrefWithoutArrow{https://chiragdhunna.github.io}{chiragdhunna.github.io}}%
+        \kern 5.0 pt%
+        \AND%
+        \kern 5.0 pt%
+        \mbox{\hrefWithoutArrow{https://www.linkedin.com/in/chiragdhunna/}{Linkedin}}%
+        \kern 5.0 pt%
+        \AND%
+        \kern 5.0 pt%
+        \mbox{\hrefWithoutArrow{https://github.com/chiragdhunna}{Github}}%
+        \kern 5.0 pt%
+        \AND%
+        \kern 5.0 pt%
+        \mbox{\hrefWithoutArrow{https://leetcode.com/chiragdhunna/}{Leetcode}}%
+    \end{header}
+
+    \vspace{5 pt - 0.3 cm}
+
+
+%================== PROFILE SUMMARY ==================%
+\section{\textcolor{highlightColor}{Objective}}
+\begin{onecolentry}
+Full-stack Engineer with 1+ years of hands-on experience shipping scalable applications at scale. Strong in system design, cloud architectures, CI/CD automation, and performance optimization. I build things that work — and keep working.
+\end{onecolentry}
+
+    \section{\textcolor{highlightColor}{SKILLS}}
+
+        \begin{onecolentry}
+            \begin{highlights}
+                \item \textbf{Programming Languages \& Frameworks:} C++, Python, Javascript, Java, Dart, React
+                \item \textbf{APIs \& Databases:} Node.js, Express.js, REST APIs, MongoDB, MySQL, Firebase, SQLite
+                \item \textbf{Tools/Technologies:} Android SDK, Android Studio, Azure, AWS, Version Control: Git/GitHub
+
+            \end{highlights}
+        \end{onecolentry}
+
+    \section{\textcolor{highlightColor}{EXPERIENCE}}
+
+        \begin{twocolentry}{
+            April 2025 – Present
+        }
+            \textbf{Engineer}, TCS\end{twocolentry}
+
+        \vspace{0.10 cm}
+        \begin{onecolentry}
+            \begin{highlights}
+               \item Architected and delivered enterprise-grade conversational AI solutions leveraging AWS and Azure cloud platforms, enabling scalable, secure, and high-availability chatbot deployments for large user bases.
+                \item Developed and integrated full-stack chatbot interfaces using React, ensuring seamless user experiences while supporting real-time interactions and dynamic conversational flows.
+                \item Implemented robust backend services using Java and Spring Boot to handle conversation orchestration, API integrations, authentication, and data persistence at scale.
+                \item Collaborated with cross-functional teams to integrate LLM-powered workflows into existing enterprise systems, streamlining business processes and enhancing operational efficiency.
+
+            \end{highlights}
+        \end{onecolentry}
+
+        \vspace{0.20 cm}
+
+        \begin{twocolentry}{
+            July 2024 – Dec 2024
+        }
+            \textbf{SDE }, BlueMango Labs\end{twocolentry}
+
+        \vspace{0.10 cm}
+        \begin{onecolentry}
+            \begin{highlights}
+                \item Automated app distribution processes using Fastlane, creating a script to email application builds directly to testers, improving the efficiency of the testing and deployment workflow.
+                \item Implemented internationalization features, enabling support for multiple languages and improving accessibility for users in diverse regions.
+                \item  Improved audio and video call functionality using Livekit, ensuring a smoother user communication experience and reducing connection issues.
+                \item  Integrated live streaming functionality using Livekit to deliver a high-quality real-time interaction experience with minimal latency.
+            \end{highlights}
+        \end{onecolentry}
+
+        \vspace{0.20 cm}
+        \begin{twocolentry}{
+            Jan 2024 – June 2024
+        }
+            \textbf{SDE Intern}, BlueMango Labs\end{twocolentry}
+
+        \vspace{0.10 cm}
+        \begin{onecolentry}
+            \begin{highlights}
+                \item Redesigned user interfaces for SuperAstro and Kosmic apps, conducting user research and prototyping to improve user experience and interface usability.
+                \item  Adopted Domain-Driven Design principles to improve code quality and maintainability, collaborating with senior developers to align development with business objectives.
+                \item  Integrated APIs and MQTT brokers to enhance app scalability and support higher concurrent user activity during peak loads.
+                \item Deployed Firebase notifications and interactive features to improve user engagement and encourage active participation on the platform.
+            \end{highlights}
+        \end{onecolentry}
+
+
+    \section{\textcolor{highlightColor}{PROJECTS}}
+
+\begin{twocolentry}{
+            \href{https://github.com/chiragdhunna/montra}{\textbf{\textcolor{highlightColor}{Link}}}
+        }
+            \textbf{ Montra | Full-Stack Expense Tracking App (Flutter + Node.js) }\end{twocolentry}
+            
+            \begin{onecolentry}
+                \begin{highlights}
+                   \item Designed and developed a full-stack personal finance tracker with budget planning, multi-account support, and exportable analytics.
+                  \item Built RESTful API backend using Node.js, PostgreSQL, and Express with modular architecture and secure endpoints.
+                  \item Integrated SQLite for local storage, BLoC for state management, and Freezed for immutable data modeling in Flutter.
+                  \item Delivered rich UI/UX with responsive dashboards, recurring transaction logic, and category-based spending reports.
+                \end{highlights}
+            \end{onecolentry}
+
+
+        \vspace{0.2 cm}
+
+        \section{\textcolor{highlightColor}{EDUCATION}}
+
+        \begin{twocolentry}{
+     
+        }
+            \textbf{RGPV University}, Bachelor of Engineering in Computer Science\end{twocolentry}
+
+        \vspace{0.10 cm}
+        \begin{onecolentry}
+            \begin{highlights}
+                \item CGPA: 8.7
+            \end{highlights}
+        \end{onecolentry}
+\end{document}
