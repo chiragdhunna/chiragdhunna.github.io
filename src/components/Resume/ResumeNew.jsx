@@ -22,6 +22,10 @@ function ResumeNew() {
   const [isLoading, setIsLoading] = useState(true);
   const [pdfData, setPdfData] = useState(null);
 
+  // Use local PDF (synced from Overleaf via GitHub Actions)
+  // Or replace with OVERLEAF_PDF to load directly from Overleaf
+  const pdf = "/CHIRAG_DHUNNA.pdf";
+
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -72,7 +76,6 @@ function ResumeNew() {
 
   // Use local PDF (synced from Overleaf via GitHub Actions)
   // Or replace with OVERLEAF_PDF to load directly from Overleaf
-  const pdf = "/CHIRAG_DHUNNA.pdf";
 
   return (
     <div>
