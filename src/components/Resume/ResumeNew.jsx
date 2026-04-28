@@ -49,7 +49,7 @@ function ResumeNew() {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const buf = await res.arrayBuffer();
-        setPdfData(new Uint8Array(buf));
+        setPdfData(buf);
       } catch (err) {
         if (err.name === "AbortError") return;
         console.error("Error fetching PDF:", err);
@@ -66,6 +66,7 @@ function ResumeNew() {
   const onDocumentLoadSuccess = () => {
     setIsLoading(false);
     setError(null);
+    console.log("Document rendered successfully");
   };
 
   const onDocumentLoadError = (error) => {
