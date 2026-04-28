@@ -21,6 +21,7 @@ function ResumeNew() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pdfData, setPdfData] = useState(null);
+  const [renderFallback, setRenderFallback] = useState(false);
 
   // Use local PDF (synced from Overleaf via GitHub Actions)
   // Or replace with OVERLEAF_PDF to load directly from Overleaf
@@ -49,6 +50,18 @@ function ResumeNew() {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const buf = await res.arrayBuffer();
+        // Log first bytes to help debug corrupt/HTML responses
+        try {
+          const header = new Uint8Array(buf).subarray(0, 8);
+          console.log(
+            "PDF header bytes:",
+            Array.from(header)
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join(" "),
+          );
+        } catch (e) {
+          console.warn("Could not read PDF header bytes", e);
+        }
         setPdfData(buf);
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -72,7 +85,8 @@ function ResumeNew() {
   const onDocumentLoadError = (error) => {
     console.error("PDF Load Error:", error);
     setIsLoading(false);
-    setError("Error loading PDF. Please try again later.");
+    setError("Error loading PDF. Falling back to browser viewer.");
+    setRenderFallback(true);
   };
 
   // Use local PDF (synced from Overleaf via GitHub Actions)
@@ -100,21 +114,43 @@ function ResumeNew() {
             <div className="text-danger text-center mt-4">{error}</div>
           ) : (
             <div className="w-100 d-flex justify-content-center">
-              <Document
-                file={pdfData || pdf}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadError}
-                loading={<div className="text-center mt-4">Loading PDF...</div>}
-              >
-                {isLoading ? null : (
-                  <Page
-                    pageNumber={1}
-                    scale={width > 786 ? 1.7 : 0.6}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                  />
-                )}
-              </Document>
+              {renderFallback ? (
+                <div style={{ width: "100%" }}>
+                  <object
+                    data={pdf}
+                    type="application/pdf"
+                    width="100%"
+                    height="800px"
+                  >
+                    <p>
+                      Your browser does not support viewing PDFs inline. You can
+                      <a href={pdf} target="_blank" rel="noopener noreferrer">
+                        {" "}
+                        download the PDF here
+                      </a>
+                      .
+                    </p>
+                  </object>
+                </div>
+              ) : (
+                <Document
+                  file={pdfData || pdf}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  onLoadError={onDocumentLoadError}
+                  loading={
+                    <div className="text-center mt-4">Loading PDF...</div>
+                  }
+                >
+                  {isLoading ? null : (
+                    <Page
+                      pageNumber={1}
+                      scale={width > 786 ? 1.7 : 0.6}
+                      renderAnnotationLayer={false}
+                      renderTextLayer={false}
+                    />
+                  )}
+                </Document>
+              )}
             </div>
           )}
         </Row>
