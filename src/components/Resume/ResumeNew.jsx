@@ -6,9 +6,9 @@ import { AiOutlineDownload } from "react-icons/ai";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
-// Configure PDF.js worker
+// Configure PDF.js worker (use explicit https)
 const pdfjsVersion = pdfjs.version;
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
 
 // OVERLEAF SETUP:
 // Option 1: Use local PDF (synced via GitHub Actions)
@@ -20,6 +20,7 @@ function ResumeNew() {
   const [width, setWidth] = useState(1200);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pdfData, setPdfData] = useState(null);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -28,6 +29,35 @@ function ResumeNew() {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Fetch PDF as ArrayBuffer and pass bytes to react-pdf to avoid serving issues
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadPdf = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const res = await fetch(pdf, { signal: controller.signal });
+        console.log(
+          "Resume fetch status:",
+          res.status,
+          res.headers.get("content-type"),
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const buf = await res.arrayBuffer();
+        setPdfData(new Uint8Array(buf));
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.error("Error fetching PDF:", err);
+        setError("Error loading PDF. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPdf();
+    return () => controller.abort();
+  }, [pdf]);
 
   const onDocumentLoadSuccess = () => {
     setIsLoading(false);
@@ -67,7 +97,7 @@ function ResumeNew() {
           ) : (
             <div className="w-100 d-flex justify-content-center">
               <Document
-                file={pdf}
+                file={pdfData || pdf}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading={<div className="text-center mt-4">Loading PDF...</div>}
