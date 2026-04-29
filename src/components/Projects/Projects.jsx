@@ -11,6 +11,7 @@ import chatGoBackend from "../../Assets/chatgo backend.png";
 import montraBackend from "../../Assets/montra backend.png";
 import montraLogo from "../../Assets/montra logo.png";
 import gptJrLogo from "../../Assets/Projects/gptJr.png";
+import linkedinPostImg from "../../Assets/Projects/linkedin_post_generator.png";
 
 const projects = [
   {
@@ -83,6 +84,14 @@ const projects = [
       "GPT Jr is a Flutter app integrating ChatGPT and DALL·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     ghLink: "https://github.com/chiragdhunna/GPT-Jr",
     demoLink: "https://github.com/chiragdhunna/gpt_jr/releases/",
+  },
+  {
+    categories: ["Web", "Backend"],
+    imgPath: linkedinPostImg,
+    title: "LinkedIn Post Generator",
+    description:
+      "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving. Generates posts from rotating prompts, saves to post.txt, publishes via the LinkedIn UGC Posts API, and archives each post under posts/.",
+    ghLink: "https://github.com/chiragdhunna/linkedin_post_generator",
   },
 ];
 
