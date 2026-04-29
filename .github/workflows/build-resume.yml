@@ -2,9 +2,8 @@ name: Sync Resume from Overleaf
 
 on:
   schedule:
-    # Runs daily at midnight UTC
     - cron: "0 0 * * *"
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,31 +14,28 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
-      - name: Download PDF from Overleaf
+      - name: Clone Overleaf project via Git
         run: |
-          # Replace YOUR_PROJECT_ID with your actual Overleaf project ID
-          # Get this from: Share -> Turn on link sharing -> Copy the ID from the URL
-          OVERLEAF_PROJECT_ID="${{ secrets.OVERLEAF_PROJECT_ID }}"
+          git clone https://git@git.overleaf.com/${{ secrets.OVERLEAF_PROJECT_ID }} overleaf-project \
+            --config credential.helper='!f(){ echo "password=${{ secrets.OVERLEAF_GIT_TOKEN }}"; };f'
 
-          if [ -z "$OVERLEAF_PROJECT_ID" ]; then
-            echo "Error: OVERLEAF_PROJECT_ID secret not set"
-            echo "Go to Settings > Secrets and variables > Actions > New repository secret"
-            echo "Name: OVERLEAF_PROJECT_ID"
-            echo "Value: Your Overleaf project ID (from the share link)"
-            exit 1
-          fi
+      - name: Compile LaTeX to PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: overleaf-project
 
+      - name: Copy PDF to public folder
+        run: |
           mkdir -p public
-          curl -L "https://www.overleaf.com/download/project/${OVERLEAF_PROJECT_ID}/build/output.pdf?compileGroup=standard&clsiserverid=clsi-pre-emp-n2d-c-f-5n5r" \
-            -o public/CHIRAG_DHUNNA.pdf
+          cp overleaf-project/main.pdf public/CHIRAG_DHUNNA.pdf
 
       - name: Commit and push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-sync resume PDF from Overleaf"
           file_pattern: public/CHIRAG_DHUNNA.pdf
-          commit_options: "--no-verify"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
