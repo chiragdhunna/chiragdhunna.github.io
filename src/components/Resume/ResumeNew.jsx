@@ -6,91 +6,20 @@ import { AiOutlineDownload } from "react-icons/ai";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
-// Configure PDF.js worker (use explicit https)
-const pdfjsVersion = pdfjs.version;
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
-
-// OVERLEAF SETUP:
-// Option 1: Use local PDF (synced via GitHub Actions)
-// Option 2: Use direct Overleaf link (uncomment and add your project ID)
-// const OVERLEAF_PROJECT_ID = "YOUR_PROJECT_ID_HERE";
-// const OVERLEAF_PDF = `https://www.overleaf.com/download/project/${OVERLEAF_PROJECT_ID}/build/output.pdf?compileGroup=standard`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 function ResumeNew() {
   const [width, setWidth] = useState(1200);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [pdfData, setPdfData] = useState(null);
-  const [renderFallback, setRenderFallback] = useState(false);
+  const [numPages, setNumPages] = useState(null);
 
-  // Use local PDF (synced from Overleaf via GitHub Actions)
-  // Or replace with OVERLEAF_PDF to load directly from Overleaf
   const pdf = "/CHIRAG_DHUNNA.pdf";
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
-    handleResize(); // Set initial width
-
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Fetch PDF as ArrayBuffer and pass bytes to react-pdf to avoid serving issues
-  useEffect(() => {
-    const controller = new AbortController();
-    const loadPdf = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const res = await fetch(pdf, { signal: controller.signal });
-        console.log(
-          "Resume fetch status:",
-          res.status,
-          res.headers.get("content-type"),
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const buf = await res.arrayBuffer();
-        // Log first bytes to help debug corrupt/HTML responses
-        try {
-          const header = new Uint8Array(buf).subarray(0, 8);
-          console.log(
-            "PDF header bytes:",
-            Array.from(header)
-              .map((b) => b.toString(16).padStart(2, "0"))
-              .join(" "),
-          );
-        } catch (e) {
-          console.warn("Could not read PDF header bytes", e);
-        }
-        setPdfData(buf);
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        console.error("Error fetching PDF:", err);
-        setError("Error loading PDF. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPdf();
-    return () => controller.abort();
-  }, [pdf]);
-
-  const onDocumentLoadSuccess = () => {
-    setIsLoading(false);
-    setError(null);
-    console.log("Document rendered successfully");
-  };
-
-  const onDocumentLoadError = (error) => {
-    console.error("PDF Load Error:", error);
-    setIsLoading(false);
-    setError("Error loading PDF. Falling back to browser viewer.");
-    setRenderFallback(true);
-  };
-
-  // Use local PDF (synced from Overleaf via GitHub Actions)
-  // Or replace with OVERLEAF_PDF to load directly from Overleaf
 
   return (
     <div>
@@ -110,49 +39,24 @@ function ResumeNew() {
         </Row>
 
         <Row className="resume">
-          {error ? (
-            <div className="text-danger text-center mt-4">{error}</div>
-          ) : (
-            <div className="w-100 d-flex justify-content-center">
-              {renderFallback ? (
-                <div style={{ width: "100%" }}>
-                  <object
-                    data={pdf}
-                    type="application/pdf"
-                    width="100%"
-                    height="800px"
-                  >
-                    <p>
-                      Your browser does not support viewing PDFs inline. You can
-                      <a href={pdf} target="_blank" rel="noopener noreferrer">
-                        {" "}
-                        download the PDF here
-                      </a>
-                      .
-                    </p>
-                  </object>
-                </div>
-              ) : (
-                <Document
-                  file={pdfData || pdf}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  onLoadError={onDocumentLoadError}
-                  loading={
-                    <div className="text-center mt-4">Loading PDF...</div>
-                  }
-                >
-                  {isLoading ? null : (
-                    <Page
-                      pageNumber={1}
-                      scale={width > 786 ? 1.7 : 0.6}
-                      renderAnnotationLayer={false}
-                      renderTextLayer={false}
-                    />
-                  )}
-                </Document>
-              )}
-            </div>
-          )}
+          <Document
+            file={pdf}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            onLoadError={(e) => console.error("PDF load error:", e)}
+            loading={<div className="text-center mt-4">Loading Resume...</div>}
+            error={
+              <div className="text-center mt-4 text-danger">
+                Failed to load resume.
+              </div>
+            }
+          >
+            <Page
+              pageNumber={1}
+              scale={width > 786 ? 1.7 : 0.6}
+              renderAnnotationLayer={false}
+              renderTextLayer={false}
+            />
+          </Document>
         </Row>
 
         <Row
