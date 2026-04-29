@@ -5,7 +5,7 @@ import Particle from "../Particle";
 import { AiOutlineDownload } from "react-icons/ai";
 
 function ResumeNew() {
-  const pdf = "/resume/CHIRAG_DHUNNA.pdf";
+  const pdf = "/resume/Chirag_Dhunna.pdf";
 
   return (
     <div>
