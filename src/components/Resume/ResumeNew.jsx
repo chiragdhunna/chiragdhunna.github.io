@@ -24,24 +24,27 @@ function ResumeNew() {
           </Button>
         </Row>
 
-        <Row className="resume">
-          <object
-            data={pdf}
-            type="application/pdf"
-            aria-label="Resume PDF preview"
+        <Row
+          className="resume"
+          style={{
+            justifyContent: "center",
+            overflow: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          <iframe
+            src={pdf}
+            title="Resume PDF"
             style={{
               width: "100%",
               maxWidth: "1120px",
               height: "90vh",
               border: "none",
               borderRadius: "12px",
+              display: "block",
+              margin: "0 auto",
             }}
-          >
-            <div className="text-center mt-4">
-              Your browser cannot preview the resume. Use the download button
-              instead.
-            </div>
-          </object>
+          />
         </Row>
 
         <Row
