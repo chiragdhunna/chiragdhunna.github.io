@@ -1,25 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Container, Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Particle from "../Particle";
 import { AiOutlineDownload } from "react-icons/ai";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 function ResumeNew() {
-  const [width, setWidth] = useState(1200);
-  const [numPages, setNumPages] = useState(null);
-
-  const pdf = "/CHIRAG_DHUNNA.pdf";
-
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const pdf = "/resume/CHIRAG_DHUNNA.pdf";
 
   return (
     <div>
@@ -39,24 +25,23 @@ function ResumeNew() {
         </Row>
 
         <Row className="resume">
-          <Document
-            file={pdf}
-            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-            onLoadError={(e) => console.error("PDF load error:", e)}
-            loading={<div className="text-center mt-4">Loading Resume...</div>}
-            error={
-              <div className="text-center mt-4 text-danger">
-                Failed to load resume.
-              </div>
-            }
+          <object
+            data={pdf}
+            type="application/pdf"
+            aria-label="Resume PDF preview"
+            style={{
+              width: "100%",
+              maxWidth: "1120px",
+              height: "90vh",
+              border: "none",
+              borderRadius: "12px",
+            }}
           >
-            <Page
-              pageNumber={1}
-              scale={width > 786 ? 1.7 : 0.6}
-              renderAnnotationLayer={false}
-              renderTextLayer={false}
-            />
-          </Document>
+            <div className="text-center mt-4">
+              Your browser cannot preview the resume. Use the download button
+              instead.
+            </div>
+          </object>
         </Row>
 
         <Row
