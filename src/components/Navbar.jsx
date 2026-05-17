@@ -6,6 +6,7 @@ import {
   AiOutlineFundProjectionScreen,
   AiOutlineHome,
   AiOutlineUser,
+  AiOutlineSafetyCertificate,
 } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
@@ -71,6 +72,17 @@ function NavBar() {
                   style={{ marginBottom: "2px" }}
                 />{" "}
                 Projects
+              </Nav.Link>
+            </Nav.Item>
+
+            <Nav.Item>
+              <Nav.Link
+                as={Link}
+                to="/certifications"
+                onClick={() => updateExpanded(false)}
+              >
+                <AiOutlineSafetyCertificate style={{ marginBottom: "2px" }} />
+                Certifications
               </Nav.Link>
             </Nav.Item>
 

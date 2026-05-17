@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cert_aws",
+    "slug": "aws-certified-ai-practitioner",
+    "name": "AWS Certified AI Practitioner",
+    "issuer": "Amazon Web Services",
+    "imageUrl": "/assets/certs/aws-certified-ai-practitioner.png",
+    "pdfUrl": "/assets/certs/aws-certified-ai-practitioner.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-17T00:00:00Z"
+  },
+  {
+    "id": "cert_azure",
+    "slug": "azure-ai-engineer-associate",
+    "name": "Azure AI Engineer Associate",
+    "issuer": "Microsoft",
+    "imageUrl": "/assets/certs/azure-ai-engineer-associate.png",
+    "pdfUrl": "/assets/certs/azure-ai-engineer-associate.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-17T00:00:00Z"
+  }
+]
