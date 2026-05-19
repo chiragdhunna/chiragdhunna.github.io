@@ -1,0 +1,81 @@
+.admin-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  padding: 2rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.admin-header h1 {
+  color: #c9d1d9;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background: #da3633;
+  border: 1px solid #f85149;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background: #f85149;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.tab-button {
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8b949e;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-button:hover {
+  color: #c9d1d9;
+}
+
+.tab-button.active {
+  color: #58a6ff;
+  border-bottom-color: #58a6ff;
+}
+
+.admin-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.placeholder-content {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #8b949e;
+}
