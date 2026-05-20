@@ -21,7 +21,7 @@ async function uploadFileToGitHub(path, base64Content) {
     let sha = null;
     try {
       const getResponse = await fetch(
-        `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}?ref=main`,
+        `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
         {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
@@ -42,7 +42,6 @@ async function uploadFileToGitHub(path, base64Content) {
     const putBody = {
       message: `chore: upload asset for CMS`,
       content: base64Content,
-      branch: "main",
     };
 
     // Include SHA if file exists (for update)
@@ -103,7 +102,6 @@ export async function dispatchCmsEvent(eventType, payload) {
         client_payload: {
           ...payload,
           adminToken: token,
-          branch: "main",
         },
       }),
     });
