@@ -8,7 +8,7 @@ import { getStoredToken } from "./auth";
 const GITHUB_API = "https://api.github.com/repos";
 const OWNER = "chiragdhunna";
 const REPO = "chiragdhunna.github.io";
-const WORKER_URL = "https://portfolio-cms-worker.chiragdhunna.workers.dev";
+const WORKER_URL = "https://portfolio-cms-worker.chigsdroid.workers.dev";
 
 /**
  * Determine if running in production or development
