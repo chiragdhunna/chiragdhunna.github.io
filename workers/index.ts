@@ -1,6 +1,5 @@
 /**
  * Cloudflare Worker for Portfolio CMS
- * Handles GitHub API calls with JWT validation
  */
 
 interface Env {
@@ -12,164 +11,81 @@ interface Env {
 
 const GITHUB_API = "https://api.github.com/repos";
 
-/**
- * Validate JWT token
- */
-async function validateJWT(token: string, secret: string): Promise<boolean> {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return false;
-
-    const [headerB64, payloadB64, signatureB64] = parts;
-
-    // Decode payload
-    const payloadJson = JSON.parse(
-      new TextDecoder().decode(
-        Uint8Array.from(
-          atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/")),
-          (c) => c.charCodeAt(0),
-        ),
-      ),
-    );
-
-    // Check expiration
-    if (payloadJson.exp && payloadJson.exp < Date.now() / 1000) {
-      return false;
-    }
-
-    // Verify signature using Web Crypto API
-    const encoder = new TextEncoder();
-    const secretKey = await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(secret),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"],
-    );
-
-    const messageBuffer = encoder.encode(`${headerB64}.${payloadB64}`);
-    const signatureBuffer = Uint8Array.from(
-      atob(signatureB64.replace(/-/g, "+").replace(/_/g, "/")),
-      (c) => c.charCodeAt(0),
-    );
-
-    const isValid = await crypto.subtle.verify(
-      "HMAC",
-      secretKey,
-      signatureBuffer,
-      messageBuffer,
-    );
-
-    return isValid;
-  } catch (e) {
-    console.error("JWT validation error:", e);
-    return false;
-  }
-}
-
-/**
- * Upload file to GitHub
- */
 async function uploadToGithub(
   path: string,
   base64Content: string,
   env: Env,
 ): Promise<{ sha: string }> {
-  try {
-    // Get existing file SHA
-    let sha = null;
-    try {
-      const getRes = await fetch(
-        `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
-        {
-          headers: {
-            Authorization: `Bearer ${env.GITHUB_PAT}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        },
-      );
+  console.log("Uploading file:", path);
 
-      if (getRes.ok) {
-        const data = await getRes.json();
-        sha = data.sha;
-      }
-    } catch (e) {
-      // File doesn't exist yet
-    }
+  // Check if file already exists
+  let sha: string | null = null;
 
-    // Upload file
-    const uploadRes = await fetch(
-      `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${env.GITHUB_PAT}`,
-          Accept: "application/vnd.github.v3+json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: `chore: upload asset for CMS`,
-          content: base64Content,
-          ...(sha && { sha }),
-        }),
-      },
-    );
-
-    if (!uploadRes.ok) {
-      const error = await uploadRes.json();
-      throw new Error(`GitHub API error: ${error.message}`);
-    }
-
-    const result = await uploadRes.json();
-    return { sha: result.content.sha };
-  } catch (error) {
-    console.error("GitHub upload error:", error);
-    throw error;
-  }
-}
-
-/**
- * Dispatch repository event
- */
-async function dispatchEvent(
-  eventType: string,
-  payload: Record<string, unknown>,
-  env: Env,
-): Promise<void> {
-  const dispatchRes = await fetch(
-    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/dispatches`,
+  const existingFileRes = await fetch(
+    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
     {
-      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_PAT}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    },
+  );
+
+  console.log("Existing file check status:", existingFileRes.status);
+
+  if (existingFileRes.ok) {
+    const existingFile = await existingFileRes.json();
+    sha = existingFile.sha;
+    console.log("Existing SHA:", sha);
+  }
+
+  // Upload / overwrite file
+  const payload = {
+    message: `chore: upload ${path}`,
+    content: base64Content,
+    branch: "master",
+    ...(sha ? { sha } : {}),
+  };
+
+  console.log("Uploading to GitHub...");
+
+  const uploadRes = await fetch(
+    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
+    {
+      method: "PUT",
       headers: {
         Authorization: `Bearer ${env.GITHUB_PAT}`,
         Accept: "application/vnd.github.v3+json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        event_type: eventType,
-        client_payload: payload,
-      }),
+      body: JSON.stringify(payload),
     },
   );
 
-  if (!dispatchRes.ok) {
-    const error = await dispatchRes.json();
-    throw new Error(`Dispatch error: ${error.message}`);
+  const uploadText = await uploadRes.text();
+
+  console.log("GitHub upload status:", uploadRes.status);
+  console.log("GitHub upload response:", uploadText);
+
+  if (!uploadRes.ok) {
+    throw new Error(`GitHub upload failed: ${uploadText}`);
   }
+
+  const uploadData = JSON.parse(uploadText);
+
+  return {
+    sha: uploadData.content.sha,
+  };
 }
 
-/**
- * Handle incoming requests
- */
 export default {
-  async fetch(request: Request, env: any): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "https://chiragdhunna.github.io",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
 
-    // HANDLE PREFLIGHT
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -177,16 +93,47 @@ export default {
       });
     }
 
+    if (request.method === "GET") {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Worker running",
+        }),
+        {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
+
     try {
-      // EXAMPLE BODY PARSING
       const body = await request.json();
 
-      // YOUR EXISTING LOGIC HERE
-      // GitHub API calls etc.
+      console.log("Incoming request body keys:", Object.keys(body));
+
+      const {
+        path,
+        content,
+      }: {
+        path: string;
+        content: string;
+      } = body;
+
+      if (!path || !content) {
+        throw new Error("Missing path or content");
+      }
+
+      const result = await uploadToGithub(path, content, env);
+
+      console.log("Upload successful");
 
       return new Response(
         JSON.stringify({
           success: true,
+          sha: result.sha,
         }),
         {
           status: 200,
@@ -197,8 +144,11 @@ export default {
         },
       );
     } catch (err: any) {
+      console.error("Worker error:", err);
+
       return new Response(
         JSON.stringify({
+          success: false,
           error: err.message,
         }),
         {
