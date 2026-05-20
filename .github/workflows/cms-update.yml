@@ -9,6 +9,7 @@ on:
       - add-project
       - update-project
       - delete-project
+      - upload-resume
 
 jobs:
   process-cms-event:
@@ -246,6 +247,20 @@ jobs:
                   f.write('\n')
               print(f"✓ Updated {projects_path}")
 
+          elif EVENT_TYPE == 'upload-resume':
+              print(f"Processing: {EVENT_TYPE}")
+              
+              # Resume upload is already handled by GitHub API
+              # The file was uploaded directly to public/resume/Chirag_Dhunna.pdf
+              # Just confirm the upload
+              resume_path = Path('public/resume/Chirag_Dhunna.pdf')
+              
+              if resume_path.exists():
+                  file_size = resume_path.stat().st_size
+                  print(f"✓ Resume updated: {resume_path} ({file_size} bytes)")
+              else:
+                  print(f"⚠ Resume file not found at {resume_path}")
+
           else:
               print(f"❌ Unknown event type: {EVENT_TYPE}")
               sys.exit(1)
@@ -260,8 +275,8 @@ jobs:
       - name: Commit and push changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            git add public/data/projects.json public/data/certs.json public/assets/
-            git commit -m "chore: update CMS content (certifications and projects)"
+            git add public/data/projects.json public/data/certs.json public/assets/ public/resume/
+            git commit -m "chore: update CMS content (certifications, projects, and resume)"
             git push
             echo "CHANGES_PUSHED=true" >> $GITHUB_ENV
           else

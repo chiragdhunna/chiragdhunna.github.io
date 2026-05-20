@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CertForm from "./CertForm";
 import ProjectForm from "./ProjectForm";
+import ResumeForm from "./ResumeForm";
 import "./AdminDashboard.css";
 
 function AdminDashboard({ onLogout }) {
@@ -40,6 +41,12 @@ function AdminDashboard({ onLogout }) {
         >
           Projects
         </button>
+        <button
+          className={`tab-button ${activeTab === "resume" ? "active" : ""}`}
+          onClick={() => setActiveTab("resume")}
+        >
+          Resume
+        </button>
       </div>
 
       <div className="admin-content">
@@ -47,6 +54,7 @@ function AdminDashboard({ onLogout }) {
           <CertForm onSuccess={handleSuccess} />
         )}
         {activeTab === "projects" && <ProjectForm onSuccess={handleSuccess} />}
+        {activeTab === "resume" && <ResumeForm onSuccess={handleSuccess} />}
       </div>
     </div>
   );
