@@ -184,12 +184,17 @@ export async function deleteCertification(certId) {
  * @returns {Promise<boolean>} - Success status
  */
 export async function addProject(projectData) {
+  // Upload image first
+  const imagePath = `public/assets/projects/${projectData.slug}.jpg`;
+  console.log(`Uploading image to ${imagePath}...`);
+  await uploadFileToGitHub(imagePath, projectData.imageBase64.split(",")[1]);
+
+  // Dispatch event (without file content)
   return dispatchCmsEvent("add-project", {
     name: projectData.name,
     description: projectData.description,
-    imageBase64: projectData.imageBase64,
-    projectUrl: projectData.projectUrl,
-    demoUrl: projectData.demoUrl || null,
-    tags: projectData.tags || [],
+    githubLink: projectData.githubLink,
+    demoLink: projectData.demoLink || null,
+    slug: projectData.slug,
   });
 }
