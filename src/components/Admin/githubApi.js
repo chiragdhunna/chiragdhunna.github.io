@@ -197,3 +197,19 @@ export async function addProject(projectData) {
     slug: projectData.slug,
   });
 }
+
+/**
+ * Upload a new resume (deletes existing and replaces)
+ * @param {string} resumeBase64 - Base64 encoded resume PDF
+ * @returns {Promise<boolean>} - Success status
+ */
+export async function uploadResume(resumeBase64) {
+  const resumePath = `public/resume/Chirag_Dhunna.pdf`;
+  console.log(`Uploading resume to ${resumePath}...`);
+  await uploadFileToGitHub(resumePath, resumeBase64.split(",")[1]);
+
+  // Dispatch event
+  return dispatchCmsEvent("upload-resume", {
+    fileName: "Chirag_Dhunna.pdf",
+  });
+}
