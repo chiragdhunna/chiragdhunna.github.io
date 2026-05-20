@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CertForm from "./CertForm";
+import ProjectForm from "./ProjectForm";
 import "./AdminDashboard.css";
 
 function AdminDashboard({ onLogout }) {
@@ -38,11 +39,7 @@ function AdminDashboard({ onLogout }) {
         {activeTab === "certifications" && (
           <CertForm onSuccess={handleSuccess} />
         )}
-        {activeTab === "projects" && (
-          <div className="placeholder-content">
-            <p>Project management coming soon</p>
-          </div>
-        )}
+        {activeTab === "projects" && <ProjectForm onSuccess={handleSuccess} />}
       </div>
     </div>
   );

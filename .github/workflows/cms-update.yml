@@ -109,90 +109,146 @@ jobs:
               slug = slug.strip('-')
               return slug
 
-          def generate_id(slug):
+          def generate_id(slug, prefix):
               """Generate ID from slug"""
-              return f"cert_{slug[:10]}"
+              return f"{prefix}_{slug[:10]}"
 
-          def decode_base64_file(base64_str, output_path):
-              """Decode base64 and write to file"""
-              if base64_str.startswith('data:'):
-                  base64_str = base64_str.split(',')[1]
+          # Process based on event type
+          if EVENT_TYPE.startswith('add-cert') or EVENT_TYPE.startswith('update-cert') or EVENT_TYPE.startswith('delete-cert'):
+              print(f"Processing: {EVENT_TYPE}")
               
-              file_data = base64.b64decode(base64_str)
-              Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-              with open(output_path, 'wb') as f:
-                  f.write(file_data)
+              # Load certifications JSON
+              certs_path = Path('public/data/certs.json')
+              if certs_path.exists():
+                  with open(certs_path) as f:
+                      certs = json.load(f)
+              else:
+                  certs = []
 
-          # Load certifications JSON
-          certs_path = Path('public/data/certs.json')
-          if certs_path.exists():
-              with open(certs_path) as f:
-                  certs = json.load(f)
+              if EVENT_TYPE == 'add-cert':
+                  name = PAYLOAD.get('name', '').strip()
+                  issuer = PAYLOAD.get('issuer', '').strip()
+                  issue_date = PAYLOAD.get('issueDate', '')
+                  credential_url = PAYLOAD.get('credentialUrl')
+                  has_pdf = PAYLOAD.get('hasPdf', False)
+                  slug = PAYLOAD.get('slug', '')
+
+                  if not all([name, issuer, issue_date, slug]):
+                      print("❌ Missing required fields for cert")
+                      sys.exit(1)
+
+                  cert_id = generate_id(slug, "cert")
+
+                  # Create certification entry (files already uploaded by admin UI)
+                  pdf_url = f'/assets/certs/{slug}.pdf' if has_pdf else None
+                  
+                  new_cert = {
+                      'id': cert_id,
+                      'slug': slug,
+                      'name': name,
+                      'issuer': issuer,
+                      'imageUrl': f'/assets/certs/{slug}.jpg',
+                      'pdfUrl': pdf_url,
+                      'credentialUrl': credential_url,
+                      'issueDate': issue_date,
+                      'createdAt': datetime.utcnow().isoformat() + 'Z'
+                  }
+
+                  certs.append(new_cert)
+                  print(f"✓ Added certification: {name}")
+
+              elif EVENT_TYPE == 'delete-cert':
+                  cert_id = PAYLOAD.get('id')
+                  
+                  cert_to_delete = next((c for c in certs if c['id'] == cert_id), None)
+                  if cert_to_delete:
+                      # Delete image and PDF files
+                      slug = cert_to_delete['slug']
+                      image_path = Path(f'public/assets/certs/{slug}.jpg')
+                      pdf_path = Path(f'public/assets/certs/{slug}.pdf')
+                      
+                      if image_path.exists():
+                          image_path.unlink()
+                          print(f"✓ Deleted image: {image_path}")
+                      
+                      if pdf_path.exists():
+                          pdf_path.unlink()
+                          print(f"✓ Deleted PDF: {pdf_path}")
+                      
+                      certs.remove(cert_to_delete)
+                      print(f"✓ Deleted certification: {cert_to_delete['name']}")
+
+              # Save updated certifications JSON
+              with open(certs_path, 'w') as f:
+                  json.dump(certs, f, indent=2)
+                  f.write('\n')
+              print(f"✓ Updated {certs_path}")
+
+          elif EVENT_TYPE.startswith('add-project') or EVENT_TYPE.startswith('update-project') or EVENT_TYPE.startswith('delete-project'):
+              print(f"Processing: {EVENT_TYPE}")
+              
+              # Load projects JSON
+              projects_path = Path('public/data/projects.json')
+              if projects_path.exists():
+                  with open(projects_path) as f:
+                      projects = json.load(f)
+              else:
+                  projects = []
+
+              if EVENT_TYPE == 'add-project':
+                  name = PAYLOAD.get('name', '').strip()
+                  description = PAYLOAD.get('description', '').strip()
+                  github_link = PAYLOAD.get('githubLink', '').strip()
+                  demo_link = PAYLOAD.get('demoLink')
+                  slug = PAYLOAD.get('slug', '')
+
+                  if not all([name, description, github_link, slug]):
+                      print("❌ Missing required fields for project")
+                      sys.exit(1)
+
+                  project_id = generate_id(slug, "proj")
+
+                  # Create project entry (image already uploaded by admin UI)
+                  new_project = {
+                      'id': project_id,
+                      'slug': slug,
+                      'name': name,
+                      'description': description,
+                      'imageUrl': f'/assets/projects/{slug}.jpg',
+                      'projectUrl': github_link,
+                      'demoUrl': demo_link,
+                      'tags': [],
+                      'createdAt': datetime.utcnow().isoformat() + 'Z'
+                  }
+
+                  projects.append(new_project)
+                  print(f"✓ Added project: {name}")
+
+              elif EVENT_TYPE == 'delete-project':
+                  project_id = PAYLOAD.get('id')
+                  
+                  project_to_delete = next((p for p in projects if p['id'] == project_id), None)
+                  if project_to_delete:
+                      # Delete image file
+                      slug = project_to_delete['slug']
+                      image_path = Path(f'public/assets/projects/{slug}.jpg')
+                      
+                      if image_path.exists():
+                          image_path.unlink()
+                          print(f"✓ Deleted image: {image_path}")
+                      
+                      projects.remove(project_to_delete)
+                      print(f"✓ Deleted project: {project_to_delete['name']}")
+
+              # Save updated projects JSON
+              with open(projects_path, 'w') as f:
+                  json.dump(projects, f, indent=2)
+                  f.write('\n')
+              print(f"✓ Updated {projects_path}")
+
           else:
-              certs = []
-
-          # Process different event types
-          if EVENT_TYPE == 'add-cert':
-              print("Processing: add-cert")
-              
-              name = PAYLOAD.get('name', '').strip()
-              issuer = PAYLOAD.get('issuer', '').strip()
-              issue_date = PAYLOAD.get('issueDate', '')
-              credential_url = PAYLOAD.get('credentialUrl')
-              has_pdf = PAYLOAD.get('hasPdf', False)
-              slug = PAYLOAD.get('slug', '')
-
-              if not all([name, issuer, issue_date, slug]):
-                  print("❌ Missing required fields")
-                  sys.exit(1)
-
-              cert_id = f"cert_{slug[:10]}"
-
-              # Create certification entry (files already uploaded by admin UI)
-              pdf_url = f'/assets/certs/{slug}.pdf' if has_pdf else None
-              
-              new_cert = {
-                  'id': cert_id,
-                  'slug': slug,
-                  'name': name,
-                  'issuer': issuer,
-                  'imageUrl': f'/assets/certs/{slug}.jpg',
-                  'pdfUrl': pdf_url,
-                  'credentialUrl': credential_url,
-                  'issueDate': issue_date,
-                  'createdAt': datetime.utcnow().isoformat() + 'Z'
-              }
-
-              certs.append(new_cert)
-              print(f"✓ Added certification: {name}")
-
-          elif EVENT_TYPE == 'delete-cert':
-              print("Processing: delete-cert")
-              cert_id = PAYLOAD.get('id')
-              
-              cert_to_delete = next((c for c in certs if c['id'] == cert_id), None)
-              if cert_to_delete:
-                  # Delete image and PDF files
-                  slug = cert_to_delete['slug']
-                  image_path = Path(f'public/assets/certs/{slug}.jpg')
-                  pdf_path = Path(f'public/assets/certs/{slug}.pdf')
-                  
-                  if image_path.exists():
-                      image_path.unlink()
-                      print(f"✓ Deleted image: {image_path}")
-                  
-                  if pdf_path.exists():
-                      pdf_path.unlink()
-                      print(f"✓ Deleted PDF: {pdf_path}")
-                  
-                  certs.remove(cert_to_delete)
-                  print(f"✓ Deleted certification: {cert_to_delete['name']}")
-
-          # Save updated certifications JSON
-          with open(certs_path, 'w') as f:
-              json.dump(certs, f, indent=2)
-              f.write('\n')
-          print(f"✓ Updated {certs_path}")
+              print(f"❌ Unknown event type: {EVENT_TYPE}")
+              sys.exit(1)
 
           EOF
 
@@ -204,8 +260,8 @@ jobs:
       - name: Commit and push changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            git add public/data/certs.json public/assets/
-            git commit -m "chore: update certifications from CMS"
+            git add public/data/projects.json public/data/certs.json public/assets/
+            git commit -m "chore: update CMS content (certifications and projects)"
             git push
             echo "CHANGES_PUSHED=true" >> $GITHUB_ENV
           else
