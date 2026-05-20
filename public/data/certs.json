@@ -40,5 +40,16 @@
     "credentialUrl": null,
     "issueDate": "2026-05-20",
     "createdAt": "2026-05-20T16:43:56.075537Z"
+  },
+  {
+    "id": "cert_test-certi",
+    "slug": "test-certificate-chirag-dhunna",
+    "name": "Test Certificate Chirag Dhunna",
+    "issuer": "testing",
+    "imageUrl": "/assets/certs/test-certificate-chirag-dhunna.jpg",
+    "pdfUrl": "/assets/certs/test-certificate-chirag-dhunna.pdf",
+    "credentialUrl": null,
+    "issueDate": "2026-05-20",
+    "createdAt": "2026-05-20T16:47:25.322781Z"
   }
 ]
