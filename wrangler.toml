@@ -1,0 +1,8 @@
+name = "portfolio-cms-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+env = { production = { routes = [{ pattern = "chiragdhunna.github.io/api/*", zone_name = "github.io" }] } }
+
+[env.production]
+vars = { GITHUB_OWNER = "chiragdhunna", GITHUB_REPO = "chiragdhunna.github.io" }

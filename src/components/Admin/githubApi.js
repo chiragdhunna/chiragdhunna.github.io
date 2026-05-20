@@ -1,6 +1,6 @@
 /**
  * GitHub API integration for CMS operations
- * Uses repository_dispatch to trigger workflows
+ * Uses Cloudflare Worker proxy in production, direct API in development
  */
 
 import { getStoredToken } from "./auth";
@@ -8,87 +8,110 @@ import { getStoredToken } from "./auth";
 const GITHUB_API = "https://api.github.com/repos";
 const OWNER = "chiragdhunna";
 const REPO = "chiragdhunna.github.io";
+const WORKER_URL = "https://portfolio-cms-worker.chiragdhunna.workers.dev";
 
 /**
- * Get GitHub PAT - checks if it's available in environment or from admin input
+ * Determine if running in production or development
  */
-function getGitHubPAT() {
-  // Check env var (only available in dev)
-  if (import.meta.env.VITE_GITHUB_PAT) {
-    return import.meta.env.VITE_GITHUB_PAT;
-  }
-
-  // In production, the PAT is NOT exposed for security reasons
-  // Instead, the workflow handles file operations server-side
-  throw new Error(
-    "GitHub PAT not available. This feature requires deployment context.",
-  );
+function isProduction(): boolean {
+  return import.meta.env.PROD;
 }
 
 /**
- * Upload a file to GitHub and return its content SHA
- * @param {string} path - File path in repo (e.g., "public/assets/certs/test.jpg")
- * @param {string} base64Content - Base64 encoded file content
- * @returns {Promise<string>} - File SHA
+ * Upload a file to GitHub
+ * In prod: Uses Cloudflare Worker
+ * In dev: Uses direct GitHub API
  */
-async function uploadFileToGitHub(path, base64Content) {
+async function uploadFileToGitHub(path: string, base64Content: string) {
   try {
-    const pat = getGitHubPAT();
+    const token = getStoredToken();
+    if (!token) {
+      throw new Error("Not authenticated");
+    }
 
-    // First, try to get the existing file's SHA
-    let sha = null;
-    try {
-      const getResponse = await fetch(
+    if (isProduction()) {
+      // Production: Use Cloudflare Worker
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: "upload",
+          path,
+          content: base64Content.split(",")[1], // Remove data URL prefix
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Upload failed: ${error.error}`);
+      }
+
+      const data = await response.json();
+      return data.sha;
+    } else {
+      // Development: Use direct GitHub API
+      const pat = import.meta.env.VITE_GITHUB_PAT;
+      if (!pat) {
+        throw new Error("GitHub PAT not available in development");
+      }
+
+      // Get existing file SHA
+      let sha = null;
+      try {
+        const getResponse = await fetch(
+          `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+          {
+            headers: {
+              Authorization: `Bearer ${pat}`,
+              Accept: "application/vnd.github.v3+json",
+            },
+          },
+        );
+
+        if (getResponse.ok) {
+          const fileData = await getResponse.json();
+          sha = fileData.sha;
+        }
+      } catch (e) {
+        // File doesn't exist, that's OK
+      }
+
+      // Upload the file
+      const putBody = {
+        message: `chore: upload asset for CMS`,
+        content: base64Content.split(",")[1],
+      };
+
+      if (sha) {
+        putBody.sha = sha;
+      }
+
+      const response = await fetch(
         `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
         {
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${pat}`,
             Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(putBody),
         },
       );
 
-      if (getResponse.ok) {
-        const fileData = await getResponse.json();
-        sha = fileData.sha;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `Failed to upload file: ${errorData.message || response.statusText}`,
+        );
       }
-    } catch (e) {
-      // File doesn't exist, that's OK
+
+      const data = await response.json();
+      return data.content.sha;
     }
-
-    // Upload the file
-    const putBody = {
-      message: `chore: upload asset for CMS`,
-      content: base64Content,
-    };
-
-    // Include SHA if file exists (for update)
-    if (sha) {
-      putBody.sha = sha;
-    }
-
-    const response = await fetch(
-      `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${pat}`,
-          Accept: "application/vnd.github.v3+json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(putBody),
-      },
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `Failed to upload file: ${errorData.message || response.statusText}`,
-      );
-    }
-
-    const data = await response.json();
-    return data.content.sha;
   } catch (error) {
     console.error(`Failed to upload ${path}:`, error);
     throw error;
@@ -96,48 +119,77 @@ async function uploadFileToGitHub(path, base64Content) {
 }
 
 /**
- * Dispatch a CMS event to GitHub Actions (small payload only)
- * @param {string} eventType - Event type
- * @param {object} payload - Event payload (must be <10KB)
- * @returns {Promise<boolean>} - Success status
+ * Dispatch a CMS event to GitHub Actions
+ * In prod: Uses Cloudflare Worker
+ * In dev: Uses direct GitHub API
  */
-export async function dispatchCmsEvent(eventType, payload) {
+export async function dispatchCmsEvent(
+  eventType: string,
+  payload: Record<string, unknown>,
+) {
   const token = getStoredToken();
   if (!token) {
     throw new Error("Not authenticated");
   }
 
   try {
-    const pat = getGitHubPAT();
-
-    const response = await fetch(`${GITHUB_API}/${OWNER}/${REPO}/dispatches`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${pat}`,
-        Accept: "application/vnd.github.v3+json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        event_type: eventType,
-        client_payload: {
-          ...payload,
-          adminToken: token,
+    if (isProduction()) {
+      // Production: Use Cloudflare Worker
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      }),
-    });
+        body: JSON.stringify({
+          action: "dispatch",
+          eventType,
+          payload,
+        }),
+      });
 
-    if (!response.ok) {
-      let errorMessage = `GitHub API error: ${response.status} ${response.statusText}`;
-      try {
-        const errorData = await response.json();
-        errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
-      } catch (e) {
-        // Error response is not JSON
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Dispatch failed: ${error.error}`);
       }
-      throw new Error(errorMessage);
-    }
 
-    return true;
+      return true;
+    } else {
+      // Development: Use direct GitHub API
+      const pat = import.meta.env.VITE_GITHUB_PAT;
+      if (!pat) {
+        throw new Error("GitHub PAT not available in development");
+      }
+
+      const response = await fetch(
+        `${GITHUB_API}/${OWNER}/${REPO}/dispatches`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${pat}`,
+            Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            event_type: eventType,
+            client_payload: payload,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        let errorMessage = `GitHub API error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
+        } catch (e) {
+          // Error response is not JSON
+        }
+        throw new Error(errorMessage);
+      }
+
+      return true;
+    }
   } catch (error) {
     console.error("Failed to dispatch CMS event:", error);
     throw error;
@@ -146,23 +198,21 @@ export async function dispatchCmsEvent(eventType, payload) {
 
 /**
  * Add a new certification
- * @param {object} certData - Certification data
- * @returns {Promise<boolean>} - Success status
  */
-export async function addCertification(certData) {
+export async function addCertification(certData: any) {
   // Upload image first
   const imagePath = `public/assets/certs/${certData.slug}.jpg`;
   console.log(`Uploading image to ${imagePath}...`);
-  await uploadFileToGitHub(imagePath, certData.imageBase64.split(",")[1]);
+  await uploadFileToGitHub(imagePath, certData.imageBase64);
 
   // Upload PDF if provided
   if (certData.pdfBase64) {
     const pdfPath = `public/assets/certs/${certData.slug}.pdf`;
     console.log(`Uploading PDF to ${pdfPath}...`);
-    await uploadFileToGitHub(pdfPath, certData.pdfBase64.split(",")[1]);
+    await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
-  // Dispatch event (without file content)
+  // Dispatch event
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
     issuer: certData.issuer,
@@ -175,11 +225,8 @@ export async function addCertification(certData) {
 
 /**
  * Update an existing certification
- * @param {string} certId - Certification ID
- * @param {object} certData - Updated certification data
- * @returns {Promise<boolean>} - Success status
  */
-export async function updateCertification(certId, certData) {
+export async function updateCertification(certId: string, certData: any) {
   return dispatchCmsEvent("update-cert", {
     id: certId,
     ...certData,
@@ -188,10 +235,8 @@ export async function updateCertification(certId, certData) {
 
 /**
  * Delete a certification
- * @param {string} certId - Certification ID
- * @returns {Promise<boolean>} - Success status
  */
-export async function deleteCertification(certId) {
+export async function deleteCertification(certId: string) {
   return dispatchCmsEvent("delete-cert", {
     id: certId,
   });
@@ -199,16 +244,14 @@ export async function deleteCertification(certId) {
 
 /**
  * Add a new project
- * @param {object} projectData - Project data
- * @returns {Promise<boolean>} - Success status
  */
-export async function addProject(projectData) {
+export async function addProject(projectData: any) {
   // Upload image first
   const imagePath = `public/assets/projects/${projectData.slug}.jpg`;
   console.log(`Uploading image to ${imagePath}...`);
-  await uploadFileToGitHub(imagePath, projectData.imageBase64.split(",")[1]);
+  await uploadFileToGitHub(imagePath, projectData.imageBase64);
 
-  // Dispatch event (without file content)
+  // Dispatch event
   return dispatchCmsEvent("add-project", {
     name: projectData.name,
     description: projectData.description,
@@ -220,13 +263,11 @@ export async function addProject(projectData) {
 
 /**
  * Upload a new resume (deletes existing and replaces)
- * @param {string} resumeBase64 - Base64 encoded resume PDF
- * @returns {Promise<boolean>} - Success status
  */
-export async function uploadResume(resumeBase64) {
+export async function uploadResume(resumeBase64: string) {
   const resumePath = `public/resume/Chirag_Dhunna.pdf`;
   console.log(`Uploading resume to ${resumePath}...`);
-  await uploadFileToGitHub(resumePath, resumeBase64.split(",")[1]);
+  await uploadFileToGitHub(resumePath, resumeBase64);
 
   // Dispatch event
   return dispatchCmsEvent("upload-resume", {
