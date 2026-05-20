@@ -1,100 +1,363 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap");
+
+/* ── Container ── */
 .admin-login-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-  font-family: "Ubuntu", sans-serif;
+  background: #0a0d12;
+  font-family: "Syne", sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
+.admin-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(88, 166, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88, 166, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.admin-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(88, 166, 255, 0.05) 0%,
+    transparent 70%
+  );
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── Card ── */
 .admin-login-box {
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  padding: 2.5rem;
+  position: relative;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 32px 64px rgba(0, 0, 0, 0.5);
+  animation: adminFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes adminFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Header ── */
+.admin-login-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid #161b22;
+  position: relative;
+}
+
+.admin-lock-icon {
+  position: absolute;
+  top: 1.75rem;
+  right: 1.75rem;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #484f58;
+  background: #010409;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #58a6ff;
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin-bottom: 1rem;
+}
+
+.admin-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #58a6ff;
+  animation: adminPulse 2s ease-in-out infinite;
+}
+
+@keyframes adminPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .admin-login-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #c9d1d9;
-  margin-bottom: 0.5rem;
-  text-align: center;
+  font-family: "Syne", sans-serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #e6edf3;
+  margin: 0 0 0.25rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .admin-login-subtitle {
-  font-size: 0.875rem;
-  color: #8b949e;
-  text-align: center;
-  margin-bottom: 2rem;
+  font-family: "Space Mono", monospace;
+  font-size: 0.68rem;
+  color: #484f58;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── Body ── */
+.admin-login-body {
+  padding: 1.75rem 2rem 2rem;
 }
 
 .admin-form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .admin-form-group label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #c9d1d9;
+  font-family: "Space Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b949e;
   margin-bottom: 0.5rem;
 }
 
-.admin-form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  color: #c9d1d9;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
+.admin-input-wrap {
+  position: relative;
 }
 
-.admin-form-group input:focus {
+.admin-input-wrap input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 2.5rem 0.7rem 0.875rem;
+  background: #010409;
+  border: 1px solid #21262d;
+  border-radius: 7px;
+  color: #e6edf3;
+  font-family: "Space Mono", monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   outline: none;
+}
+
+.admin-input-wrap input:focus {
   border-color: #58a6ff;
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
 }
 
-.admin-form-group input:disabled {
-  opacity: 0.6;
+.admin-input-wrap input:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.admin-error-message {
-  background: rgba(248, 81, 73, 0.1);
-  border: 1px solid #f85149;
-  color: #f85149;
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
+.admin-eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #484f58;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
 }
 
+.admin-eye-btn:hover {
+  color: #8b949e;
+}
+
+/* ── Error ── */
+.admin-error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(248, 81, 73, 0.08);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: #f85149;
+  padding: 0.625rem 0.875rem;
+  border-radius: 7px;
+  font-family: "Space Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  animation: adminShake 0.35s ease;
+}
+
+.admin-error-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+@keyframes adminShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ── Login button ── */
 .admin-login-btn {
   width: 100%;
   padding: 0.75rem;
   background: #238636;
-  border: 1px solid #2ea043;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
   color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: "Syne", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
 .admin-login-btn:hover:not(:disabled) {
   background: #2ea043;
 }
-
+.admin-login-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
 .admin-login-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.admin-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: adminSpin 0.7s linear infinite;
+}
+
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Divider ── */
+.admin-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.25rem 0;
+}
+
+.admin-divider-line {
+  flex: 1;
+  height: 1px;
+  background: #161b22;
+}
+
+.admin-divider-text {
+  font-family: "Space Mono", monospace;
+  font-size: 0.65rem;
+  color: #30363d;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Home button ── */
+.admin-home-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: transparent;
+  border: 1px solid #21262d;
+  border-radius: 7px;
+  color: #8b949e;
+  font-family: "Space Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    background 0.2s;
+}
+
+.admin-home-btn:hover {
+  border-color: #30363d;
+  color: #c9d1d9;
+  background: #161b22;
+}
+
+/* ── Footer ── */
+.admin-login-footer {
+  padding: 0.875rem 2rem;
+  border-top: 1px solid #161b22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-login-footer span {
+  font-family: "Space Mono", monospace;
+  font-size: 0.6rem;
+  color: #30363d;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
