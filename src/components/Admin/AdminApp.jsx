@@ -8,7 +8,6 @@ function AdminApp() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if there's a valid token on mount
     const token = getStoredToken();
     if (token && verifyToken(token)) {
       setIsAuthenticated(true);
@@ -16,25 +15,29 @@ function AdminApp() {
     setLoading(false);
   }, []);
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
+  const handleLoginSuccess = () => setIsAuthenticated(true);
 
   const handleLogout = () => {
     clearToken();
     setIsAuthenticated(false);
   };
 
-  if (loading) {
-    return null;
-  }
+  const handleGoHome = () => {
+    window.location.href = "/";
+    // If using React Router, replace with: navigate("/")
+  };
+
+  if (loading) return null;
 
   return (
     <>
       {isAuthenticated ? (
         <AdminDashboard onLogout={handleLogout} />
       ) : (
-        <AdminLogin onLoginSuccess={handleLoginSuccess} />
+        <AdminLogin
+          onLoginSuccess={handleLoginSuccess}
+          onGoHome={handleGoHome}
+        />
       )}
     </>
   );
