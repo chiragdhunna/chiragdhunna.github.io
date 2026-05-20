@@ -10,9 +10,49 @@ const OWNER = "chiragdhunna";
 const REPO = "chiragdhunna.github.io";
 
 /**
- * Dispatch a CMS event to GitHub Actions
- * @param {string} eventType - Event type (add-cert, update-cert, delete-cert, etc.)
- * @param {object} payload - Event payload
+ * Upload a file to GitHub and return its content SHA
+ * @param {string} path - File path in repo (e.g., "public/assets/certs/test.jpg")
+ * @param {string} base64Content - Base64 encoded file content
+ * @returns {Promise<string>} - File SHA
+ */
+async function uploadFileToGitHub(path, base64Content) {
+  try {
+    const response = await fetch(
+      `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+          Accept: "application/vnd.github.v3+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `chore: upload asset for CMS`,
+          content: base64Content,
+          branch: "cms-workflow",
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Failed to upload file: ${errorData.message || response.statusText}`,
+      );
+    }
+
+    const data = await response.json();
+    return data.content.sha;
+  } catch (error) {
+    console.error(`Failed to upload ${path}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Dispatch a CMS event to GitHub Actions (small payload only)
+ * @param {string} eventType - Event type
+ * @param {object} payload - Event payload (must be <10KB)
  * @returns {Promise<boolean>} - Success status
  */
 export async function dispatchCmsEvent(eventType, payload) {
@@ -22,27 +62,31 @@ export async function dispatchCmsEvent(eventType, payload) {
   }
 
   try {
-    const response = await fetch(
-      `${GITHUB_API}/${OWNER}/${REPO}/dispatches`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
-          Accept: "application/vnd.github.v3+json",
-          "Content-Type": "application/json",
-          "X-Admin-Token": token,
+    const response = await fetch(`${GITHUB_API}/${OWNER}/${REPO}/dispatches`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        event_type: eventType,
+        client_payload: {
+          ...payload,
+          adminToken: token,
         },
-        body: JSON.stringify({
-          event_type: eventType,
-          client_payload: payload,
-        }),
-      }
-    );
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(
-        `GitHub API error: ${response.status} ${response.statusText}`
-      );
+      let errorMessage = `GitHub API error: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
+      } catch (e) {
+        // Error response is not JSON
+      }
+      throw new Error(errorMessage);
     }
 
     return true;
@@ -58,13 +102,26 @@ export async function dispatchCmsEvent(eventType, payload) {
  * @returns {Promise<boolean>} - Success status
  */
 export async function addCertification(certData) {
+  // Upload image first
+  const imagePath = `public/assets/certs/${certData.slug}.jpg`;
+  console.log(`Uploading image to ${imagePath}...`);
+  await uploadFileToGitHub(imagePath, certData.imageBase64.split(",")[1]);
+
+  // Upload PDF if provided
+  if (certData.pdfBase64) {
+    const pdfPath = `public/assets/certs/${certData.slug}.pdf`;
+    console.log(`Uploading PDF to ${pdfPath}...`);
+    await uploadFileToGitHub(pdfPath, certData.pdfBase64.split(",")[1]);
+  }
+
+  // Dispatch event (without file content)
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
     issuer: certData.issuer,
     issueDate: certData.issueDate,
-    imageBase64: certData.imageBase64,
-    pdfBase64: certData.pdfBase64,
     credentialUrl: certData.credentialUrl || null,
+    hasPdf: !!certData.pdfBase64,
+    slug: certData.slug,
   });
 }
 

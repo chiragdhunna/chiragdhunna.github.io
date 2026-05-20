@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { addCertification } from "./githubApi";
 import "./CertForm.css";
 
+// Helper function to generate slug from name
+function generateSlug(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function CertForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -139,6 +148,9 @@ function CertForm({ onSuccess }) {
     setLoading(true);
 
     try {
+      // Generate slug from name
+      const slug = generateSlug(formData.name);
+
       // Resize and encode image
       const imageBase64 = await resizeImage(imageFile);
 
@@ -156,11 +168,10 @@ function CertForm({ onSuccess }) {
         imageBase64,
         pdfBase64,
         credentialUrl: formData.credentialUrl.trim() || null,
+        slug,
       });
 
-      setSuccess(
-        "✓ Submitted! The live site will update in ~60 seconds."
-      );
+      setSuccess("✓ Submitted! The live site will update in ~60 seconds.");
 
       // Reset form
       setFormData({

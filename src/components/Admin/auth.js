@@ -16,13 +16,9 @@ export async function issueToken(password) {
   const algorithm = { name: "HMAC", hash: "SHA-256" };
 
   // Import the secret as a key
-  const key = await crypto.subtle.importKey(
-    "raw",
-    secret,
-    algorithm,
-    false,
-    ["sign"]
-  );
+  const key = await crypto.subtle.importKey("raw", secret, algorithm, false, [
+    "sign",
+  ]);
 
   // Create header and payload
   const header = { alg: "HS256", typ: "JWT" };
@@ -48,7 +44,11 @@ export async function issueToken(password) {
   const messageEncoded = new TextEncoder().encode(message);
 
   // Sign the message
-  const signatureBuffer = await crypto.subtle.sign(algorithm, key, messageEncoded);
+  const signatureBuffer = await crypto.subtle.sign(
+    algorithm,
+    key,
+    messageEncoded,
+  );
   const signatureArray = Array.from(new Uint8Array(signatureBuffer));
   const signatureEncoded = btoa(String.fromCharCode.apply(null, signatureArray))
     .replace(/\+/g, "-")
@@ -89,7 +89,9 @@ export function verifyToken(token) {
     const payloadPadded =
       payloadEncoded + (padding < 4 ? "=".repeat(padding) : "");
 
-    const payloadStr = atob(payloadPadded.replace(/-/g, "+").replace(/_/g, "/"));
+    const payloadStr = atob(
+      payloadPadded.replace(/-/g, "+").replace(/_/g, "/"),
+    );
     const payload = JSON.parse(payloadStr);
 
     // Check expiration

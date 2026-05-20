@@ -8,7 +8,7 @@ Your portfolio now has a complete **Certification Management System** with autom
 ✅ **Certification Form** - Upload image + PDF + title  
 ✅ **JWT Authentication** - Secure Web Crypto-based tokens  
 ✅ **GitHub Actions Workflow** - Automatic deployment on upload  
-✅ **Zero External Dependencies** - Everything uses GitHub APIs  
+✅ **Zero External Dependencies** - Everything uses GitHub APIs
 
 ## How It Works (3-Step Process)
 
@@ -28,6 +28,7 @@ VITE_GITHUB_PAT=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 **To get your GitHub PAT:**
+
 1. Go to https://github.com/settings/personal-access-tokens/new
 2. Name: `CMS Token`
 3. Expiration: 90 days
@@ -44,17 +45,20 @@ In your GitHub repo settings (Settings → Secrets and variables → Actions):
 ```
 ADMIN_SECRET = MySecurePassword123!
 ```
+
 (Same value as `VITE_ADMIN_PASSWORD`)
 
 ### Step 3: Test It
 
 **Development:**
+
 ```bash
 npm run dev
 # Go to http://localhost:5173/admin
 ```
 
 **Production:**
+
 - Go to https://chiragdhunna.github.io/admin
 - Enter your admin password
 - Fill in the form and submit!
@@ -90,6 +94,7 @@ public/data/
 ## Example Upload
 
 Fill out the form with:
+
 - **Name**: AWS Certified AI Practitioner
 - **Issuer**: Amazon Web Services
 - **Issue Date**: 2026-05-17
@@ -102,6 +107,7 @@ Click "Add Certification" → Check in ~60 seconds for live update
 ## What Gets Saved
 
 New entry in `public/data/certs.json`:
+
 ```json
 {
   "id": "cert_aws",
@@ -142,21 +148,21 @@ Site live! 🎉 (60 seconds)
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| "Admin password not configured" | Add `VITE_ADMIN_PASSWORD` to `.env.local` |
-| "GitHub API error: 401" | Check your GitHub PAT is valid & not expired |
-| "JWT validation failed" | Ensure `ADMIN_SECRET` in GitHub matches `VITE_ADMIN_PASSWORD` |
-| Changes not appearing | Check GitHub Actions logs, hard refresh (Ctrl+Shift+R) |
-| Image too large | Max 5MB (auto-resized anyway) |
-| PDF too large | Max 10MB |
+| Issue                           | Solution                                                      |
+| ------------------------------- | ------------------------------------------------------------- |
+| "Admin password not configured" | Add `VITE_ADMIN_PASSWORD` to `.env.local`                     |
+| "GitHub API error: 401"         | Check your GitHub PAT is valid & not expired                  |
+| "JWT validation failed"         | Ensure `ADMIN_SECRET` in GitHub matches `VITE_ADMIN_PASSWORD` |
+| Changes not appearing           | Check GitHub Actions logs, hard refresh (Ctrl+Shift+R)        |
+| Image too large                 | Max 5MB (auto-resized anyway)                                 |
+| PDF too large                   | Max 10MB                                                      |
 
 ## Security Notes
 
 🔒 **Passwords**: Stored in sessionStorage only (cleared on tab close)  
 🔒 **JWT**: Validated server-side in the workflow  
 🔒 **Secrets**: Never hardcoded, always in GitHub Secrets  
-🔒 **CORS**: No external APIs, everything through GitHub  
+🔒 **CORS**: No external APIs, everything through GitHub
 
 ## Next Steps
 
@@ -168,6 +174,7 @@ Site live! 🎉 (60 seconds)
 ## For Future Development
 
 The structure supports:
+
 - Project uploads (same flow as certs)
 - Edit/delete operations (just add more event types)
 - Bulk uploads (future enhancement)

@@ -138,31 +138,19 @@ jobs:
               name = PAYLOAD.get('name', '').strip()
               issuer = PAYLOAD.get('issuer', '').strip()
               issue_date = PAYLOAD.get('issueDate', '')
-              image_base64 = PAYLOAD.get('imageBase64', '')
-              pdf_base64 = PAYLOAD.get('pdfBase64')
               credential_url = PAYLOAD.get('credentialUrl')
+              has_pdf = PAYLOAD.get('hasPdf', False)
+              slug = PAYLOAD.get('slug', '')
 
-              if not all([name, issuer, issue_date, image_base64]):
+              if not all([name, issuer, issue_date, slug]):
                   print("❌ Missing required fields")
                   sys.exit(1)
 
-              slug = sanitize_slug(name)
-              cert_id = generate_id(slug)
+              cert_id = f"cert_{slug[:10]}"
 
-              # Save image
-              image_path = f'public/assets/certs/{slug}.jpg'
-              decode_base64_file(image_base64, image_path)
-              print(f"✓ Saved image: {image_path}")
-
-              # Save PDF if provided
-              pdf_url = None
-              if pdf_base64:
-                  pdf_path = f'public/assets/certs/{slug}.pdf'
-                  decode_base64_file(pdf_base64, pdf_path)
-                  pdf_url = f'/assets/certs/{slug}.pdf'
-                  print(f"✓ Saved PDF: {pdf_path}")
-
-              # Create certification entry
+              # Create certification entry (files already uploaded by admin UI)
+              pdf_url = f'/assets/certs/{slug}.pdf' if has_pdf else None
+              
               new_cert = {
                   'id': cert_id,
                   'slug': slug,

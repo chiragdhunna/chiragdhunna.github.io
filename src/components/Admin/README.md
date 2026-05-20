@@ -11,7 +11,7 @@ This is a GitHub-based CMS for managing certifications and projects without touc
 - **Database**: JSON files in `public/data/`
   - `certs.json` - Certifications
   - `projects.json` - Projects
-- **Assets**: 
+- **Assets**:
   - `public/assets/certs/<slug>.jpg` - Certification images
   - `public/assets/certs/<slug>.pdf` - Certificate PDFs
   - `public/assets/projects/<slug>.jpg` - Project images
@@ -135,6 +135,7 @@ Add `VITE_ADMIN_PASSWORD` to `.env.local`
 ### "GitHub API error: 401"
 
 Check your `VITE_GITHUB_PAT`:
+
 - Is it valid and not expired?
 - Does it have the right scopes (Contents + Actions)?
 - Is the repo correct?
