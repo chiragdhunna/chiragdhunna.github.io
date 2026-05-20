@@ -8,10 +8,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
   max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 2rem auto;
+}
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .admin-header h1 {
@@ -21,6 +25,45 @@
   font-weight: 700;
 }
 
+/* Home Button */
+.home-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-btn:hover {
+  background: #21262d;
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+
+.home-btn-arrow {
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.home-btn:hover .home-btn-arrow {
+  transform: translateX(-3px);
+}
+
+.home-btn-text {
+  letter-spacing: 0.02em;
+}
+
+/* Logout Button */
 .logout-btn {
   padding: 0.5rem 1rem;
   background: #da3633;
@@ -37,6 +80,7 @@
   background: #f85149;
 }
 
+/* Tabs */
 .admin-tabs {
   display: flex;
   gap: 0;
@@ -68,6 +112,7 @@
   border-bottom-color: #58a6ff;
 }
 
+/* Content */
 .admin-content {
   max-width: 800px;
   margin: 0 auto;
