@@ -1,5 +1,6 @@
+import "./Projects.css";
 import React, { useState } from "react";
-import { Container, Row, Col, ButtonGroup, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import ProjectCard from "./ProjectCards";
 import Particle from "../Particle";
 import uberEatsClone from "../../Assets/Projects/uberEatsClone.png";
@@ -55,7 +56,7 @@ const projects = [
     imgPath: montraBackend,
     title: "Montra Backend",
     description:
-      "Montra Backend is a powerful financial management API built with Node.js and PostgreSQL, supporting secure authentication, transaction tracking, budgeting, and data exports..",
+      "Montra Backend is a powerful financial management API built with Node.js and PostgreSQL, supporting secure authentication, transaction tracking, budgeting, and data exports.",
     ghLink: "https://github.com/chiragdhunna/montra_backend",
     demoLink: "https://montra-backend-b45c.onrender.com/api/v1/docs/s",
   },
@@ -90,22 +91,41 @@ const projects = [
     imgPath: linkedinPostImg,
     title: "LinkedIn Post Generator",
     description:
-      "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving. Generates posts from rotating prompts, saves to post.txt, publishes via the LinkedIn UGC Posts API, and archives each post under posts/.",
+      "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving.",
     ghLink: "https://github.com/chiragdhunna/linkedin_post_generator",
   },
 ];
 
-const categories = ["All", "Web", "Mobile", "Full Stack", "Backend"];
+const categories = [
+  { label: "All", icon: "⬡" },
+  { label: "Web", icon: "🌐" },
+  { label: "Mobile", icon: "📱" },
+  { label: "Full Stack", icon: "⚡" },
+  { label: "Backend", icon: "🖥" },
+];
 
 function Projects() {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [animating, setAnimating] = useState(false);
+
+  const handleCategoryChange = (category) => {
+    if (category === selectedCategory) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setSelectedCategory(category);
+      setAnimating(false);
+    }, 200);
+  };
 
   const filteredProjects =
     selectedCategory === "All"
       ? projects
-      : projects.filter((project) =>
-          project.categories.includes(selectedCategory),
-        );
+      : projects.filter((p) => p.categories.includes(selectedCategory));
+
+  const getCount = (label) =>
+    label === "All"
+      ? projects.length
+      : projects.filter((p) => p.categories.includes(label)).length;
 
   return (
     <Container fluid className="project-section" style={{ minHeight: "100vh" }}>
@@ -117,24 +137,58 @@ function Projects() {
         <p style={{ color: "white" }}>
           Here are a few projects I've worked on recently.
         </p>
-        <ButtonGroup
-          className="category-buttons"
-          style={{ marginBottom: "20px" }}
+
+        {/* ── Filter Bar ── */}
+        <div className="filter-bar">
+          <div className="filter-track">
+            {categories.map(({ label, icon }) => {
+              const active = selectedCategory === label;
+              return (
+                <button
+                  key={label}
+                  className={`filter-pill ${active ? "filter-pill--active" : ""}`}
+                  onClick={() => handleCategoryChange(label)}
+                  aria-pressed={active}
+                >
+                  <span className="filter-pill__icon" aria-hidden="true">
+                    {icon}
+                  </span>
+                  <span className="filter-pill__label">{label}</span>
+                  <span className="filter-pill__count">{getCount(label)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Result meta ── */}
+        <p className="filter-meta">
+          Showing{" "}
+          <span className="filter-meta__num">{filteredProjects.length}</span>{" "}
+          {filteredProjects.length === 1 ? "project" : "projects"}
+          {selectedCategory !== "All" && (
+            <>
+              {" "}
+              in <span className="filter-meta__cat">{selectedCategory}</span>
+            </>
+          )}
+        </p>
+
+        {/* ── Cards Grid ── */}
+        <Row
+          style={{ justifyContent: "center", paddingBottom: "10px" }}
+          className={
+            animating ? "projects-grid--fade" : "projects-grid--visible"
+          }
         >
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "primary" : "light"}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </Button>
-          ))}
-        </ButtonGroup>
-        <Row style={{ justifyContent: "center", paddingBottom: "10px" }}>
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
-              <Col md={4} className="project-card" key={index}>
+              <Col
+                md={4}
+                className="project-card"
+                key={`${selectedCategory}-${index}`}
+                style={{ animationDelay: `${index * 60}ms` }}
+              >
                 <ProjectCard
                   imgPath={project.imgPath}
                   isBlog={false}
@@ -147,7 +201,7 @@ function Projects() {
             ))
           ) : (
             <p style={{ color: "white", textAlign: "center" }}>
-              No Project Available
+              No projects available
             </p>
           )}
         </Row>
