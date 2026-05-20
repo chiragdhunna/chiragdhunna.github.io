@@ -39,9 +39,7 @@ function AdminDashboard({ onLogout }) {
         {activeTab === "certifications" && (
           <CertForm onSuccess={handleSuccess} />
         )}
-        {activeTab === "projects" && (
-          <ProjectForm onSuccess={handleSuccess} />
-        )}
+        {activeTab === "projects" && <ProjectForm onSuccess={handleSuccess} />}
       </div>
     </div>
   );

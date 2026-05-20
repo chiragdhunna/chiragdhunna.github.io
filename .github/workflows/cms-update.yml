@@ -245,7 +245,7 @@ jobs:
                   json.dump(projects, f, indent=2)
                   f.write('\n')
               print(f"✓ Updated {projects_path}")
-          
+
           else:
               print(f"❌ Unknown event type: {EVENT_TYPE}")
               sys.exit(1)
