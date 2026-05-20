@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Preloader from "./components/Pre";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home/Home";
@@ -17,6 +17,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import "./style.css";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+const AdminApp = React.lazy(() => import("./components/Admin/AdminApp"));
 
 function App() {
   const [load, upadateLoad] = useState(true);
@@ -41,6 +43,14 @@ function App() {
           <Route path="/certifications" element={<Certifications />} />
           <Route path="/about" element={<About />} />
           <Route path="/resume" element={<Resume />} />
+          <Route
+            path="/admin/*"
+            element={
+              <Suspense fallback={<Preloader load={true} />}>
+                <AdminApp />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Footer />

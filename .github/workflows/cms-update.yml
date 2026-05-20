@@ -1,0 +1,221 @@
+name: CMS Update
+
+on:
+  repository_dispatch:
+    types:
+      - add-cert
+      - update-cert
+      - delete-cert
+      - add-project
+      - update-project
+      - delete-project
+
+jobs:
+  process-cms-event:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Validate JWT and Process Event
+        env:
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+          EVENT_TYPE: ${{ github.event.action }}
+          PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          ADMIN_TOKEN: ${{ github.event.client_payload.adminToken }}
+        run: |
+          python3 << 'EOF'
+          import json
+          import hmac
+          import hashlib
+          import base64
+          import os
+          import sys
+          from datetime import datetime
+          from pathlib import Path
+          import re
+
+          # Configuration
+          ADMIN_SECRET = os.environ.get('ADMIN_SECRET', '')
+          EVENT_TYPE = os.environ.get('EVENT_TYPE', '')
+          PAYLOAD = json.loads(os.environ.get('PAYLOAD', '{}'))
+          ADMIN_TOKEN = os.environ.get('ADMIN_TOKEN', '')
+
+          if not ADMIN_SECRET:
+              print("❌ ADMIN_SECRET not configured")
+              sys.exit(1)
+
+          # JWT Validation Function
+          def validate_jwt(token, secret):
+              try:
+                  parts = token.split('.')
+                  if len(parts) != 3:
+                      return False
+
+                  header, payload, signature = parts
+
+                  # Verify signature
+                  secret_bytes = secret.encode()
+                  message = f"{header}.{payload}".encode()
+                  
+                  # Add padding to signature
+                  padding = 4 - (len(signature) % 4)
+                  signature_padded = signature + ('=' * padding if padding < 4 else '')
+                  
+                  expected_sig = base64.urlsafe_b64encode(
+                      hmac.new(secret_bytes, message, hashlib.sha256).digest()
+                  ).decode().rstrip('=')
+
+                  if signature != expected_sig:
+                      return False
+
+                  # Decode payload
+                  payload_padded = payload + ('=' * (4 - len(payload) % 4) if len(payload) % 4 else '')
+                  payload_decoded = base64.urlsafe_b64decode(payload_padded)
+                  payload_json = json.loads(payload_decoded)
+
+                  # Check expiration
+                  from time import time
+                  current_time = int(time())
+                  if payload_json.get('exp', 0) < current_time:
+                      return False
+
+                  return True
+              except Exception as e:
+                  print(f"JWT validation error: {e}")
+                  return False
+
+          # Validate JWT
+          if not validate_jwt(ADMIN_TOKEN, ADMIN_SECRET):
+              print("❌ JWT validation failed - authentication error")
+              sys.exit(1)
+
+          print("✓ JWT validated successfully")
+
+          # Helper functions
+          def sanitize_slug(name):
+              """Convert name to kebab-case slug"""
+              slug = name.lower().strip()
+              slug = re.sub(r'[^a-z0-9]+', '-', slug)
+              slug = slug.strip('-')
+              return slug
+
+          def generate_id(slug):
+              """Generate ID from slug"""
+              return f"cert_{slug[:10]}"
+
+          def decode_base64_file(base64_str, output_path):
+              """Decode base64 and write to file"""
+              if base64_str.startswith('data:'):
+                  base64_str = base64_str.split(',')[1]
+              
+              file_data = base64.b64decode(base64_str)
+              Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+              with open(output_path, 'wb') as f:
+                  f.write(file_data)
+
+          # Load certifications JSON
+          certs_path = Path('public/data/certs.json')
+          if certs_path.exists():
+              with open(certs_path) as f:
+                  certs = json.load(f)
+          else:
+              certs = []
+
+          # Process different event types
+          if EVENT_TYPE == 'add-cert':
+              print("Processing: add-cert")
+              
+              name = PAYLOAD.get('name', '').strip()
+              issuer = PAYLOAD.get('issuer', '').strip()
+              issue_date = PAYLOAD.get('issueDate', '')
+              credential_url = PAYLOAD.get('credentialUrl')
+              has_pdf = PAYLOAD.get('hasPdf', False)
+              slug = PAYLOAD.get('slug', '')
+
+              if not all([name, issuer, issue_date, slug]):
+                  print("❌ Missing required fields")
+                  sys.exit(1)
+
+              cert_id = f"cert_{slug[:10]}"
+
+              # Create certification entry (files already uploaded by admin UI)
+              pdf_url = f'/assets/certs/{slug}.pdf' if has_pdf else None
+              
+              new_cert = {
+                  'id': cert_id,
+                  'slug': slug,
+                  'name': name,
+                  'issuer': issuer,
+                  'imageUrl': f'/assets/certs/{slug}.jpg',
+                  'pdfUrl': pdf_url,
+                  'credentialUrl': credential_url,
+                  'issueDate': issue_date,
+                  'createdAt': datetime.utcnow().isoformat() + 'Z'
+              }
+
+              certs.append(new_cert)
+              print(f"✓ Added certification: {name}")
+
+          elif EVENT_TYPE == 'delete-cert':
+              print("Processing: delete-cert")
+              cert_id = PAYLOAD.get('id')
+              
+              cert_to_delete = next((c for c in certs if c['id'] == cert_id), None)
+              if cert_to_delete:
+                  # Delete image and PDF files
+                  slug = cert_to_delete['slug']
+                  image_path = Path(f'public/assets/certs/{slug}.jpg')
+                  pdf_path = Path(f'public/assets/certs/{slug}.pdf')
+                  
+                  if image_path.exists():
+                      image_path.unlink()
+                      print(f"✓ Deleted image: {image_path}")
+                  
+                  if pdf_path.exists():
+                      pdf_path.unlink()
+                      print(f"✓ Deleted PDF: {pdf_path}")
+                  
+                  certs.remove(cert_to_delete)
+                  print(f"✓ Deleted certification: {cert_to_delete['name']}")
+
+          # Save updated certifications JSON
+          with open(certs_path, 'w') as f:
+              json.dump(certs, f, indent=2)
+              f.write('\n')
+          print(f"✓ Updated {certs_path}")
+
+          EOF
+
+      - name: Configure git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit and push changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add public/data/certs.json public/assets/
+            git commit -m "chore: update certifications from CMS"
+            git push
+            echo "CHANGES_PUSHED=true" >> $GITHUB_ENV
+          else
+            echo "No changes to commit"
+            echo "CHANGES_PUSHED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger deployment
+        if: env.CHANGES_PUSHED == 'true'
+        run: |
+          gh workflow run deploy.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
