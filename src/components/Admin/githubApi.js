@@ -10,6 +10,22 @@ const OWNER = "chiragdhunna";
 const REPO = "chiragdhunna.github.io";
 
 /**
+ * Get GitHub PAT - checks if it's available in environment or from admin input
+ */
+function getGitHubPAT() {
+  // Check env var (only available in dev)
+  if (import.meta.env.VITE_GITHUB_PAT) {
+    return import.meta.env.VITE_GITHUB_PAT;
+  }
+
+  // In production, the PAT is NOT exposed for security reasons
+  // Instead, the workflow handles file operations server-side
+  throw new Error(
+    "GitHub PAT not available. This feature requires deployment context.",
+  );
+}
+
+/**
  * Upload a file to GitHub and return its content SHA
  * @param {string} path - File path in repo (e.g., "public/assets/certs/test.jpg")
  * @param {string} base64Content - Base64 encoded file content
@@ -17,6 +33,8 @@ const REPO = "chiragdhunna.github.io";
  */
 async function uploadFileToGitHub(path, base64Content) {
   try {
+    const pat = getGitHubPAT();
+
     // First, try to get the existing file's SHA
     let sha = null;
     try {
@@ -24,7 +42,7 @@ async function uploadFileToGitHub(path, base64Content) {
         `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
         {
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+            Authorization: `Bearer ${pat}`,
             Accept: "application/vnd.github.v3+json",
           },
         },
@@ -54,7 +72,7 @@ async function uploadFileToGitHub(path, base64Content) {
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+          Authorization: `Bearer ${pat}`,
           Accept: "application/vnd.github.v3+json",
           "Content-Type": "application/json",
         },
@@ -90,10 +108,12 @@ export async function dispatchCmsEvent(eventType, payload) {
   }
 
   try {
+    const pat = getGitHubPAT();
+
     const response = await fetch(`${GITHUB_API}/${OWNER}/${REPO}/dispatches`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+        Authorization: `Bearer ${pat}`,
         Accept: "application/vnd.github.v3+json",
         "Content-Type": "application/json",
       },

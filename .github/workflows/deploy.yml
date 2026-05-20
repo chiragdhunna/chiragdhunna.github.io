@@ -27,7 +27,6 @@ jobs:
       - name: Build
         env:
           VITE_ADMIN_PASSWORD: ${{ secrets.ADMIN_SECRET }}
-          VITE_GITHUB_PAT: ${{ secrets.VITE_GITHUB_PAT }}
         run: npm run build
 
       - name: Deploy to GitHub Pages
