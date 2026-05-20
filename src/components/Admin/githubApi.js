@@ -17,6 +17,39 @@ const REPO = "chiragdhunna.github.io";
  */
 async function uploadFileToGitHub(path, base64Content) {
   try {
+    // First, try to get the existing file's SHA
+    let sha = null;
+    try {
+      const getResponse = await fetch(
+        `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+            Accept: "application/vnd.github.v3+json",
+          },
+        },
+      );
+
+      if (getResponse.ok) {
+        const fileData = await getResponse.json();
+        sha = fileData.sha;
+      }
+    } catch (e) {
+      // File doesn't exist, that's OK
+    }
+
+    // Upload the file
+    const putBody = {
+      message: `chore: upload asset for CMS`,
+      content: base64Content,
+      branch: "cms-workflow",
+    };
+
+    // Include SHA if file exists (for update)
+    if (sha) {
+      putBody.sha = sha;
+    }
+
     const response = await fetch(
       `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
       {
@@ -26,11 +59,7 @@ async function uploadFileToGitHub(path, base64Content) {
           Accept: "application/vnd.github.v3+json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          message: `chore: upload asset for CMS`,
-          content: base64Content,
-          branch: "cms-workflow",
-        }),
+        body: JSON.stringify(putBody),
       },
     );
 
