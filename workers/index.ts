@@ -162,96 +162,51 @@ async function dispatchEvent(
  * Handle incoming requests
  */
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    // Only POST requests
-    if (request.method !== "POST") {
-      return new Response("Method not allowed", { status: 405 });
-    }
-
-    // CORS headers
+  async fetch(request: Request, env: any): Promise<Response> {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "https://chiragdhunna.github.io",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
 
-    // Handle CORS preflight
+    // HANDLE PREFLIGHT
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
+      });
     }
 
     try {
-      // Validate JWT
-      const authHeader = request.headers.get("Authorization");
-      if (!authHeader?.startsWith("Bearer ")) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      const token = authHeader.slice(7);
-      const isValid = await validateJWT(token, env.ADMIN_SECRET);
-
-      if (!isValid) {
-        return new Response(JSON.stringify({ error: "Invalid token" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      // Parse request body
+      // EXAMPLE BODY PARSING
       const body = await request.json();
-      const { action, path, content, eventType, payload } = body;
 
-      // Handle upload action
-      if (action === "upload") {
-        if (!path || !content) {
-          return new Response(
-            JSON.stringify({ error: "Missing path or content" }),
-            { status: 400, headers: { "Content-Type": "application/json" } },
-          );
-        }
+      // YOUR EXISTING LOGIC HERE
+      // GitHub API calls etc.
 
-        const result = await uploadToGithub(path, content, env);
-
-        return new Response(JSON.stringify(result), {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      // Handle dispatch action
-      if (action === "dispatch") {
-        if (!eventType) {
-          return new Response(
-            JSON.stringify({ error: "Missing eventType" }),
-            { status: 400, headers: { "Content-Type": "application/json" } },
-          );
-        }
-
-        await dispatchEvent(eventType, payload || {}, env);
-
-        return new Response(JSON.stringify({ success: true }), {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      return new Response(JSON.stringify({ error: "Unknown action" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (error) {
-      console.error("Worker error:", error);
       return new Response(
         JSON.stringify({
-          error:
-            error instanceof Error ? error.message : "Internal server error",
+          success: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    } catch (err: any) {
+      return new Response(
+        JSON.stringify({
+          error: err.message,
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
         },
       );
     }
