@@ -27,6 +27,7 @@ async function uploadToGithub(
       headers: {
         Authorization: `Bearer ${env.GITHUB_PAT}`,
         Accept: "application/vnd.github.v3+json",
+        "User-Agent": "portfolio-cms-worker",
       },
     },
   );
@@ -57,6 +58,7 @@ async function uploadToGithub(
         Authorization: `Bearer ${env.GITHUB_PAT}`,
         Accept: "application/vnd.github.v3+json",
         "Content-Type": "application/json",
+        "User-Agent": "portfolio-cms-worker",
       },
       body: JSON.stringify(payload),
     },
