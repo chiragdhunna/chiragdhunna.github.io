@@ -741,3 +741,21 @@ button:focus {
 .fork-btn-inner::after {
   display: none !important;
 }
+
+/* --------- */
+/* Admin Footer Link */
+/* --------- */
+.admin-footer-link {
+  color: #ffffff25 !important;
+  font-size: 0.75rem !important;
+  text-decoration: none !important;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+  display: inline-block;
+  margin-top: 0.6rem;
+}
+
+.admin-footer-link:hover {
+  color: #c770f0 !important;
+  text-decoration: none !important;
+}

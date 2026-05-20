@@ -1,20 +1,27 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CertForm from "./CertForm";
 import ProjectForm from "./ProjectForm";
 import "./AdminDashboard.css";
 
 function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState("certifications");
+  const navigate = useNavigate();
 
   const handleSuccess = () => {
-    // Could add notifications or refresh data here
     setActiveTab("certifications");
   };
 
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
-        <h1>Portfolio CMS</h1>
+        <div className="admin-header-left">
+          <button className="home-btn" onClick={() => navigate("/")}>
+            <span className="home-btn-arrow">←</span>
+            <span className="home-btn-text">Home</span>
+          </button>
+          <h1>Portfolio CMS</h1>
+        </div>
         <button onClick={onLogout} className="logout-btn">
           Logout
         </button>

@@ -6,13 +6,17 @@ import {
   AiFillInstagram,
 } from "react-icons/ai";
 import { FaLinkedinIn } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Footer() {
-  let date = new Date();
   return (
     <Container fluid className="footer">
       <Row>
-        <Col md="4" className="footer-copywright"></Col>
+        <Col md="4" className="footer-copywright">
+          <Link to="/admin" className="admin-footer-link">
+            Admin Panel
+          </Link>
+        </Col>
         <Col md="4" className="footer-copywright"></Col>
         <Col md="4" className="footer-body">
           <ul className="footer-icons">
