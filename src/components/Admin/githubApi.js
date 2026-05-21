@@ -19,6 +19,14 @@ function isProduction() {
 }
 
 /**
+ * Unicode-safe base64 encoder (handles emojis, accents, CJK, etc.)
+ * btoa() crashes on any character outside Latin-1 — this fixes that.
+ */
+function toBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+/**
  * Fetch a JSON file from GitHub.
  * In prod: Uses the Cloudflare Worker so the browser never needs repo access.
  * In dev: Uses the direct GitHub API with the local PAT.
@@ -59,7 +67,9 @@ async function getFileFromGitHub(path) {
       throw new Error("Worker get response is missing content");
     }
 
-    const parsed = JSON.parse(atob(data.content));
+    // GitHub base64 includes newlines — strip them before decoding
+    const cleaned = data.content.replace(/\s/g, "");
+    const parsed = JSON.parse(atob(cleaned));
 
     return { content: parsed, sha: data.sha };
   }
@@ -90,7 +100,9 @@ async function getFileFromGitHub(path) {
   }
 
   const data = await response.json();
-  const parsed = JSON.parse(atob(data.content));
+  // Strip whitespace/newlines from GitHub's base64 before decoding
+  const cleaned = data.content.replace(/\s/g, "");
+  const parsed = JSON.parse(atob(cleaned));
 
   return { content: parsed, sha: data.sha };
 }
@@ -286,9 +298,8 @@ export async function dispatchCmsEvent(eventType, payload) {
 
 /**
  * Add a new certification.
- * Uploads image (and optional PDF), reads the existing certs.json from the
- * public GitHub raw URL (no auth needed), appends the new entry, then
- * commits the updated file back via the Worker / direct API.
+ * Uploads image (and optional PDF), reads the existing certs.json,
+ * appends the new entry, then commits the updated file back.
  */
 export async function addCertification(certData) {
   // 1. Upload image
@@ -303,29 +314,26 @@ export async function addCertification(certData) {
     await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
-  // 3. Read existing certs.json directly from GitHub raw (always up-to-date,
-  //    no auth required for public repos, cache-busted with timestamp)
+  // 3. Read existing certs.json — THROW on failure so we never
+  //    silently start with an empty list and wipe existing certs.
   const certsPath = "public/data/certs.json";
   let certs = [];
 
-  console.log(`[addCertification] Reading existing certs from GitHub raw...`);
+  console.log(`[addCertification] Reading existing certs.json...`);
 
-  try {
-    const existing = await getFileFromGitHub(certsPath);
+  const existing = await getFileFromGitHub(certsPath);
 
-    if (existing && Array.isArray(existing.content)) {
-      certs = existing.content;
-      console.log(`[addCertification] Found ${certs.length} existing cert(s)`);
-    } else {
-      console.warn(
-        `[addCertification] Unexpected content shape:`,
-        existing?.content,
-      );
-    }
-  } catch (error) {
-    console.error(
-      "[addCertification] Failed to read certs.json, starting fresh:",
-      error,
+  if (existing === null) {
+    // File doesn't exist yet — this is the very first cert, start fresh
+    console.log(`[addCertification] certs.json not found, starting fresh.`);
+    certs = [];
+  } else if (Array.isArray(existing.content)) {
+    certs = existing.content;
+    console.log(`[addCertification] Found ${certs.length} existing cert(s).`);
+  } else {
+    // File exists but content is not an array — something is wrong, abort
+    throw new Error(
+      `[addCertification] certs.json has unexpected shape: ${JSON.stringify(existing.content).slice(0, 100)}`,
     );
   }
 
@@ -346,8 +354,8 @@ export async function addCertification(certData) {
     `[addCertification] Uploading updated certs.json with ${certs.length} cert(s)...`,
   );
 
-  // 5. Commit updated list back to the repo
-  const updatedCertsContent = btoa(JSON.stringify(certs, null, 2));
+  // 5. Encode with Unicode-safe encoder and commit back
+  const updatedCertsContent = toBase64(JSON.stringify(certs, null, 2));
   await uploadFileToGitHub(
     certsPath,
     `data:application/json;base64,${updatedCertsContent}`,
