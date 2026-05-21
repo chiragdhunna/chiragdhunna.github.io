@@ -43,11 +43,11 @@ jobs:
       - name: Unstash changes
         run: git stash pop
 
-      - name: Resolve merge conflicts
+      - name: Force overwrite conflicts
         run: |
+          git reset --hard
           git add .
-          git merge --strategy-option ours || true
-          git add .
+          git commit -m "Resolve conflicts by overwriting with stashed changes" || true
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
