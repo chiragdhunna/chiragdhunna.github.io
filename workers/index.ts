@@ -11,6 +11,9 @@ interface Env {
 
 const GITHUB_API = "https://api.github.com/repos";
 
+/**
+ * Upload file to GitHub
+ */
 async function uploadToGithub(
   path: string,
   base64Content: string,
@@ -80,6 +83,43 @@ async function uploadToGithub(
   };
 }
 
+/**
+ * Dispatch repository event
+ */
+async function dispatchEvent(
+  eventType: string,
+  payload: Record<string, unknown>,
+  env: Env,
+): Promise<void> {
+  console.log("Dispatching GitHub event:", eventType);
+
+  const dispatchRes = await fetch(
+    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/dispatches`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_PAT}`,
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+        "User-Agent": "portfolio-cms-worker",
+      },
+      body: JSON.stringify({
+        event_type: eventType,
+        client_payload: payload,
+      }),
+    },
+  );
+
+  const dispatchText = await dispatchRes.text();
+
+  console.log("Dispatch status:", dispatchRes.status);
+  console.log("Dispatch response:", dispatchText);
+
+  if (!dispatchRes.ok) {
+    throw new Error(`Dispatch failed: ${dispatchText}`);
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const corsHeaders = {
@@ -88,6 +128,9 @@ export default {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
 
+    // =========================
+    // PREFLIGHT
+    // =========================
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -95,6 +138,9 @@ export default {
       });
     }
 
+    // =========================
+    // HEALTH CHECK
+    // =========================
     if (request.method === "GET") {
       return new Response(
         JSON.stringify({
@@ -116,35 +162,76 @@ export default {
 
       console.log("Incoming request body keys:", Object.keys(body));
 
-      const {
-        path,
-        content,
-      }: {
-        path: string;
-        content: string;
-      } = body;
+      // =========================
+      // HANDLE FILE UPLOAD
+      // =========================
+      if (body.action === "upload") {
+        const {
+          path,
+          content,
+        }: {
+          path: string;
+          content: string;
+        } = body;
 
-      if (!path || !content) {
-        throw new Error("Missing path or content");
+        if (!path || !content) {
+          throw new Error("Missing path or content");
+        }
+
+        const result = await uploadToGithub(path, content, env);
+
+        console.log("Upload successful");
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            sha: result.sha,
+          }),
+          {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          },
+        );
       }
 
-      const result = await uploadToGithub(path, content, env);
+      // =========================
+      // HANDLE DISPATCH EVENT
+      // =========================
+      if (body.action === "dispatch") {
+        const {
+          eventType,
+          payload,
+        }: {
+          eventType: string;
+          payload: Record<string, unknown>;
+        } = body;
 
-      console.log("Upload successful");
+        if (!eventType) {
+          throw new Error("Missing eventType");
+        }
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          sha: result.sha,
-        }),
-        {
-          status: 200,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
+        await dispatchEvent(eventType, payload || {}, env);
+
+        console.log("Dispatch successful");
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+          }),
+          {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
           },
-        },
-      );
+        );
+      }
+
+      throw new Error("Invalid action");
     } catch (err: any) {
       console.error("Worker error:", err);
 
