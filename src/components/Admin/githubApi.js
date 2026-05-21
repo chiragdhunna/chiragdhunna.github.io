@@ -33,8 +33,8 @@ async function getFileFromGitHub(path) {
   }
 
   if (isProduction()) {
-    // Production: Use Cloudflare Worker
-    // Your worker must handle action: "get" and return { content: <base64>, sha: <string> }
+    console.log(`[getFileFromGitHub] PROD mode — fetching via worker: ${path}`);
+
     const response = await fetch(WORKER_URL, {
       method: "POST",
       headers: {
@@ -44,20 +44,44 @@ async function getFileFromGitHub(path) {
       body: JSON.stringify({ action: "get", path }),
     });
 
+    console.log(
+      `[getFileFromGitHub] Worker response status: ${response.status}`,
+    );
+
     if (!response.ok) {
-      if (response.status === 404) return null;
+      if (response.status === 404) {
+        console.warn(`[getFileFromGitHub] File not found (404): ${path}`);
+        return null;
+      }
       const error = await response.json();
       throw new Error(`Fetch failed: ${error.error}`);
     }
 
     const data = await response.json();
-    return {
-      content: JSON.parse(atob(data.content)),
-      sha: data.sha,
-    };
+    console.log(`[getFileFromGitHub] Worker returned keys:`, Object.keys(data));
+
+    // Worker must return { content: <base64_string>, sha: <string> }
+    if (!data.content) {
+      console.error(
+        `[getFileFromGitHub] Worker response missing 'content' field:`,
+        data,
+      );
+      throw new Error("Worker get response is missing 'content' field");
+    }
+
+    const parsed = JSON.parse(atob(data.content));
+    console.log(
+      `[getFileFromGitHub] Parsed content type: ${typeof parsed}, isArray: ${Array.isArray(parsed)}, length: ${Array.isArray(parsed) ? parsed.length : "n/a"}`,
+    );
+
+    return { content: parsed, sha: data.sha };
   }
 
   // Development: Use direct GitHub API
+  console.log(
+    `[getFileFromGitHub] DEV mode — fetching via GitHub API: ${path}`,
+  );
+
   const pat = import.meta.env.VITE_GITHUB_PAT;
 
   if (!pat) {
@@ -74,16 +98,26 @@ async function getFileFromGitHub(path) {
     },
   );
 
+  console.log(
+    `[getFileFromGitHub] GitHub API response status: ${response.status}`,
+  );
+
   if (!response.ok) {
-    if (response.status === 404) return null;
+    if (response.status === 404) {
+      console.warn(`[getFileFromGitHub] File not found (404): ${path}`);
+      return null;
+    }
     throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
   }
 
   const data = await response.json();
-  return {
-    content: JSON.parse(atob(data.content)),
-    sha: data.sha,
-  };
+  const parsed = JSON.parse(atob(data.content));
+
+  console.log(
+    `[getFileFromGitHub] Parsed content type: ${typeof parsed}, isArray: ${Array.isArray(parsed)}, length: ${Array.isArray(parsed) ? parsed.length : "n/a"}`,
+  );
+
+  return { content: parsed, sha: data.sha };
 }
 
 /**
@@ -263,7 +297,6 @@ export async function dispatchCmsEvent(eventType, payload) {
         const errorData = await response.json();
         errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
       } catch (e) {
-        // Error response is not JSON
         console.warn("Non-JSON error response:", e);
       }
 
@@ -280,48 +313,56 @@ export async function dispatchCmsEvent(eventType, payload) {
 /**
  * Add a new certification
  * Uploads image (and optional PDF), appends to certs.json, then dispatches event.
- *
- * @param {object} certData
- * @param {string} certData.slug
- * @param {string} certData.name
- * @param {string} certData.issuer
- * @param {string} certData.issueDate
- * @param {string} certData.imageBase64
- * @param {string} [certData.pdfBase64]
- * @param {string} [certData.credentialUrl]
  */
 export async function addCertification(certData) {
   // Upload image
   const imagePath = `public/assets/certs/${certData.slug}.jpg`;
-
-  console.log(`Uploading image to ${imagePath}...`);
+  console.log(`[addCertification] Uploading image to ${imagePath}...`);
   await uploadFileToGitHub(imagePath, certData.imageBase64);
 
   // Upload PDF if provided
   if (certData.pdfBase64) {
     const pdfPath = `public/assets/certs/${certData.slug}.pdf`;
-
-    console.log(`Uploading PDF to ${pdfPath}...`);
+    console.log(`[addCertification] Uploading PDF to ${pdfPath}...`);
     await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
-  // Fetch existing certs.json using the auth-aware helper so it works in
-  // both dev and production (fixes the bug where VITE_GITHUB_PAT was used
-  // directly here, causing an empty fetch in prod and wiping the list).
+  // Fetch existing certs.json
   const certsPath = "public/data/certs.json";
   let certs = [];
 
+  console.log(`[addCertification] Fetching existing certs from: ${certsPath}`);
+  console.log(`[addCertification] isProduction: ${isProduction()}`);
+
   try {
     const existing = await getFileFromGitHub(certsPath);
+    console.log(`[addCertification] getFileFromGitHub returned:`, existing);
 
     if (existing && Array.isArray(existing.content)) {
       certs = existing.content;
+      console.log(`[addCertification] Loaded ${certs.length} existing cert(s)`);
+    } else {
+      console.warn(
+        `[addCertification] existing.content is not an array:`,
+        existing?.content,
+      );
     }
   } catch (error) {
-    console.warn("Failed to fetch existing certs.json, starting fresh:", error);
+    console.error(
+      "[addCertification] getFileFromGitHub threw an error:",
+      error,
+    );
+    console.warn(
+      "[addCertification] Starting with empty list due to error above",
+    );
   }
 
-  // Append the new certificate — never replaces the full list
+  console.log(
+    `[addCertification] certs list before push (length=${certs.length}):`,
+    JSON.stringify(certs, null, 2),
+  );
+
+  // Append the new certificate
   certs.push({
     id: certData.slug,
     slug: certData.slug,
@@ -334,15 +375,20 @@ export async function addCertification(certData) {
     createdAt: new Date().toISOString(),
   });
 
-  // Upload the updated list back to GitHub
-  console.log("Updating certs.json...");
+  console.log(
+    `[addCertification] certs list after push (length=${certs.length})`,
+  );
+
+  // Upload updated list
+  console.log("[addCertification] Uploading updated certs.json...");
   const updatedCertsContent = btoa(JSON.stringify(certs, null, 2));
   await uploadFileToGitHub(
     certsPath,
     `data:application/json;base64,${updatedCertsContent}`,
   );
 
-  // Dispatch GitHub Actions event
+  console.log("[addCertification] Done. Dispatching event...");
+
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
     issuer: certData.issuer,
@@ -355,9 +401,6 @@ export async function addCertification(certData) {
 
 /**
  * Update an existing certification
- *
- * @param {string} certId
- * @param {object} certData - Fields to update
  */
 export async function updateCertification(certId, certData) {
   return dispatchCmsEvent("update-cert", {
@@ -368,8 +411,6 @@ export async function updateCertification(certId, certData) {
 
 /**
  * Delete a certification
- *
- * @param {string} certId
  */
 export async function deleteCertification(certId) {
   return dispatchCmsEvent("delete-cert", {
@@ -379,24 +420,13 @@ export async function deleteCertification(certId) {
 
 /**
  * Add a new project
- * Uploads image then dispatches event.
- *
- * @param {object} projectData
- * @param {string} projectData.slug
- * @param {string} projectData.name
- * @param {string} projectData.description
- * @param {string} projectData.githubLink
- * @param {string} [projectData.demoLink]
- * @param {string} projectData.imageBase64
  */
 export async function addProject(projectData) {
-  // Upload image
   const imagePath = `public/assets/projects/${projectData.slug}.jpg`;
 
-  console.log(`Uploading image to ${imagePath}...`);
+  console.log(`[addProject] Uploading image to ${imagePath}...`);
   await uploadFileToGitHub(imagePath, projectData.imageBase64);
 
-  // Dispatch event
   return dispatchCmsEvent("add-project", {
     name: projectData.name,
     description: projectData.description,
@@ -408,16 +438,13 @@ export async function addProject(projectData) {
 
 /**
  * Upload a new resume (replaces the existing file)
- *
- * @param {string} resumeBase64 - Base64-encoded PDF (with or without data URL prefix)
  */
 export async function uploadResume(resumeBase64) {
   const resumePath = "public/resume/Chirag_Dhunna.pdf";
 
-  console.log(`Uploading resume to ${resumePath}...`);
+  console.log(`[uploadResume] Uploading resume to ${resumePath}...`);
   await uploadFileToGitHub(resumePath, resumeBase64);
 
-  // Dispatch event
   return dispatchCmsEvent("upload-resume", {
     fileName: "Chirag_Dhunna.pdf",
   });
