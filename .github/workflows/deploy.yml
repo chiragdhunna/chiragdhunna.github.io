@@ -40,17 +40,15 @@ jobs:
           git checkout gh-pages || git checkout --orphan gh-pages
           git pull origin gh-pages
 
+      - name: Reset gh-pages branch
+        run: |
+          git reset --hard origin/gh-pages
+
+      - name: Force push changes
+        run: |
+          git add .
+          git commit -m "Force update gh-pages with new build" || true
+          git push origin gh-pages --force
+
       - name: Unstash changes
         run: git stash pop
-
-      - name: Force overwrite conflicts
-        run: |
-          git reset --hard
-          git add .
-          git commit -m "Resolve conflicts by overwriting with stashed changes" || true
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
