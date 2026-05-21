@@ -220,6 +220,50 @@ export async function addCertification(certData) {
     await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
+  // Fetch existing certs.json
+  const certsPath = "public/data/certs.json";
+  let certs = [];
+
+  try {
+    const response = await fetch(
+      `${GITHUB_API}/${OWNER}/${REPO}/contents/${certsPath}`,
+      {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      },
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      certs = JSON.parse(atob(data.content));
+    }
+  } catch (error) {
+    console.warn("Failed to fetch existing certs.json, starting fresh:", error);
+  }
+
+  // Append new certificate metadata
+  certs.push({
+    id: certData.slug,
+    slug: certData.slug,
+    name: certData.name,
+    issuer: certData.issuer,
+    issueDate: certData.issueDate,
+    imageUrl: `/assets/certs/${certData.slug}.jpg`,
+    pdfUrl: certData.pdfBase64 ? `/assets/certs/${certData.slug}.pdf` : null,
+    credentialUrl: certData.credentialUrl || null,
+    createdAt: new Date().toISOString(),
+  });
+
+  // Upload updated certs.json
+  console.log("Updating certs.json...");
+  const updatedCertsContent = btoa(JSON.stringify(certs, null, 2));
+  await uploadFileToGitHub(
+    certsPath,
+    `data:application/json;base64,${updatedCertsContent}`,
+  );
+
   // Dispatch event
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
