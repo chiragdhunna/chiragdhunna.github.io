@@ -1,32 +1,13 @@
 [
   {
-    "id": "cert_aws",
-    "slug": "aws-certified-ai-practitioner",
-    "name": "AWS Certified AI Practitioner",
-    "issuer": "Amazon Web Services",
-    "imageUrl": "/assets/certs/aws-certified-ai-practitioner.png",
-    "pdfUrl": "/assets/certs/aws-certified-ai-practitioner.pdf",
+    "id": "test-project-chirag-dhunna",
+    "slug": "test-project-chirag-dhunna",
+    "name": "Test Project | Chirag Dhunna",
+    "issuer": "testing",
+    "issueDate": "2026-05-21",
+    "imageUrl": "/assets/certs/test-project-chirag-dhunna.jpg",
+    "pdfUrl": "/assets/certs/test-project-chirag-dhunna.pdf",
     "credentialUrl": null,
-    "createdAt": "2026-05-17T00:00:00Z"
-  },
-  {
-    "id": "cert_azure_ai",
-    "slug": "azure-ai-engineer-associate",
-    "name": "Microsoft Certified: Azure AI Engineer Associate",
-    "issuer": "Microsoft",
-    "imageUrl": "/assets/certs/azure-ai-engineer-associate.png",
-    "pdfUrl": "/assets/certs/azure-ai-engineer-associate.pdf",
-    "credentialUrl": "https://learn.microsoft.com/en-us/users/chiragdhunna-6058/credentials/certification/azure-ai-engineer?tab=credentials-tab",
-    "createdAt": "2026-05-18T00:00:00Z"
-  },
-  {
-    "id": "cert_az104",
-    "slug": "az-104-azure-administrator-associate",
-    "name": "Microsoft Certified: Azure Administrator Associate",
-    "issuer": "Microsoft",
-    "imageUrl": "/assets/certs/az-104.png",
-    "pdfUrl": "/assets/certs/az-104.pdf",
-    "credentialUrl": null,
-    "createdAt": "2026-05-17T00:00:00Z"
+    "createdAt": "2026-05-21T06:43:21.032Z"
   }
 ]
