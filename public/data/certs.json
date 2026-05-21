@@ -20,5 +20,16 @@
     "pdfUrl": "/assets/certs/test-certificate-chirag-dhunna.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-21T07:48:08.073Z"
+  },
+  {
+    "id": "test-project-chirag-dhunna",
+    "slug": "test-project-chirag-dhunna",
+    "name": "Test Project | Chirag Dhunna",
+    "issuer": "testing",
+    "issueDate": "2026-05-21",
+    "imageUrl": "/assets/certs/test-project-chirag-dhunna.jpg",
+    "pdfUrl": "/assets/certs/test-project-chirag-dhunna.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-21T07:56:56.251Z"
   }
 ]
