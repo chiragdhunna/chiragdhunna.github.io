@@ -12,6 +12,46 @@ interface Env {
 const GITHUB_API = "https://api.github.com/repos";
 
 /**
+ * Fetch a file from GitHub contents API.
+ */
+async function getFromGithub(
+  path: string,
+  env: Env,
+): Promise<{ content: string; sha: string } | null> {
+  const response = await fetch(
+    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_PAT}`,
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "portfolio-cms-worker",
+      },
+    },
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  const responseText = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`GitHub fetch failed: ${responseText}`);
+  }
+
+  const data = JSON.parse(responseText);
+
+  if (!data.content || !data.sha) {
+    throw new Error("GitHub fetch response missing content or sha");
+  }
+
+  return {
+    content: data.content,
+    sha: data.sha,
+  };
+}
+
+/**
  * Upload file to GitHub
  */
 async function uploadToGithub(
@@ -161,6 +201,54 @@ export default {
       const body = await request.json();
 
       console.log("Incoming request body keys:", Object.keys(body));
+
+      // =========================
+      // HANDLE FILE FETCH
+      // =========================
+      if (body.action === "get") {
+        const {
+          path,
+        }: {
+          path: string;
+        } = body;
+
+        if (!path) {
+          throw new Error("Missing path");
+        }
+
+        const result = await getFromGithub(path, env);
+
+        if (!result) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: "Not found",
+            }),
+            {
+              status: 404,
+              headers: {
+                ...corsHeaders,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            content: result.content,
+            sha: result.sha,
+          }),
+          {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+      }
 
       // =========================
       // HANDLE FILE UPLOAD

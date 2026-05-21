@@ -19,37 +19,80 @@ function isProduction() {
 }
 
 /**
- * Fetch a JSON file directly from GitHub raw content.
- * Works in both dev and prod without auth since the repo is public.
- * Cache-busted with a timestamp so we always get the latest committed version.
+ * Fetch a JSON file from GitHub.
+ * In prod: Uses the Cloudflare Worker so the browser never needs repo access.
+ * In dev: Uses the direct GitHub API with the local PAT.
  *
  * @param {string} path - Repo-relative path, e.g. "public/data/certs.json"
- * @returns {{ content: any } | null}
+ * @returns {{ content: any, sha?: string } | null}
  */
 async function getFileFromGitHub(path) {
-  const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}?t=${Date.now()}`;
+  const token = getStoredToken();
 
-  console.log(`[getFileFromGitHub] Fetching: ${url}`);
+  if (!token) {
+    throw new Error("Not authenticated");
+  }
 
-  const response = await fetch(url);
+  if (isProduction()) {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ action: "get", path }),
+    });
 
-  console.log(`[getFileFromGitHub] Status: ${response.status}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.warn(`[getFileFromGitHub] File not found (404): ${path}`);
+        return null;
+      }
+
+      const error = await response.json().catch(() => ({}));
+      throw new Error(`Fetch failed: ${error.error || response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.content) {
+      throw new Error("Worker get response is missing content");
+    }
+
+    const parsed = JSON.parse(atob(data.content));
+
+    return { content: parsed, sha: data.sha };
+  }
+
+  const pat = import.meta.env.VITE_GITHUB_PAT;
+
+  if (!pat) {
+    throw new Error("GitHub PAT not available in development");
+  }
+
+  const response = await fetch(
+    `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${pat}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    },
+  );
 
   if (!response.ok) {
     if (response.status === 404) {
       console.warn(`[getFileFromGitHub] File not found (404): ${path}`);
       return null;
     }
+
     throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
   }
 
-  const content = await response.json();
+  const data = await response.json();
+  const parsed = JSON.parse(atob(data.content));
 
-  console.log(
-    `[getFileFromGitHub] Loaded ${Array.isArray(content) ? content.length : typeof content} item(s)`,
-  );
-
-  return { content };
+  return { content: parsed, sha: data.sha };
 }
 
 /**
