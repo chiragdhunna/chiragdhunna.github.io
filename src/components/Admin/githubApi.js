@@ -8,6 +8,7 @@ import { getStoredToken } from "./auth";
 const GITHUB_API = "https://api.github.com/repos";
 const OWNER = "chiragdhunna";
 const REPO = "chiragdhunna.github.io";
+const BRANCH = "master";
 const WORKER_URL = "https://portfolio-cms-worker.chigsdroid.workers.dev";
 
 /**
@@ -18,89 +19,21 @@ function isProduction() {
 }
 
 /**
- * Fetch a file's content and SHA from GitHub
- * In prod: Uses Cloudflare Worker (requires "get" action support in worker)
- * In dev: Uses direct GitHub API
+ * Fetch a JSON file directly from GitHub raw content.
+ * Works in both dev and prod without auth since the repo is public.
+ * Cache-busted with a timestamp so we always get the latest committed version.
  *
- * @param {string} path - Repo-relative path to the file
- * @returns {{ content: any, sha: string } | null} Parsed JSON content + SHA, or null if not found
+ * @param {string} path - Repo-relative path, e.g. "public/data/certs.json"
+ * @returns {{ content: any } | null}
  */
 async function getFileFromGitHub(path) {
-  const token = getStoredToken();
+  const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}?t=${Date.now()}`;
 
-  if (!token) {
-    throw new Error("Not authenticated");
-  }
+  console.log(`[getFileFromGitHub] Fetching: ${url}`);
 
-  if (isProduction()) {
-    console.log(`[getFileFromGitHub] PROD mode — fetching via worker: ${path}`);
+  const response = await fetch(url);
 
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ action: "get", path }),
-    });
-
-    console.log(
-      `[getFileFromGitHub] Worker response status: ${response.status}`,
-    );
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        console.warn(`[getFileFromGitHub] File not found (404): ${path}`);
-        return null;
-      }
-      const error = await response.json();
-      throw new Error(`Fetch failed: ${error.error}`);
-    }
-
-    const data = await response.json();
-    console.log(`[getFileFromGitHub] Worker returned keys:`, Object.keys(data));
-
-    // Worker must return { content: <base64_string>, sha: <string> }
-    if (!data.content) {
-      console.error(
-        `[getFileFromGitHub] Worker response missing 'content' field:`,
-        data,
-      );
-      throw new Error("Worker get response is missing 'content' field");
-    }
-
-    const parsed = JSON.parse(atob(data.content));
-    console.log(
-      `[getFileFromGitHub] Parsed content type: ${typeof parsed}, isArray: ${Array.isArray(parsed)}, length: ${Array.isArray(parsed) ? parsed.length : "n/a"}`,
-    );
-
-    return { content: parsed, sha: data.sha };
-  }
-
-  // Development: Use direct GitHub API
-  console.log(
-    `[getFileFromGitHub] DEV mode — fetching via GitHub API: ${path}`,
-  );
-
-  const pat = import.meta.env.VITE_GITHUB_PAT;
-
-  if (!pat) {
-    throw new Error("GitHub PAT not available in development");
-  }
-
-  const response = await fetch(
-    `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
-    {
-      headers: {
-        Authorization: `Bearer ${pat}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-    },
-  );
-
-  console.log(
-    `[getFileFromGitHub] GitHub API response status: ${response.status}`,
-  );
+  console.log(`[getFileFromGitHub] Status: ${response.status}`);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -110,14 +43,13 @@ async function getFileFromGitHub(path) {
     throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
   }
 
-  const data = await response.json();
-  const parsed = JSON.parse(atob(data.content));
+  const content = await response.json();
 
   console.log(
-    `[getFileFromGitHub] Parsed content type: ${typeof parsed}, isArray: ${Array.isArray(parsed)}, length: ${Array.isArray(parsed) ? parsed.length : "n/a"}`,
+    `[getFileFromGitHub] Loaded ${Array.isArray(content) ? content.length : typeof content} item(s)`,
   );
 
-  return { content: parsed, sha: data.sha };
+  return { content };
 }
 
 /**
@@ -216,7 +148,6 @@ async function uploadFileToGitHub(path, base64Content) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-
       throw new Error(
         `Failed to upload file: ${errorData.message || response.statusText}`,
       );
@@ -311,58 +242,51 @@ export async function dispatchCmsEvent(eventType, payload) {
 }
 
 /**
- * Add a new certification
- * Uploads image (and optional PDF), appends to certs.json, then dispatches event.
+ * Add a new certification.
+ * Uploads image (and optional PDF), reads the existing certs.json from the
+ * public GitHub raw URL (no auth needed), appends the new entry, then
+ * commits the updated file back via the Worker / direct API.
  */
 export async function addCertification(certData) {
-  // Upload image
+  // 1. Upload image
   const imagePath = `public/assets/certs/${certData.slug}.jpg`;
   console.log(`[addCertification] Uploading image to ${imagePath}...`);
   await uploadFileToGitHub(imagePath, certData.imageBase64);
 
-  // Upload PDF if provided
+  // 2. Upload PDF if provided
   if (certData.pdfBase64) {
     const pdfPath = `public/assets/certs/${certData.slug}.pdf`;
     console.log(`[addCertification] Uploading PDF to ${pdfPath}...`);
     await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
-  // Fetch existing certs.json
+  // 3. Read existing certs.json directly from GitHub raw (always up-to-date,
+  //    no auth required for public repos, cache-busted with timestamp)
   const certsPath = "public/data/certs.json";
   let certs = [];
 
-  console.log(`[addCertification] Fetching existing certs from: ${certsPath}`);
-  console.log(`[addCertification] isProduction: ${isProduction()}`);
+  console.log(`[addCertification] Reading existing certs from GitHub raw...`);
 
   try {
     const existing = await getFileFromGitHub(certsPath);
-    console.log(`[addCertification] getFileFromGitHub returned:`, existing);
 
     if (existing && Array.isArray(existing.content)) {
       certs = existing.content;
-      console.log(`[addCertification] Loaded ${certs.length} existing cert(s)`);
+      console.log(`[addCertification] Found ${certs.length} existing cert(s)`);
     } else {
       console.warn(
-        `[addCertification] existing.content is not an array:`,
+        `[addCertification] Unexpected content shape:`,
         existing?.content,
       );
     }
   } catch (error) {
     console.error(
-      "[addCertification] getFileFromGitHub threw an error:",
+      "[addCertification] Failed to read certs.json, starting fresh:",
       error,
-    );
-    console.warn(
-      "[addCertification] Starting with empty list due to error above",
     );
   }
 
-  console.log(
-    `[addCertification] certs list before push (length=${certs.length}):`,
-    JSON.stringify(certs, null, 2),
-  );
-
-  // Append the new certificate
+  // 4. Append — never replace
   certs.push({
     id: certData.slug,
     slug: certData.slug,
@@ -376,19 +300,19 @@ export async function addCertification(certData) {
   });
 
   console.log(
-    `[addCertification] certs list after push (length=${certs.length})`,
+    `[addCertification] Uploading updated certs.json with ${certs.length} cert(s)...`,
   );
 
-  // Upload updated list
-  console.log("[addCertification] Uploading updated certs.json...");
+  // 5. Commit updated list back to the repo
   const updatedCertsContent = btoa(JSON.stringify(certs, null, 2));
   await uploadFileToGitHub(
     certsPath,
     `data:application/json;base64,${updatedCertsContent}`,
   );
 
-  console.log("[addCertification] Done. Dispatching event...");
+  console.log(`[addCertification] Done. Dispatching event...`);
 
+  // 6. Dispatch GitHub Actions event
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
     issuer: certData.issuer,
