@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "public/assets/certs/**"
+      - "public/assets/projects/**"
+      - "public/resume/**"
   workflow_dispatch:
 
 permissions:
