@@ -1,13 +1,13 @@
 [
   {
-    "id": "test-project-chirag-dhunna",
-    "slug": "test-project-chirag-dhunna",
-    "name": "Test Project | Chirag Dhunna",
+    "id": "chirag-dhunna",
+    "slug": "chirag-dhunna",
+    "name": "Chirag Dhunna",
     "issuer": "testing",
     "issueDate": "2026-05-21",
-    "imageUrl": "/assets/certs/test-project-chirag-dhunna.jpg",
-    "pdfUrl": "/assets/certs/test-project-chirag-dhunna.pdf",
+    "imageUrl": "/assets/certs/chirag-dhunna.jpg",
+    "pdfUrl": "/assets/certs/chirag-dhunna.pdf",
     "credentialUrl": null,
-    "createdAt": "2026-05-21T06:43:21.032Z"
+    "createdAt": "2026-05-21T07:26:40.615Z"
   }
 ]
