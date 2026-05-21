@@ -18,9 +18,82 @@ function isProduction() {
 }
 
 /**
+ * Fetch a file's content and SHA from GitHub
+ * In prod: Uses Cloudflare Worker (requires "get" action support in worker)
+ * In dev: Uses direct GitHub API
+ *
+ * @param {string} path - Repo-relative path to the file
+ * @returns {{ content: any, sha: string } | null} Parsed JSON content + SHA, or null if not found
+ */
+async function getFileFromGitHub(path) {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error("Not authenticated");
+  }
+
+  if (isProduction()) {
+    // Production: Use Cloudflare Worker
+    // Your worker must handle action: "get" and return { content: <base64>, sha: <string> }
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ action: "get", path }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      const error = await response.json();
+      throw new Error(`Fetch failed: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return {
+      content: JSON.parse(atob(data.content)),
+      sha: data.sha,
+    };
+  }
+
+  // Development: Use direct GitHub API
+  const pat = import.meta.env.VITE_GITHUB_PAT;
+
+  if (!pat) {
+    throw new Error("GitHub PAT not available in development");
+  }
+
+  const response = await fetch(
+    `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${pat}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    content: JSON.parse(atob(data.content)),
+    sha: data.sha,
+  };
+}
+
+/**
  * Upload a file to GitHub
  * In prod: Uses Cloudflare Worker
  * In dev: Uses direct GitHub API
+ *
+ * @param {string} path - Repo-relative path to the file
+ * @param {string} base64Content - Base64 content (with or without data URL prefix)
+ * @returns {string} SHA of the uploaded file
  */
 async function uploadFileToGitHub(path, base64Content) {
   try {
@@ -61,7 +134,7 @@ async function uploadFileToGitHub(path, base64Content) {
       throw new Error("GitHub PAT not available in development");
     }
 
-    // Get existing file SHA
+    // Get existing file SHA (needed to overwrite an existing file)
     let sha = null;
 
     try {
@@ -80,7 +153,7 @@ async function uploadFileToGitHub(path, base64Content) {
         sha = fileData.sha;
       }
     } catch (e) {
-      // File doesn't exist, that's OK
+      // File doesn't exist yet, that's fine
       console.warn("Existing file not found:", e);
     }
 
@@ -127,6 +200,10 @@ async function uploadFileToGitHub(path, base64Content) {
  * Dispatch a CMS event to GitHub Actions
  * In prod: Uses Cloudflare Worker
  * In dev: Uses direct GitHub API
+ *
+ * @param {string} eventType - The repository_dispatch event type
+ * @param {object} payload - The client_payload to send with the event
+ * @returns {boolean} true on success
  */
 export async function dispatchCmsEvent(eventType, payload) {
   const token = getStoredToken();
@@ -202,13 +279,22 @@ export async function dispatchCmsEvent(eventType, payload) {
 
 /**
  * Add a new certification
+ * Uploads image (and optional PDF), appends to certs.json, then dispatches event.
+ *
+ * @param {object} certData
+ * @param {string} certData.slug
+ * @param {string} certData.name
+ * @param {string} certData.issuer
+ * @param {string} certData.issueDate
+ * @param {string} certData.imageBase64
+ * @param {string} [certData.pdfBase64]
+ * @param {string} [certData.credentialUrl]
  */
 export async function addCertification(certData) {
-  // Upload image first
+  // Upload image
   const imagePath = `public/assets/certs/${certData.slug}.jpg`;
 
   console.log(`Uploading image to ${imagePath}...`);
-
   await uploadFileToGitHub(imagePath, certData.imageBase64);
 
   // Upload PDF if provided
@@ -216,34 +302,26 @@ export async function addCertification(certData) {
     const pdfPath = `public/assets/certs/${certData.slug}.pdf`;
 
     console.log(`Uploading PDF to ${pdfPath}...`);
-
     await uploadFileToGitHub(pdfPath, certData.pdfBase64);
   }
 
-  // Fetch existing certs.json
+  // Fetch existing certs.json using the auth-aware helper so it works in
+  // both dev and production (fixes the bug where VITE_GITHUB_PAT was used
+  // directly here, causing an empty fetch in prod and wiping the list).
   const certsPath = "public/data/certs.json";
   let certs = [];
 
   try {
-    const response = await fetch(
-      `${GITHUB_API}/${OWNER}/${REPO}/contents/${certsPath}`,
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_PAT}`,
-          Accept: "application/vnd.github.v3+json",
-        },
-      },
-    );
+    const existing = await getFileFromGitHub(certsPath);
 
-    if (response.ok) {
-      const data = await response.json();
-      certs = JSON.parse(atob(data.content));
+    if (existing && Array.isArray(existing.content)) {
+      certs = existing.content;
     }
   } catch (error) {
     console.warn("Failed to fetch existing certs.json, starting fresh:", error);
   }
 
-  // Append new certificate metadata
+  // Append the new certificate — never replaces the full list
   certs.push({
     id: certData.slug,
     slug: certData.slug,
@@ -256,7 +334,7 @@ export async function addCertification(certData) {
     createdAt: new Date().toISOString(),
   });
 
-  // Upload updated certs.json
+  // Upload the updated list back to GitHub
   console.log("Updating certs.json...");
   const updatedCertsContent = btoa(JSON.stringify(certs, null, 2));
   await uploadFileToGitHub(
@@ -264,7 +342,7 @@ export async function addCertification(certData) {
     `data:application/json;base64,${updatedCertsContent}`,
   );
 
-  // Dispatch event
+  // Dispatch GitHub Actions event
   return dispatchCmsEvent("add-cert", {
     name: certData.name,
     issuer: certData.issuer,
@@ -277,6 +355,9 @@ export async function addCertification(certData) {
 
 /**
  * Update an existing certification
+ *
+ * @param {string} certId
+ * @param {object} certData - Fields to update
  */
 export async function updateCertification(certId, certData) {
   return dispatchCmsEvent("update-cert", {
@@ -287,6 +368,8 @@ export async function updateCertification(certId, certData) {
 
 /**
  * Delete a certification
+ *
+ * @param {string} certId
  */
 export async function deleteCertification(certId) {
   return dispatchCmsEvent("delete-cert", {
@@ -296,13 +379,21 @@ export async function deleteCertification(certId) {
 
 /**
  * Add a new project
+ * Uploads image then dispatches event.
+ *
+ * @param {object} projectData
+ * @param {string} projectData.slug
+ * @param {string} projectData.name
+ * @param {string} projectData.description
+ * @param {string} projectData.githubLink
+ * @param {string} [projectData.demoLink]
+ * @param {string} projectData.imageBase64
  */
 export async function addProject(projectData) {
-  // Upload image first
+  // Upload image
   const imagePath = `public/assets/projects/${projectData.slug}.jpg`;
 
   console.log(`Uploading image to ${imagePath}...`);
-
   await uploadFileToGitHub(imagePath, projectData.imageBase64);
 
   // Dispatch event
@@ -316,13 +407,14 @@ export async function addProject(projectData) {
 }
 
 /**
- * Upload a new resume (deletes existing and replaces)
+ * Upload a new resume (replaces the existing file)
+ *
+ * @param {string} resumeBase64 - Base64-encoded PDF (with or without data URL prefix)
  */
 export async function uploadResume(resumeBase64) {
   const resumePath = "public/resume/Chirag_Dhunna.pdf";
 
   console.log(`Uploading resume to ${resumePath}...`);
-
   await uploadFileToGitHub(resumePath, resumeBase64);
 
   // Dispatch event
