@@ -20,5 +20,16 @@
     "pdfUrl": "/assets/certs/aws-certified-ai-practitioner.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-21T14:05:11.918Z"
+  },
+  {
+    "id": "azure-administrator-associate",
+    "slug": "azure-administrator-associate",
+    "name": "Azure Administrator Associate",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-administrator-associate.jpg",
+    "pdfUrl": "/assets/certs/azure-administrator-associate.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-21T14:07:41.676Z"
   }
 ]
