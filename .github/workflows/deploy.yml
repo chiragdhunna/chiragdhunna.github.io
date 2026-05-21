@@ -43,6 +43,12 @@ jobs:
       - name: Unstash changes
         run: git stash pop
 
+      - name: Resolve merge conflicts
+        run: |
+          git add .
+          git merge --strategy-option ours || true
+          git add .
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
