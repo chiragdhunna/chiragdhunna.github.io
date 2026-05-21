@@ -135,10 +135,7 @@ function CertForm({ onSuccess }) {
       return;
     }
 
-    if (!formData.issueDate) {
-      setError("Issue date is required");
-      return;
-    }
+    // Issue date is optional now; no validation required
 
     if (!imageFile) {
       setError("Certificate image is required");
@@ -225,7 +222,7 @@ function CertForm({ onSuccess }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="issueDate">Issue Date *</label>
+        <label htmlFor="issueDate">Issue Date (Optional)</label>
         <input
           type="date"
           id="issueDate"

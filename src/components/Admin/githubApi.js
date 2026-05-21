@@ -292,7 +292,7 @@ export async function addCertification(certData) {
     slug: certData.slug,
     name: certData.name,
     issuer: certData.issuer,
-    issueDate: certData.issueDate,
+    issueDate: certData.issueDate || null,
     imageUrl: `/assets/certs/${certData.slug}.jpg`,
     pdfUrl: certData.pdfBase64 ? `/assets/certs/${certData.slug}.pdf` : null,
     credentialUrl: certData.credentialUrl || null,
