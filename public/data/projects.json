@@ -1,5 +1,6 @@
 [
   {
+    "slug": "chat-go",
     "categories": ["Web", "Full Stack"],
     "imageUrl": "/assets/projects/chat_go_logo.jpeg",
     "name": "Chat Go",
@@ -8,6 +9,7 @@
     "demoLink": "https://chatgo.chiragdhunna.com/"
   },
   {
+    "slug": "chat-go-backend",
     "categories": ["Backend"],
     "imageUrl": "/assets/projects/chat-go-backend.png",
     "name": "Chat Go Backend",
@@ -16,6 +18,7 @@
     "demoLink": "https://chat-go-backend.onrender.com/api/v1/docs/"
   },
   {
+    "slug": "booking-calendar",
     "categories": ["Mobile"],
     "imageUrl": "/assets/projects/booking_calendar_logo.png",
     "name": "Booking Calendar",
@@ -24,6 +27,7 @@
     "demoLink": "https://pub.dev/packages/booking_calendar"
   },
   {
+    "slug": "montra",
     "categories": ["Mobile", "Full Stack"],
     "imageUrl": "/assets/projects/montra.png",
     "name": "Montra",
@@ -32,6 +36,7 @@
     "demoLink": "https://github.com/chiragdhunna/montra/releases/"
   },
   {
+    "slug": "montra-backend",
     "categories": ["Backend"],
     "imageUrl": "/assets/projects/montra-backend.png",
     "name": "Montra Backend",
@@ -40,6 +45,7 @@
     "demoLink": "https://montra-backend-b45c.onrender.com/api/v1/docs/s"
   },
   {
+    "slug": "uber-eats-clone",
     "categories": ["Mobile"],
     "imageUrl": "/assets/projects/uberEatsClone.png",
     "name": "Uber Eats Clone",
@@ -48,6 +54,7 @@
     "demoLink": "https://github.com/chiragdhunna/uber_eats_clone/releases/"
   },
   {
+    "slug": "music-mix",
     "categories": ["Mobile"],
     "imageUrl": "/assets/projects/musicMix.jpeg",
     "name": "Music Mix",
@@ -56,6 +63,7 @@
     "demoLink": null
   },
   {
+    "slug": "gpt-jr",
     "categories": ["Mobile"],
     "imageUrl": "/assets/projects/gptJr.png",
     "name": "GPT Jr",
@@ -64,6 +72,7 @@
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
   {
+    "slug": "linkedin-post-generator",
     "categories": ["Web", "Backend"],
     "imageUrl": "/assets/projects/linkedin_post_generator.png",
     "name": "LinkedIn Post Generator",
