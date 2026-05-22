@@ -67,7 +67,7 @@
     "categories": ["Mobile"],
     "imageUrl": "/assets/projects/gptJr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALL·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -75,7 +75,7 @@
     "slug": "linkedin-post-generator",
     "categories": ["Web", "Backend"],
     "imageUrl": "/assets/projects/linkedin_post_generator.png",
-    "name": "LinkedIn Post Generator",
+    "name": "LinkedIn Post Generator!!!!",
     "description": "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving.",
     "ghLink": "https://github.com/chiragdhunna/linkedin_post_generator",
     "demoLink": null
