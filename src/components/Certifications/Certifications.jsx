@@ -3,11 +3,13 @@ import { Container, Row, Col } from "react-bootstrap";
 import CertCard from "./CertCard";
 import Particle from "../Particle";
 
+const certsDataUrl = `${import.meta.env.BASE_URL}data/certs.json`;
+
 function Certifications() {
   const [certs, setCerts] = useState([]);
 
   useEffect(() => {
-    fetch("/data/certs.json")
+    fetch(certsDataUrl)
       .then((res) => res.json())
       .then((data) => setCerts(data))
       .catch(() => setCerts([]));

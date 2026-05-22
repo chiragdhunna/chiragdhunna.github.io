@@ -397,11 +397,55 @@ export async function deleteCertification(certId) {
  * Add a new project
  */
 export async function addProject(projectData) {
+  // 1. Upload image
   const imagePath = `public/assets/projects/${projectData.slug}.jpg`;
-
   console.log(`[addProject] Uploading image to ${imagePath}...`);
   await uploadFileToGitHub(imagePath, projectData.imageBase64);
 
+  // 2. Read existing projects.json
+  const projectsPath = "public/data/projects.json";
+  console.log(`[addProject] Reading existing projects.json...`);
+  const existing = await getFileFromGitHub(projectsPath);
+
+  let projects = [];
+
+  if (existing === null) {
+    console.log(`[addProject] projects.json not found, starting fresh.`);
+  } else if (Array.isArray(existing.content)) {
+    projects = existing.content;
+    console.log(`[addProject] Found ${projects.length} existing project(s).`);
+  } else {
+    throw new Error(
+      `[addProject] projects.json has unexpected shape: ${JSON.stringify(existing.content).slice(0, 100)}`,
+    );
+  }
+
+  // 3. Append new project
+  projects.push({
+    id: projectData.slug,
+    slug: projectData.slug,
+    name: projectData.name,
+    description: projectData.description,
+    categories: projectData.categories || ["Web"],
+    imageUrl: `/assets/projects/${projectData.slug}.jpg`,
+    ghLink: projectData.githubLink || null,
+    demoLink: projectData.demoLink || null,
+    createdAt: new Date().toISOString(),
+  });
+
+  // 4. Commit updated projects.json
+  console.log(
+    `[addProject] Uploading updated projects.json with ${projects.length} project(s)...`,
+  );
+  const updatedContent = toBase64(JSON.stringify(projects, null, 2));
+  await uploadFileToGitHub(
+    projectsPath,
+    `data:application/json;base64,${updatedContent}`,
+  );
+
+  console.log(`[addProject] Done. Dispatching event...`);
+
+  // 5. Dispatch event
   return dispatchCmsEvent("add-project", {
     name: projectData.name,
     description: projectData.description,
