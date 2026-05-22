@@ -126,3 +126,288 @@
   text-align: center;
   color: #8b949e;
 }
+
+/* ── Projects Tab Layout ── */
+.projects-tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .projects-tab {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Project List Panel ── */
+.project-list-panel {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+
+.project-count {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 20px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+.panel-loading,
+.panel-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+
+/* ── Project List Items ── */
+.project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.project-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #21262d;
+  gap: 0.75rem;
+  transition: background 0.15s ease;
+}
+
+.project-list-item:last-child {
+  border-bottom: none;
+}
+
+.project-list-item:hover {
+  background: #1c2128;
+}
+
+.project-list-item--editing {
+  background: rgba(88, 166, 255, 0.05);
+  border-left: 2px solid #58a6ff;
+}
+
+.project-list-item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.project-list-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.project-list-meta {
+  min-width: 0;
+}
+
+.project-list-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #c9d1d9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-list-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.project-list-cat {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #8b949e;
+}
+
+/* ── Action Buttons ── */
+.project-list-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  padding: 0.3rem 0.7rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.action-btn--edit {
+  background: rgba(88, 166, 255, 0.1);
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+
+.action-btn--edit:hover:not(:disabled) {
+  background: rgba(88, 166, 255, 0.2);
+}
+
+.action-btn--delete {
+  background: rgba(248, 81, 73, 0.1);
+  border-color: #f85149;
+  color: #f85149;
+}
+
+.action-btn--delete:hover:not(:disabled) {
+  background: rgba(248, 81, 73, 0.2);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Inline Delete Confirmation ── */
+.delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.delete-confirm-text {
+  font-size: 0.8rem;
+  color: #f85149;
+  font-weight: 500;
+}
+
+.delete-confirm-yes {
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #da3633;
+  border: 1px solid #f85149;
+  color: #fff;
+  transition: background 0.15s;
+}
+
+.delete-confirm-yes:hover:not(:disabled) {
+  background: #f85149;
+}
+
+.delete-confirm-yes:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.delete-confirm-no {
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  transition: all 0.15s;
+}
+
+.delete-confirm-no:hover:not(:disabled) {
+  border-color: #8b949e;
+  color: #c9d1d9;
+}
+
+.delete-error {
+  margin: 0.75rem 1.25rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid #f85149;
+  border-radius: 6px;
+  color: #f85149;
+  font-size: 0.85rem;
+}
+
+/* ── Form Panel ── */
+.project-form-panel {
+  position: sticky;
+  top: 1rem;
+}
+
+/* ── ProjectForm header row (edit mode cancel button) ── */
+.project-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+/* Remove or replace this in ProjectForm.css: */
+.project-form h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem; /* ← this margin is now handled by .project-form-header */
+  color: #58a6ff;
+  font-weight: 600;
+}
+
+.cancel-edit-btn {
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.cancel-edit-btn:hover:not(:disabled) {
+  border-color: #8b949e;
+  color: #c9d1d9;
+}
