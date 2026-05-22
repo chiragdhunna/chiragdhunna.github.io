@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { addProject } from "./githubApi";
 import "./ProjectForm.css";
 
-// Helper function to generate slug from name
 function generateSlug(name) {
   return name
     .toLowerCase()
@@ -11,12 +10,15 @@ function generateSlug(name) {
     .replace(/^-+|-+$/g, "");
 }
 
+const CATEGORY_OPTIONS = ["Web", "Mobile", "Full Stack", "Backend"];
+
 function ProjectForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     githubLink: "",
     demoLink: "",
+    categories: [],
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -27,36 +29,37 @@ function ProjectForm({ onSuccess }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryToggle = (category) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter((c) => c !== category)
+        : [...prev.categories, category],
     }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Validate image
-      if (!file.type.startsWith("image/")) {
-        setError("Please select a valid image file");
-        return;
-      }
+    if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        setError("Image size must be less than 5MB");
-        return;
-      }
-
-      setImageFile(file);
-      setError("");
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image file");
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5MB");
+      return;
+    }
+
+    setImageFile(file);
+    setError("");
+
+    const reader = new FileReader();
+    reader.onload = (e) => setImagePreview(e.target.result);
+    reader.readAsDataURL(file);
   };
 
   const resizeImage = (file) => {
@@ -68,19 +71,13 @@ function ProjectForm({ onSuccess }) {
           const canvas = document.createElement("canvas");
           let width = img.width;
           let height = img.height;
-
-          // Resize if wider than 1200px
           if (width > 1200) {
             height = (height * 1200) / width;
             width = 1200;
           }
-
           canvas.width = width;
           canvas.height = height;
-
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, width, height);
-
+          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL("image/jpeg", 0.8));
         };
         img.src = e.target.result;
@@ -94,72 +91,49 @@ function ProjectForm({ onSuccess }) {
     setError("");
     setSuccess("");
 
-    // Validation
-    if (!formData.name.trim()) {
-      setError("Project name is required");
-      return;
-    }
+    if (!formData.name.trim()) return setError("Project name is required");
+    if (!formData.description.trim())
+      return setError("Description is required");
+    if (!formData.githubLink.trim()) return setError("GitHub link is required");
+    if (formData.categories.length === 0)
+      return setError("Select at least one category");
+    if (!imageFile) return setError("Project image is required");
 
-    if (!formData.description.trim()) {
-      setError("Project description is required");
-      return;
-    }
-
-    if (!formData.githubLink.trim()) {
-      setError("GitHub link is required");
-      return;
-    }
-
-    if (!imageFile) {
-      setError("Project image is required");
-      return;
-    }
-
-    // Validate URLs
     try {
       new URL(formData.githubLink);
-      if (formData.demoLink) {
-        new URL(formData.demoLink);
-      }
-    } catch (err) {
-      setError("Please enter valid URLs");
-      return;
+      if (formData.demoLink) new URL(formData.demoLink);
+    } catch {
+      return setError("Please enter valid URLs");
     }
 
     setLoading(true);
 
     try {
-      // Generate slug from name
       const slug = generateSlug(formData.name);
-
-      // Resize and encode image
       const imageBase64 = await resizeImage(imageFile);
 
-      // Submit to GitHub Actions
       await addProject({
         name: formData.name.trim(),
         description: formData.description.trim(),
         githubLink: formData.githubLink.trim(),
         demoLink: formData.demoLink.trim() || null,
+        categories: formData.categories,
         imageBase64,
         slug,
       });
 
       setSuccess("✓ Submitted! The live site will update in ~60 seconds.");
-
-      // Reset form
       setFormData({
         name: "",
         description: "",
         githubLink: "",
         demoLink: "",
+        categories: [],
       });
       setImageFile(null);
       setImagePreview(null);
 
-      if (onSuccess) {
-        setTimeout(onSuccess, 2000);
-      }
+      if (onSuccess) setTimeout(onSuccess, 2000);
     } catch (err) {
       setError("Submission failed: " + err.message);
     } finally {
@@ -195,6 +169,26 @@ function ProjectForm({ onSuccess }) {
           rows="4"
           disabled={loading}
         />
+      </div>
+
+      <div className="form-group">
+        <label>
+          Categories *{" "}
+          <span className="label-hint">(select all that apply)</span>
+        </label>
+        <div className="category-pills">
+          {CATEGORY_OPTIONS.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`category-pill ${formData.categories.includes(cat) ? "category-pill--active" : ""}`}
+              onClick={() => handleCategoryToggle(cat)}
+              disabled={loading}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="form-group">
