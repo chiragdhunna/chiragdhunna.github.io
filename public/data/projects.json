@@ -11,5 +11,18 @@
     "ghLink": "https://github.com/username/project",
     "demoLink": null,
     "createdAt": "2026-05-21T14:21:49.021Z"
+  },
+  {
+    "id": "test-project-2-chirag-dhunna",
+    "slug": "test-project-2-chirag-dhunna",
+    "name": "Test Project 2 | Chirag Dhunna",
+    "description": "testing",
+    "categories": [
+      "Web"
+    ],
+    "imageUrl": "/assets/projects/test-project-2-chirag-dhunna.jpg",
+    "ghLink": "https://github.com/username/project",
+    "demoLink": null,
+    "createdAt": "2026-05-22T07:52:15.578Z"
   }
 ]
