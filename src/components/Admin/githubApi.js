@@ -468,3 +468,86 @@ export async function uploadResume(resumeBase64) {
     fileName: "Chirag_Dhunna.pdf",
   });
 }
+
+/**
+ * Delete a project by slug
+ */
+export async function deleteProject(slug) {
+  const projectsPath = "public/data/projects.json";
+
+  console.log(`[deleteProject] Reading projects.json...`);
+  const existing = await getFileFromGitHub(projectsPath);
+
+  if (!existing || !Array.isArray(existing.content)) {
+    throw new Error("[deleteProject] Could not read projects.json");
+  }
+
+  const filtered = existing.content.filter((p) => p.slug !== slug);
+
+  if (filtered.length === existing.content.length) {
+    throw new Error(`[deleteProject] No project found with slug: ${slug}`);
+  }
+
+  console.log(
+    `[deleteProject] Removing "${slug}", ${filtered.length} remaining...`,
+  );
+
+  const updatedContent = toBase64(JSON.stringify(filtered, null, 2));
+  await uploadFileToGitHub(
+    projectsPath,
+    `data:application/json;base64,${updatedContent}`,
+  );
+
+  console.log(`[deleteProject] Done. Dispatching event...`);
+
+  return dispatchCmsEvent("delete-project", { slug });
+}
+
+/**
+ * Update an existing project by slug
+ */
+export async function updateProject(slug, updatedData) {
+  const projectsPath = "public/data/projects.json";
+
+  console.log(`[updateProject] Reading projects.json...`);
+  const existing = await getFileFromGitHub(projectsPath);
+
+  if (!existing || !Array.isArray(existing.content)) {
+    throw new Error("[updateProject] Could not read projects.json");
+  }
+
+  const index = existing.content.findIndex((p) => p.slug === slug);
+
+  if (index === -1) {
+    throw new Error(`[updateProject] No project found with slug: ${slug}`);
+  }
+
+  // If a new image was provided, upload it
+  if (updatedData.imageBase64) {
+    const imagePath = `public/assets/projects/${slug}.jpg`;
+    console.log(`[updateProject] Uploading new image to ${imagePath}...`);
+    await uploadFileToGitHub(imagePath, updatedData.imageBase64);
+    // Update imageUrl to the new path
+    updatedData.imageUrl = `/assets/projects/${slug}.jpg`;
+    delete updatedData.imageBase64;
+  }
+
+  // Merge — preserve slug and createdAt, update everything else
+  existing.content[index] = {
+    ...existing.content[index],
+    ...updatedData,
+    slug, // never allow slug to change
+  };
+
+  console.log(`[updateProject] Saving updated projects.json...`);
+
+  const updatedContent = toBase64(JSON.stringify(existing.content, null, 2));
+  await uploadFileToGitHub(
+    projectsPath,
+    `data:application/json;base64,${updatedContent}`,
+  );
+
+  console.log(`[updateProject] Done. Dispatching event...`);
+
+  return dispatchCmsEvent("update-project", { slug, ...updatedData });
+}

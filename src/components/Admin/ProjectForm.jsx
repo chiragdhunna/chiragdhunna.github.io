@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { addProject } from "./githubApi";
+import React, { useState, useEffect } from "react";
+import { addProject, updateProject } from "./githubApi";
 import "./ProjectForm.css";
 
 function generateSlug(name) {
@@ -12,7 +12,9 @@ function generateSlug(name) {
 
 const CATEGORY_OPTIONS = ["Web", "Mobile", "Full Stack", "Backend"];
 
-function ProjectForm({ onSuccess }) {
+function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
+  const isEditMode = !!editProject;
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -26,6 +28,35 @@ function ProjectForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Pre-fill form when in edit mode
+  useEffect(() => {
+    if (editProject) {
+      setFormData({
+        name: editProject.name || "",
+        description: editProject.description || "",
+        githubLink: editProject.ghLink || "",
+        demoLink: editProject.demoLink || "",
+        categories: editProject.categories || [],
+      });
+      setImagePreview(editProject.imageUrl || null);
+      setImageFile(null);
+      setError("");
+      setSuccess("");
+    } else {
+      setFormData({
+        name: "",
+        description: "",
+        githubLink: "",
+        demoLink: "",
+        categories: [],
+      });
+      setImagePreview(null);
+      setImageFile(null);
+      setError("");
+      setSuccess("");
+    }
+  }, [editProject]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,19 +75,12 @@ function ProjectForm({ onSuccess }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
-      return;
-    }
-
+    if (!file.type.startsWith("image/"))
+      return setError("Please select a valid image file");
+    if (file.size > 5 * 1024 * 1024)
+      return setError("Image size must be less than 5MB");
     setImageFile(file);
     setError("");
-
     const reader = new FileReader();
     reader.onload = (e) => setImagePreview(e.target.result);
     reader.readAsDataURL(file);
@@ -69,8 +93,7 @@ function ProjectForm({ onSuccess }) {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          let width = img.width;
-          let height = img.height;
+          let { width, height } = img;
           if (width > 1200) {
             height = (height * 1200) / width;
             width = 1200;
@@ -97,7 +120,7 @@ function ProjectForm({ onSuccess }) {
     if (!formData.githubLink.trim()) return setError("GitHub link is required");
     if (formData.categories.length === 0)
       return setError("Select at least one category");
-    if (!imageFile) return setError("Project image is required");
+    if (!isEditMode && !imageFile) return setError("Project image is required");
 
     try {
       new URL(formData.githubLink);
@@ -109,29 +132,47 @@ function ProjectForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      const slug = generateSlug(formData.name);
-      const imageBase64 = await resizeImage(imageFile);
+      if (isEditMode) {
+        // Build update payload — only include imageBase64 if a new image was picked
+        const updatePayload = {
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          ghLink: formData.githubLink.trim(),
+          demoLink: formData.demoLink.trim() || null,
+          categories: formData.categories,
+        };
 
-      await addProject({
-        name: formData.name.trim(),
-        description: formData.description.trim(),
-        githubLink: formData.githubLink.trim(),
-        demoLink: formData.demoLink.trim() || null,
-        categories: formData.categories,
-        imageBase64,
-        slug,
-      });
+        if (imageFile) {
+          updatePayload.imageBase64 = await resizeImage(imageFile);
+        }
 
-      setSuccess("✓ Submitted! The live site will update in ~60 seconds.");
-      setFormData({
-        name: "",
-        description: "",
-        githubLink: "",
-        demoLink: "",
-        categories: [],
-      });
-      setImageFile(null);
-      setImagePreview(null);
+        await updateProject(editProject.slug, updatePayload);
+        setSuccess("✓ Project updated! Live site updates in ~60 seconds.");
+      } else {
+        const slug = generateSlug(formData.name);
+        const imageBase64 = await resizeImage(imageFile);
+
+        await addProject({
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          githubLink: formData.githubLink.trim(),
+          demoLink: formData.demoLink.trim() || null,
+          categories: formData.categories,
+          imageBase64,
+          slug,
+        });
+
+        setSuccess("✓ Project added! Live site updates in ~60 seconds.");
+        setFormData({
+          name: "",
+          description: "",
+          githubLink: "",
+          demoLink: "",
+          categories: [],
+        });
+        setImageFile(null);
+        setImagePreview(null);
+      }
 
       if (onSuccess) setTimeout(onSuccess, 2000);
     } catch (err) {
@@ -143,7 +184,21 @@ function ProjectForm({ onSuccess }) {
 
   return (
     <form className="project-form" onSubmit={handleSubmit}>
-      <h2>Add New Project</h2>
+      <div className="project-form-header">
+        <h2>
+          {isEditMode ? `Editing: ${editProject.name}` : "Add New Project"}
+        </h2>
+        {isEditMode && (
+          <button
+            type="button"
+            className="cancel-edit-btn"
+            onClick={onCancelEdit}
+            disabled={loading}
+          >
+            ✕ Cancel
+          </button>
+        )}
+      </div>
 
       <div className="form-group">
         <label htmlFor="name">Project Name *</label>
@@ -218,7 +273,10 @@ function ProjectForm({ onSuccess }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="image">Project Image (JPG/PNG) *</label>
+        <label htmlFor="image">
+          Project Image{" "}
+          {isEditMode ? "(leave empty to keep current)" : "(JPG/PNG) *"}
+        </label>
         <div className="file-input-wrapper">
           <input
             type="file"
@@ -228,13 +286,19 @@ function ProjectForm({ onSuccess }) {
             disabled={loading}
           />
           <span className="file-input-label">
-            {imageFile ? imageFile.name : "Choose image file"}
+            {imageFile
+              ? imageFile.name
+              : isEditMode
+                ? "Choose new image (optional)"
+                : "Choose image file"}
           </span>
         </div>
         {imagePreview && (
           <div className="image-preview">
             <img src={imagePreview} alt="Preview" />
-            <p className="preview-label">Image Preview</p>
+            <p className="preview-label">
+              {imageFile ? "New image preview" : "Current image"}
+            </p>
           </div>
         )}
       </div>
@@ -243,7 +307,13 @@ function ProjectForm({ onSuccess }) {
       {success && <div className="form-success">{success}</div>}
 
       <button type="submit" disabled={loading} className="submit-btn">
-        {loading ? "Submitting..." : "Add Project"}
+        {loading
+          ? isEditMode
+            ? "Saving..."
+            : "Submitting..."
+          : isEditMode
+            ? "Save Changes"
+            : "Add Project"}
       </button>
     </form>
   );
