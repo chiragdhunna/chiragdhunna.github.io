@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import CertForm from "./CertForm";
 import ProjectForm from "./ProjectForm";
@@ -10,19 +10,20 @@ const projectsDataUrl = `${import.meta.env.BASE_URL}data/projects.json`;
 
 function ProjectsTab() {
   const [projects, setProjects] = useState([]);
-  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [editingProject, setEditingProject] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null); // slug of project pending delete
+  const [confirmDeleteSlug, setConfirmDeleteSlug] = useState(null);
   const [deletingSlug, setDeletingSlug] = useState(null);
   const [deleteError, setDeleteError] = useState("");
 
   const fetchProjects = () => {
-    setLoadingProjects(true);
+    setLoading(true);
     fetch(`${projectsDataUrl}?t=${Date.now()}`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setProjects(Array.isArray(data) ? data : []))
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setProjects(Array.isArray(d) ? d : []))
       .catch(() => setProjects([]))
-      .finally(() => setLoadingProjects(false));
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -34,123 +35,189 @@ function ProjectsTab() {
     fetchProjects();
   };
 
-  const handleDeleteClick = (slug) => {
-    setConfirmDelete(slug);
-    setDeleteError("");
-  };
-
   const handleDeleteConfirm = async (slug) => {
     setDeletingSlug(slug);
     setDeleteError("");
     try {
       await deleteProject(slug);
-      setConfirmDelete(null);
+      setConfirmDeleteSlug(null);
+      if (editingProject?.slug === slug) setEditingProject(null);
       fetchProjects();
     } catch (err) {
-      setDeleteError(`Delete failed: ${err.message}`);
+      setDeleteError(err.message);
     } finally {
       setDeletingSlug(null);
     }
   };
 
-  const handleDeleteCancel = () => {
-    setConfirmDelete(null);
-    setDeleteError("");
-  };
+  const filtered = projects.filter(
+    (p) =>
+      p.name?.toLowerCase().includes(search.toLowerCase()) ||
+      p.categories?.some((c) => c.toLowerCase().includes(search.toLowerCase())),
+  );
+
+  const isEditing = !!editingProject;
 
   return (
-    <div className="projects-tab">
-      {/* ── Left: Project List ── */}
-      <div className="project-list-panel">
-        <div className="panel-header">
-          <h3>All Projects</h3>
-          <span className="project-count">{projects.length}</span>
+    <div className="cms-shell">
+      {/* ── Sidebar ── */}
+      <div className="proj-sidebar">
+        <div className="sidebar-head">
+          <span className="sidebar-label">projects</span>
+          <span className="sidebar-count">
+            {search ? `${filtered.length}/${projects.length}` : projects.length}
+          </span>
         </div>
 
-        {loadingProjects ? (
-          <div className="panel-loading">Loading...</div>
-        ) : projects.length === 0 ? (
-          <div className="panel-empty">No projects yet</div>
-        ) : (
-          <ul className="project-list">
-            {projects.map((project) => {
-              const isConfirming = confirmDelete === project.slug;
-              const isDeleting = deletingSlug === project.slug;
-              const isEditing = editingProject?.slug === project.slug;
+        {/* Search */}
+        <div className="sidebar-search">
+          <div className="sidebar-search-wrap">
+            <i
+              className="ti ti-search sidebar-search-icon"
+              aria-hidden="true"
+            ></i>
+            <input
+              className="sidebar-search-input"
+              type="text"
+              placeholder="search projects…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="proj-list">
+          {loading ? (
+            <div className="empty-state">
+              <i className="ti ti-loader-2 empty-icon" aria-hidden="true"></i>
+              loading…
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="empty-state">
+              <i className="ti ti-folder-off empty-icon" aria-hidden="true"></i>
+              {search ? `no results for "${search}"` : "no projects yet"}
+            </div>
+          ) : (
+            filtered.map((p) => {
+              const isActive = editingProject?.slug === p.slug;
+              const isConfirming = confirmDeleteSlug === p.slug;
+              const isDeleting = deletingSlug === p.slug;
 
               return (
-                <li
-                  key={project.slug}
-                  className={`project-list-item ${isEditing ? "project-list-item--editing" : ""}`}
+                <div
+                  key={p.slug}
+                  className={`proj-item ${isActive ? "active" : ""}`}
                 >
-                  <div className="project-list-item-info">
-                    <img
-                      src={project.imageUrl}
-                      alt={project.name}
-                      className="project-list-thumb"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                      }}
-                    />
-                    <div className="project-list-meta">
-                      <span className="project-list-name">{project.name}</span>
-                      <div className="project-list-cats">
-                        {project.categories?.map((c) => (
-                          <span key={c} className="project-list-cat">
-                            {c}
-                          </span>
-                        ))}
-                      </div>
+                  <div className="proj-thumb">
+                    {p.imageUrl ? (
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      p.name?.slice(0, 2).toUpperCase()
+                    )}
+                  </div>
+                  <div className="proj-info">
+                    <div className="proj-name">{p.name}</div>
+                    <div className="proj-cats">
+                      {p.categories?.map((c) => (
+                        <span key={c} className="proj-cat">
+                          {c}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
                   {isConfirming ? (
-                    <div className="delete-confirm">
-                      <span className="delete-confirm-text">Delete?</span>
+                    <div className="delete-row">
+                      <span className="confirm-text">delete?</span>
                       <button
-                        className="delete-confirm-yes"
-                        onClick={() => handleDeleteConfirm(project.slug)}
+                        className="confirm-yes"
+                        onClick={() => handleDeleteConfirm(p.slug)}
                         disabled={isDeleting}
                       >
-                        {isDeleting ? "Deleting..." : "Yes"}
+                        {isDeleting ? "…" : "yes"}
                       </button>
                       <button
-                        className="delete-confirm-no"
-                        onClick={handleDeleteCancel}
+                        className="confirm-no"
+                        onClick={() => {
+                          setConfirmDeleteSlug(null);
+                          setDeleteError("");
+                        }}
                         disabled={isDeleting}
                       >
-                        No
+                        no
                       </button>
                     </div>
                   ) : (
-                    <div className="project-list-actions">
+                    <div className="proj-actions">
                       <button
-                        className="action-btn action-btn--edit"
-                        onClick={() => setEditingProject(project)}
-                        disabled={isDeleting}
+                        className="proj-act edit"
+                        onClick={() => {
+                          setEditingProject(p);
+                          setConfirmDeleteSlug(null);
+                        }}
                       >
-                        Edit
+                        edit
                       </button>
                       <button
-                        className="action-btn action-btn--delete"
-                        onClick={() => handleDeleteClick(project.slug)}
-                        disabled={isDeleting}
+                        className="proj-act del"
+                        onClick={() => {
+                          setConfirmDeleteSlug(p.slug);
+                          setDeleteError("");
+                        }}
                       >
-                        Delete
+                        del
                       </button>
                     </div>
                   )}
-                </li>
+                </div>
               );
-            })}
-          </ul>
-        )}
+            })
+          )}
+        </div>
 
-        {deleteError && <div className="delete-error">{deleteError}</div>}
+        {deleteError && <div className="delete-error-bar">{deleteError}</div>}
+
+        <div className="add-row">
+          <button
+            className="add-btn"
+            onClick={() => {
+              setEditingProject(null);
+              setSearch("");
+            }}
+          >
+            <i className="ti ti-plus" aria-hidden="true"></i>
+            new project
+          </button>
+        </div>
       </div>
 
-      {/* ── Right: Add / Edit Form ── */}
-      <div className="project-form-panel">
+      {/* ── Main panel ── */}
+      <div className="proj-main">
+        <div className="main-topbar">
+          <div>
+            <div className="mode-label">
+              {isEditing ? "EDIT MODE" : "ADD MODE"}
+            </div>
+            <div className="mode-title">
+              {isEditing ? editingProject.name : "New project"}
+            </div>
+          </div>
+          {isEditing && (
+            <button
+              className="cancel-btn"
+              onClick={() => setEditingProject(null)}
+            >
+              ✕ cancel
+            </button>
+          )}
+        </div>
+
         <ProjectForm
           editProject={editingProject}
           onSuccess={handleEditSuccess}

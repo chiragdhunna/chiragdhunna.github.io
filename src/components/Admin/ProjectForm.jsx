@@ -12,7 +12,7 @@ function generateSlug(name) {
 
 const CATEGORY_OPTIONS = ["Web", "Mobile", "Full Stack", "Backend"];
 
-function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
+function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
   const isEditMode = !!editProject;
 
   const [formData, setFormData] = useState({
@@ -22,14 +22,12 @@ function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
     demoLink: "",
     categories: [],
   });
-
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [msgOk, setMsgOk] = useState("");
+  const [msgErr, setMsgErr] = useState("");
 
-  // Pre-fill form when in edit mode
   useEffect(() => {
     if (editProject) {
       setFormData({
@@ -40,9 +38,6 @@ function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
         categories: editProject.categories || [],
       });
       setImagePreview(editProject.imageUrl || null);
-      setImageFile(null);
-      setError("");
-      setSuccess("");
     } else {
       setFormData({
         name: "",
@@ -52,42 +47,47 @@ function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
         categories: [],
       });
       setImagePreview(null);
-      setImageFile(null);
-      setError("");
-      setSuccess("");
     }
+    setImageFile(null);
+    setMsgOk("");
+    setMsgErr("");
   }, [editProject]);
 
-  const handleInputChange = (e) => {
+  const handleInput = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleCategoryToggle = (category) => {
-    setFormData((prev) => ({
-      ...prev,
-      categories: prev.categories.includes(category)
-        ? prev.categories.filter((c) => c !== category)
-        : [...prev.categories, category],
+  const toggleCat = (cat) => {
+    setFormData((p) => ({
+      ...p,
+      categories: p.categories.includes(cat)
+        ? p.categories.filter((c) => c !== cat)
+        : [...p.categories, cat],
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith("image/"))
-      return setError("Please select a valid image file");
+      return setMsgErr("Please select a valid image file");
     if (file.size > 5 * 1024 * 1024)
-      return setError("Image size must be less than 5MB");
+      return setMsgErr("Image must be under 5MB");
     setImageFile(file);
-    setError("");
+    setMsgErr("");
     const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target.result);
+    reader.onload = (ev) => setImagePreview(ev.target.result);
     reader.readAsDataURL(file);
   };
 
-  const resizeImage = (file) => {
-    return new Promise((resolve) => {
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(isEditMode ? editProject?.imageUrl || null : null);
+  };
+
+  const resizeImage = (file) =>
+    new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -107,62 +107,50 @@ function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
       };
       reader.readAsDataURL(file);
     });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!formData.name.trim()) return setError("Project name is required");
-    if (!formData.description.trim())
-      return setError("Description is required");
-    if (!formData.githubLink.trim()) return setError("GitHub link is required");
-    if (formData.categories.length === 0)
-      return setError("Select at least one category");
-    if (!isEditMode && !imageFile) return setError("Project image is required");
-
+    setMsgOk("");
+    setMsgErr("");
+    const { name, description, githubLink, demoLink, categories } = formData;
+    if (!name.trim()) return setMsgErr("project name is required");
+    if (!description.trim()) return setMsgErr("description is required");
+    if (!githubLink.trim()) return setMsgErr("github link is required");
+    if (!categories.length) return setMsgErr("select at least one category");
+    if (!isEditMode && !imageFile) return setMsgErr("image is required");
     try {
-      new URL(formData.githubLink);
-      if (formData.demoLink) new URL(formData.demoLink);
+      new URL(githubLink);
+      if (demoLink) new URL(demoLink);
     } catch {
-      return setError("Please enter valid URLs");
+      return setMsgErr("please enter valid URLs");
     }
 
     setLoading(true);
-
     try {
       if (isEditMode) {
-        // Build update payload — only include imageBase64 if a new image was picked
-        const updatePayload = {
-          name: formData.name.trim(),
-          description: formData.description.trim(),
-          ghLink: formData.githubLink.trim(),
-          demoLink: formData.demoLink.trim() || null,
-          categories: formData.categories,
+        const payload = {
+          name: name.trim(),
+          description: description.trim(),
+          ghLink: githubLink.trim(),
+          demoLink: demoLink.trim() || null,
+          categories,
         };
-
-        if (imageFile) {
-          updatePayload.imageBase64 = await resizeImage(imageFile);
-        }
-
-        await updateProject(editProject.slug, updatePayload);
-        setSuccess("✓ Project updated! Live site updates in ~60 seconds.");
+        if (imageFile) payload.imageBase64 = await resizeImage(imageFile);
+        await updateProject(editProject.slug, payload);
+        setMsgOk("✓ updated! deploying in ~60s");
       } else {
-        const slug = generateSlug(formData.name);
+        const slug = generateSlug(name);
         const imageBase64 = await resizeImage(imageFile);
-
         await addProject({
-          name: formData.name.trim(),
-          description: formData.description.trim(),
-          githubLink: formData.githubLink.trim(),
-          demoLink: formData.demoLink.trim() || null,
-          categories: formData.categories,
+          name: name.trim(),
+          description: description.trim(),
+          githubLink: githubLink.trim(),
+          demoLink: demoLink.trim() || null,
+          categories,
           imageBase64,
           slug,
         });
-
-        setSuccess("✓ Project added! Live site updates in ~60 seconds.");
+        setMsgOk("✓ added! deploying in ~60s");
         setFormData({
           name: "",
           description: "",
@@ -173,148 +161,191 @@ function ProjectForm({ onSuccess, editProject = null, onCancelEdit }) {
         setImageFile(null);
         setImagePreview(null);
       }
-
       if (onSuccess) setTimeout(onSuccess, 2000);
     } catch (err) {
-      setError("Submission failed: " + err.message);
+      setMsgErr(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form className="project-form" onSubmit={handleSubmit}>
-      <div className="project-form-header">
-        <h2>
-          {isEditMode ? `Editing: ${editProject.name}` : "Add New Project"}
-        </h2>
-        {isEditMode && (
+    <form className="pf-form" onSubmit={handleSubmit}>
+      <div className="pf-body">
+        <div className="pf-grid">
+          <div className="pf-field pf-full">
+            <label className="pf-label">
+              project name <span className="pf-req">*</span>
+            </label>
+            <input
+              className="pf-input"
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInput}
+              placeholder="e.g. Chat Go"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="pf-field pf-full">
+            <label className="pf-label">
+              description <span className="pf-req">*</span>
+            </label>
+            <textarea
+              className="pf-input pf-textarea"
+              name="description"
+              value={formData.description}
+              onChange={handleInput}
+              placeholder="What does this project do?"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="pf-field pf-full">
+            <label className="pf-label">
+              categories <span className="pf-req">*</span>
+            </label>
+            <div className="pf-cats">
+              {CATEGORY_OPTIONS.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`pf-cat ${formData.categories.includes(cat) ? "pf-cat--on" : ""}`}
+                  onClick={() => toggleCat(cat)}
+                  disabled={loading}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="pf-field">
+            <label className="pf-label">
+              github <span className="pf-req">*</span>
+            </label>
+            <input
+              className="pf-input"
+              type="url"
+              name="githubLink"
+              value={formData.githubLink}
+              onChange={handleInput}
+              placeholder="https://github.com/…"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="pf-field">
+            <label className="pf-label">
+              demo link
+              <span className="pf-optional"> optional</span>
+            </label>
+            <input
+              className="pf-input"
+              type="url"
+              name="demoLink"
+              value={formData.demoLink}
+              onChange={handleInput}
+              placeholder="https://example.com"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="pf-field pf-full">
+            <label className="pf-label" id="img-label">
+              project image{" "}
+              {isEditMode ? (
+                <span className="pf-optional">
+                  {" "}
+                  leave empty to keep current
+                </span>
+              ) : (
+                <span className="pf-req">*</span>
+              )}
+            </label>
+
+            {imagePreview ? (
+              <div className="pf-preview-wrap">
+                <img
+                  className="pf-preview-img"
+                  src={imagePreview}
+                  alt="preview"
+                />
+                <button
+                  type="button"
+                  className="pf-img-clear"
+                  onClick={clearImage}
+                  aria-label="Remove image"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <label className="pf-upload-zone">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage}
+                  disabled={loading}
+                  style={{ display: "none" }}
+                />
+                <i
+                  className="ti ti-photo-up pf-upload-icon"
+                  aria-hidden="true"
+                ></i>
+                <div className="pf-upload-text">
+                  drop image or <span className="pf-upload-link">browse</span>
+                </div>
+                <div className="pf-upload-hint">JPG / PNG · max 5MB</div>
+              </label>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="pf-footer">
+        {msgOk && (
+          <span className="pf-msg-ok">
+            <i className="ti ti-check" aria-hidden="true"></i> {msgOk}
+          </span>
+        )}
+        {msgErr && <span className="pf-msg-err">⚠ {msgErr}</span>}
+        {!msgOk && !msgErr && (
+          <span className="pf-hint">changes go live in ~60s after submit</span>
+        )}
+
+        {isEditMode ? (
           <button
-            type="button"
-            className="cancel-edit-btn"
-            onClick={onCancelEdit}
+            type="submit"
+            className="pf-btn pf-btn--save"
             disabled={loading}
           >
-            ✕ Cancel
+            {loading ? (
+              "saving…"
+            ) : (
+              <>
+                <i className="ti ti-device-floppy" aria-hidden="true"></i> save
+                changes
+              </>
+            )}
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="pf-btn pf-btn--add"
+            disabled={loading}
+          >
+            {loading ? (
+              "adding…"
+            ) : (
+              <>
+                <i className="ti ti-plus" aria-hidden="true"></i> add project
+              </>
+            )}
           </button>
         )}
       </div>
-
-      <div className="form-group">
-        <label htmlFor="name">Project Name *</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          placeholder="e.g., Portfolio CMS"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="description">Description *</label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Describe your project..."
-          rows="4"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>
-          Categories *{" "}
-          <span className="label-hint">(select all that apply)</span>
-        </label>
-        <div className="category-pills">
-          {CATEGORY_OPTIONS.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`category-pill ${formData.categories.includes(cat) ? "category-pill--active" : ""}`}
-              onClick={() => handleCategoryToggle(cat)}
-              disabled={loading}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="githubLink">GitHub Link *</label>
-        <input
-          type="url"
-          id="githubLink"
-          name="githubLink"
-          value={formData.githubLink}
-          onChange={handleInputChange}
-          placeholder="https://github.com/username/project"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="demoLink">Demo Link (Optional)</label>
-        <input
-          type="url"
-          id="demoLink"
-          name="demoLink"
-          value={formData.demoLink}
-          onChange={handleInputChange}
-          placeholder="https://example.com/demo"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="image">
-          Project Image{" "}
-          {isEditMode ? "(leave empty to keep current)" : "(JPG/PNG) *"}
-        </label>
-        <div className="file-input-wrapper">
-          <input
-            type="file"
-            id="image"
-            accept="image/*"
-            onChange={handleImageChange}
-            disabled={loading}
-          />
-          <span className="file-input-label">
-            {imageFile
-              ? imageFile.name
-              : isEditMode
-                ? "Choose new image (optional)"
-                : "Choose image file"}
-          </span>
-        </div>
-        {imagePreview && (
-          <div className="image-preview">
-            <img src={imagePreview} alt="Preview" />
-            <p className="preview-label">
-              {imageFile ? "New image preview" : "Current image"}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {error && <div className="form-error">{error}</div>}
-      {success && <div className="form-success">{success}</div>}
-
-      <button type="submit" disabled={loading} className="submit-btn">
-        {loading
-          ? isEditMode
-            ? "Saving..."
-            : "Submitting..."
-          : isEditMode
-            ? "Save Changes"
-            : "Add Project"}
-      </button>
     </form>
   );
 }
