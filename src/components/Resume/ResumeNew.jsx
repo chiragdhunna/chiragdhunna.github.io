@@ -10,11 +10,7 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 const pdfjsVersion = pdfjs.version;
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
 
-// OVERLEAF SETUP:
-// Option 1: Use local PDF (synced via GitHub Actions)
-// Option 2: Use direct Overleaf link (uncomment and add your project ID)
-// const OVERLEAF_PROJECT_ID = "YOUR_PROJECT_ID_HERE";
-// const OVERLEAF_PDF = `https://www.overleaf.com/download/project/${OVERLEAF_PROJECT_ID}/build/output.pdf?compileGroup=standard`;
+// Resume PDF (stored in the repo's `public/` folder)
 
 function ResumeNew() {
   const [width, setWidth] = useState(1200);
@@ -23,8 +19,7 @@ function ResumeNew() {
   const [pdfData, setPdfData] = useState(null);
   const [renderFallback, setRenderFallback] = useState(false);
 
-  // Use local PDF (synced from Overleaf via GitHub Actions)
-  // Or replace with OVERLEAF_PDF to load directly from Overleaf
+  // Use the local PDF stored in `public/resume/`.
   const pdf = "/resume/Chirag_Dhunna.pdf";
 
   useEffect(() => {
@@ -106,9 +101,6 @@ function ResumeNew() {
       alert("Failed to download PDF. Please try again.");
     }
   };
-
-  // Use local PDF (synced from Overleaf via GitHub Actions)
-  // Or replace with OVERLEAF_PDF to load directly from Overleaf
 
   return (
     <div>

@@ -63,14 +63,13 @@ This portfolio now includes a **complete Content Management System** for zero-co
 - Issue date tracking
 - Automatic slug generation
 
-#### 4. GitHub Actions CMS Workflow (`cms-update.yml`)
+#### 4. CMS Processing (Cloudflare Worker / GitHub API)
 
-- Processes CMS events automatically
+- Processing is handled by the Cloudflare Worker in production or the GitHub API in development
 - Validates JWT tokens before any changes
 - Handles file encoding/decoding
-- Updates JSON database
-- Triggers automatic deployment
-- Changes live in ~60 seconds
+- Updates JSON database (`public/data/*.json`)
+- Triggers deployment (via `deploy.yml`) so changes go live in ~60 seconds
 
 #### 5. Navbar Update
 
@@ -160,7 +159,7 @@ npm run dev
 - **GitHub Integration** - Activity calendar
 - **Tech Stack Showcase** - Visual skills display
 - **Dark Theme** - Professional dark mode
-- **Automated Resume Sync** - Syncs from Overleaf via GitHub Actions
+- **Resume PDF** - The resume PDF is stored locally in `public/resume/Chirag_Dhunna.pdf`
 
 ### CMS Features (New)
 
@@ -213,11 +212,9 @@ npm run dev
 ```
 chiragdhunna.github.io/
 ├── .github/workflows/
-│   ├── build-resume.yml           # Resume sync from Overleaf
-│   ├── deploy.yml                 # Deploy to GitHub Pages
-│   └── cms-update.yml             # 🆕 CMS event processing
+│   └── deploy.yml                 # Deploy to GitHub Pages
 ├── public/
-│   ├── CHIRAG_DHUNNA.pdf         # Auto-synced resume
+│   ├── resume/Chirag_Dhunna.pdf  # Resume PDF (stored in public/resume/)
 │   ├── data/                      # 🆕 JSON databases
 │   │   ├── certs.json            # Certifications
 │   │   └── projects.json         # Projects
@@ -356,20 +353,20 @@ npm run deploy
 ### System Overview
 
 ```
-Browser Admin Panel          GitHub Repository       GitHub Actions
-    ↓                              ↓                        ↓
-1. User fills form           .env.local (dev)    Workflow: cms-update.yml
+Browser Admin Panel          GitHub Repository       Worker / GitHub API
+   ↓                              ↓                        ↓
+1. User fills form           .env.local (dev)    Worker (prod) or API (dev)
 2. Issues JWT token          .env.example
-3. Converts to base64        certs.json          Step 1: Check JWT valid
-4. Sends to GitHub           assets/certs/       Step 2: Decode files
+3. Converts to base64        certs.json          Step 1: Validate token
+4. Sends to worker/API       assets/certs/       Step 2: Decode files
 5. Waits for update          ...                 Step 3: Create slug
-                                                 Step 4: Save assets
-                                                 Step 5: Update JSON
-                                                 Step 6: Git commit+push
-                                                 Step 7: Trigger deploy
-                                                        ↓
-                                                 Site rebuilds & goes live
-                                                 ✅ Changes visible (~60s)
+                                     Step 4: Save assets
+                                     Step 5: Update JSON
+                                     Step 6: Git commit & push
+                                     Step 7: Trigger deploy
+                                          ↓
+                                     Site rebuilds & goes live
+                                     ✅ Changes visible (~60s)
 ```
 
 ### Data Flow: Detailed
@@ -377,20 +374,16 @@ Browser Admin Panel          GitHub Repository       GitHub Actions
 1. **Admin Submission** - User fills form at `/admin`
 2. **Client Processing** - Image resized, files encoded to base64
 3. **Token Generation** - JWT created using HMAC-SHA256
-4. **GitHub API Call** - `repository_dispatch` event sent
-5. **Workflow Trigger** - `cms-update.yml` receives event
-6. **JWT Validation** - Python script validates signature
-7. **File Decoding** - Base64 decoded back to binary
-8. **File Storage** - Images/PDFs saved to `public/assets/certs/`
-9. **JSON Update** - New entry appended to `certs.json`
-10. **Git Operations** - Changes committed and pushed
-11. **Deploy Trigger** - `deploy.yml` workflow starts
-12. **Site Rebuild** - React app built with new data
-13. **Live Update** - Changes visible on site
+4. **Upload** - In production the Cloudflare Worker receives the payload; in development the client may call GitHub's `repository_dispatch`.
+5. **Processing** - Worker/API validates JWT, decodes files, and writes assets and JSON to the repo
+6. **Git Operations** - Changes are committed and pushed to the repository
+7. **Deploy Trigger** - `deploy.yml` workflow starts on push
+8. **Site Rebuild** - React app built with new data
+9. **Live Update** - Changes visible on site
 
-### GitHub Actions Workflow (`cms-update.yml`)
+### CMS Processing (Worker / API)
 
-**Events Handled:**
+**Events Handled (examples):**
 
 - `add-cert` - Add certification
 - `update-cert` - Update certification (extensible)
@@ -401,22 +394,19 @@ Browser Admin Panel          GitHub Repository       GitHub Actions
 
 **Security Checks:**
 
-1. ✅ Validates JWT signature with `ADMIN_SECRET`
+1. ✅ Validates JWT signature with `ADMIN_SECRET` (worker/API)
 2. ✅ Checks file MIME types (JPG/PNG for images, PDF for docs)
 3. ✅ Enforces file size limits (5MB images, 10MB PDFs)
 4. ✅ Sanitizes filenames (removes special characters)
 5. ✅ Never processes if validation fails
 
-**Operations:**
+**Operations (performed by worker/API):**
 
-1. Checkout repository
-2. Setup Python 3.11
-3. Validate JWT signature
-4. Decode base64 files
-5. Update JSON database
-6. Create meaningful commit
-7. Push to main branch
-8. Trigger deploy workflow
+1. Validate JWT
+2. Decode base64 files
+3. Save assets to `public/assets/` and update `public/data/*.json`
+4. Commit changes and push to the repository
+5. Trigger `deploy.yml` (push-based) to rebuild the site
 
 ---
 
@@ -712,12 +702,8 @@ Edit [src/components/Projects/Projects.jsx](src/components/Projects/Projects.jsx
 
 ### Update Resume
 
-Your resume auto-syncs from Overleaf:
-
-1. Edit in [Overleaf](https://www.overleaf.com)
-2. GitHub Actions downloads daily
-3. Manual trigger: Actions tab → "Sync Resume" → Run workflow
-4. No manual uploads needed
+The resume PDF is stored locally in the repository at `public/resume/Chirag_Dhunna.pdf`.
+To update the resume, replace that file and push changes; the site will rebuild via the normal deploy workflow.
 
 ### Style Customization
 
@@ -743,7 +729,7 @@ Modify CSS variables to customize globally.
 1. Enhance `ProjectForm.jsx`
 2. Add to AdminDashboard tabs
 3. Handle events: `add-project`, `update-project`, `delete-project`
-4. Update `cms-update.yml` workflow
+4. Update server-side processing (Cloudflare Worker or GitHub workflow)
 
 **For Other Content:**
 
@@ -796,9 +782,9 @@ Modify CSS variables to customize globally.
 **Checklist:**
 
 1. Wait 60+ seconds
-2. Check GitHub Actions → latest run
-3. Verify `cms-update.yml` succeeded
-4. Verify `deploy.yml` also ran
+2. Check Cloudflare Worker logs (production) or GitHub Actions → latest run (development)
+3. Verify the worker/API processing completed successfully
+4. Verify `deploy.yml` also ran (or was triggered by the processing)
 5. Hard refresh: `Ctrl+Shift+R`
 6. Check browser console for errors
 
@@ -852,7 +838,7 @@ Modify CSS variables to customize globally.
 **Solution:**
 
 1. Check GitHub Actions → `deploy.yml`
-2. Verify it triggered after `cms-update.yml`
+2. Verify it was triggered by the worker/API push or other commit
 3. If not: check Actions enabled in Settings
 4. Verify `deploy.yml` has `on: push` trigger
 
@@ -942,21 +928,10 @@ npm run dev -- --port 3001
 
 ---
 
-## 🔄 Resume Synchronization
+## 🔄 Resume
 
-Your resume auto-syncs from Overleaf:
-
-1. **Edit in Overleaf** - Make LaTeX changes
-2. **Auto Sync** - GitHub Actions downloads daily
-3. **Manual Trigger** - Actions → "Sync Resume" → Run workflow
-4. **No Manual Upload** - Fully automated
-
-**Setup (if using):**
-
-1. Share Overleaf project (link sharing enabled)
-2. Copy project ID from share URL
-3. Add GitHub Secret: `OVERLEAF_PROJECT_ID`
-4. Workflow runs daily at midnight UTC
+The resume PDF is stored locally in the repository at `public/resume/Chirag_Dhunna.pdf`.
+To update the resume, replace that file and push changes; the site will rebuild via the normal deploy workflow.
 
 ---
 
