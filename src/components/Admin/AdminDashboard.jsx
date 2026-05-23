@@ -3,10 +3,226 @@ import { useNavigate } from "react-router-dom";
 import CertForm from "./CertForm";
 import ProjectForm from "./ProjectForm";
 import ResumeForm from "./ResumeForm";
-import { deleteProject } from "./githubApi";
+import { deleteProject, deleteCertification } from "./githubApi";
 import "./AdminDashboard.css";
 
 const projectsDataUrl = `${import.meta.env.BASE_URL}data/projects.json`;
+const certsDataUrl = `${import.meta.env.BASE_URL}data/certs.json`;
+
+function CertsTab() {
+  const [certs, setCerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [editingCert, setEditingCert] = useState(null);
+  const [confirmDeleteSlug, setConfirmDeleteSlug] = useState(null);
+  const [deletingSlug, setDeletingSlug] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
+
+  const fetchCerts = () => {
+    setLoading(true);
+    fetch(`${certsDataUrl}?t=${Date.now()}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setCerts(Array.isArray(d) ? d : []))
+      .catch(() => setCerts([]))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchCerts();
+  }, []);
+
+  const handleEditSuccess = () => {
+    setEditingCert(null);
+    fetchCerts();
+  };
+
+  const handleDeleteConfirm = async (slug) => {
+    setDeletingSlug(slug);
+    setDeleteError("");
+    try {
+      await deleteCertification(slug);
+      setConfirmDeleteSlug(null);
+      if (editingCert?.slug === slug) setEditingCert(null);
+      fetchCerts();
+    } catch (err) {
+      setDeleteError(err.message);
+    } finally {
+      setDeletingSlug(null);
+    }
+  };
+
+  const filtered = certs.filter(
+    (c) =>
+      c.name?.toLowerCase().includes(search.toLowerCase()) ||
+      c.issuer?.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const isEditing = !!editingCert;
+
+  return (
+    <div className="cms-shell">
+      {/* ── Sidebar ── */}
+      <div className="proj-sidebar">
+        <div className="sidebar-head">
+          <span className="sidebar-label">certifications</span>
+          <span className="sidebar-count">
+            {search ? `${filtered.length}/${certs.length}` : certs.length}
+          </span>
+        </div>
+
+        <div className="sidebar-search">
+          <div className="sidebar-search-wrap">
+            <i
+              className="ti ti-search sidebar-search-icon"
+              aria-hidden="true"
+            ></i>
+            <input
+              className="sidebar-search-input"
+              type="text"
+              placeholder="search certs…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="proj-list">
+          {loading ? (
+            <div className="empty-state">
+              <i className="ti ti-loader-2 empty-icon" aria-hidden="true"></i>
+              loading…
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="empty-state">
+              <i
+                className="ti ti-certificate-off empty-icon"
+                aria-hidden="true"
+              ></i>
+              {search ? `no results for "${search}"` : "no certs yet"}
+            </div>
+          ) : (
+            filtered.map((c) => {
+              const isActive = editingCert?.slug === c.slug;
+              const isConfirming = confirmDeleteSlug === c.slug;
+              const isDeleting = deletingSlug === c.slug;
+
+              return (
+                <div
+                  key={c.slug}
+                  className={`proj-item ${isActive ? "active" : ""}`}
+                >
+                  <div className="proj-thumb">
+                    {c.imageUrl ? (
+                      <img
+                        src={c.imageUrl}
+                        alt={c.name}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      c.name?.slice(0, 2).toUpperCase()
+                    )}
+                  </div>
+                  <div className="proj-info">
+                    <div className="proj-name">{c.name}</div>
+                    <div className="proj-cats">
+                      <span className="proj-cat">{c.issuer}</span>
+                    </div>
+                  </div>
+
+                  {isConfirming ? (
+                    <div className="delete-row">
+                      <span className="confirm-text">delete?</span>
+                      <button
+                        className="confirm-yes"
+                        onClick={() => handleDeleteConfirm(c.slug)}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? "…" : "yes"}
+                      </button>
+                      <button
+                        className="confirm-no"
+                        onClick={() => {
+                          setConfirmDeleteSlug(null);
+                          setDeleteError("");
+                        }}
+                        disabled={isDeleting}
+                      >
+                        no
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="proj-actions">
+                      <button
+                        className="proj-act edit"
+                        onClick={() => {
+                          setEditingCert(c);
+                          setConfirmDeleteSlug(null);
+                        }}
+                      >
+                        edit
+                      </button>
+                      <button
+                        className="proj-act del"
+                        onClick={() => {
+                          setConfirmDeleteSlug(c.slug);
+                          setDeleteError("");
+                        }}
+                      >
+                        del
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {deleteError && <div className="delete-error-bar">{deleteError}</div>}
+
+        <div className="add-row">
+          <button
+            className="add-btn"
+            onClick={() => {
+              setEditingCert(null);
+              setSearch("");
+            }}
+          >
+            <i className="ti ti-plus" aria-hidden="true"></i>
+            new certification
+          </button>
+        </div>
+      </div>
+
+      {/* ── Main panel ── */}
+      <div className="proj-main">
+        <div className="main-topbar">
+          <div>
+            <div className="mode-label">
+              {isEditing ? "EDIT MODE" : "ADD MODE"}
+            </div>
+            <div className="mode-title">
+              {isEditing ? editingCert.name : "New certification"}
+            </div>
+          </div>
+          {isEditing && (
+            <button className="cancel-btn" onClick={() => setEditingCert(null)}>
+              ✕ cancel
+            </button>
+          )}
+        </div>
+
+        <CertForm
+          editCert={editingCert}
+          onSuccess={handleEditSuccess}
+          onCancelEdit={() => setEditingCert(null)}
+        />
+      </div>
+    </div>
+  );
+}
 
 function ProjectsTab() {
   const [projects, setProjects] = useState([]);
@@ -60,7 +276,6 @@ function ProjectsTab() {
 
   return (
     <div className="cms-shell">
-      {/* ── Sidebar ── */}
       <div className="proj-sidebar">
         <div className="sidebar-head">
           <span className="sidebar-label">projects</span>
@@ -69,7 +284,6 @@ function ProjectsTab() {
           </span>
         </div>
 
-        {/* Search */}
         <div className="sidebar-search">
           <div className="sidebar-search-wrap">
             <i
@@ -197,7 +411,6 @@ function ProjectsTab() {
         </div>
       </div>
 
-      {/* ── Main panel ── */}
       <div className="proj-main">
         <div className="main-topbar">
           <div>
@@ -260,7 +473,7 @@ function AdminDashboard({ onLogout }) {
       </div>
 
       <div className="admin-content">
-        {activeTab === "certifications" && <CertForm onSuccess={() => {}} />}
+        {activeTab === "certifications" && <CertsTab />}
         {activeTab === "projects" && <ProjectsTab />}
         {activeTab === "resume" && <ResumeForm onSuccess={() => {}} />}
       </div>
