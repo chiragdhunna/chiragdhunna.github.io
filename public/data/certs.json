@@ -31,5 +31,16 @@
     "pdfUrl": "/assets/certs/azure-administrator-associate.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-21T14:07:41.676Z"
+  },
+  {
+    "id": "azure-solutions-architect-expert",
+    "slug": "azure-solutions-architect-expert",
+    "name": "Azure Solutions Architect Expert",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-solutions-architect-expert.jpg",
+    "pdfUrl": "/assets/certs/azure-solutions-architect-expert.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-23T20:36:23.576Z"
   }
 ]
