@@ -217,6 +217,113 @@ async function uploadFileToGitHub(path, base64Content) {
 }
 
 /**
+ * Delete a file from GitHub by path.
+ * Fetches the SHA first, then deletes the file.
+ */
+async function deleteFileFromGitHub(path) {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error("Not authenticated");
+  }
+
+  if (isProduction()) {
+    const getRes = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ action: "get", path }),
+    });
+
+    if (!getRes.ok) {
+      if (getRes.status === 404) {
+        console.warn(
+          `[deleteFileFromGitHub] File not found, skipping: ${path}`,
+        );
+        return;
+      }
+
+      const err = await getRes.json().catch(() => ({}));
+      throw new Error(
+        `Failed to get SHA for ${path}: ${err.error || getRes.statusText}`,
+      );
+    }
+
+    const { sha } = await getRes.json();
+
+    const deleteRes = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ action: "delete-file", path, sha }),
+    });
+
+    if (!deleteRes.ok) {
+      const err = await deleteRes.json().catch(() => ({}));
+      throw new Error(
+        `Failed to delete ${path}: ${err.error || deleteRes.statusText}`,
+      );
+    }
+
+    return;
+  }
+
+  const pat = import.meta.env.VITE_GITHUB_PAT;
+
+  if (!pat) {
+    throw new Error("GitHub PAT not available in development");
+  }
+
+  const getRes = await fetch(
+    `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${pat}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    },
+  );
+
+  if (!getRes.ok) {
+    if (getRes.status === 404) {
+      console.warn(`[deleteFileFromGitHub] File not found, skipping: ${path}`);
+      return;
+    }
+
+    throw new Error(`Failed to get SHA for ${path}: ${getRes.statusText}`);
+  }
+
+  const { sha } = await getRes.json();
+
+  const deleteRes = await fetch(
+    `${GITHUB_API}/${OWNER}/${REPO}/contents/${path}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${pat}`,
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: `chore: delete ${path}`,
+        sha,
+      }),
+    },
+  );
+
+  if (!deleteRes.ok) {
+    const err = await deleteRes.json().catch(() => ({}));
+    throw new Error(
+      `Failed to delete ${path}: ${err.message || deleteRes.statusText}`,
+    );
+  }
+}
+
+/**
  * Dispatch a CMS event to GitHub Actions
  * In prod: Uses Cloudflare Worker
  * In dev: Uses direct GitHub API
@@ -393,6 +500,28 @@ export async function deleteCertification(slug) {
     throw new Error(`[deleteCertification] No cert found with slug: ${slug}`);
   }
 
+  const cert = existing.content.find((c) => c.slug === slug);
+
+  if (cert?.imageUrl?.startsWith("/assets/certs/")) {
+    const imagePath = `public${cert.imageUrl}`;
+    console.log(`[deleteCertification] Deleting image: ${imagePath}`);
+    await deleteFileFromGitHub(imagePath).catch((err) =>
+      console.warn(
+        `[deleteCertification] Image delete failed (non-fatal): ${err.message}`,
+      ),
+    );
+  }
+
+  if (cert?.pdfUrl?.startsWith("/assets/certs/")) {
+    const pdfPath = `public${cert.pdfUrl}`;
+    console.log(`[deleteCertification] Deleting PDF: ${pdfPath}`);
+    await deleteFileFromGitHub(pdfPath).catch((err) =>
+      console.warn(
+        `[deleteCertification] PDF delete failed (non-fatal): ${err.message}`,
+      ),
+    );
+  }
+
   console.log(
     `[deleteCertification] Removing "${slug}", ${filtered.length} remaining...`,
   );
@@ -553,6 +682,18 @@ export async function deleteProject(slug) {
 
   if (filtered.length === existing.content.length) {
     throw new Error(`[deleteProject] No project found with slug: ${slug}`);
+  }
+
+  const project = existing.content.find((p) => p.slug === slug);
+
+  if (project?.imageUrl?.startsWith("/assets/projects/")) {
+    const imagePath = `public${project.imageUrl}`;
+    console.log(`[deleteProject] Deleting image: ${imagePath}`);
+    await deleteFileFromGitHub(imagePath).catch((err) =>
+      console.warn(
+        `[deleteProject] Image delete failed (non-fatal): ${err.message}`,
+      ),
+    );
   }
 
   console.log(

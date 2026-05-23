@@ -124,6 +124,43 @@ async function uploadToGithub(
 }
 
 /**
+ * Delete a file from GitHub contents API.
+ */
+async function deleteFromGithub(
+  path: string,
+  sha: string,
+  env: Env,
+): Promise<void> {
+  console.log("Deleting file:", path, "sha:", sha);
+
+  const deleteRes = await fetch(
+    `${GITHUB_API}/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${path}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_PAT}`,
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+        "User-Agent": "portfolio-cms-worker",
+      },
+      body: JSON.stringify({
+        message: `chore: delete ${path}`,
+        sha,
+        branch: "master",
+      }),
+    },
+  );
+
+  const deleteText = await deleteRes.text();
+
+  console.log("Delete status:", deleteRes.status);
+
+  if (!deleteRes.ok) {
+    throw new Error(`GitHub delete failed: ${deleteText}`);
+  }
+}
+
+/**
  * Dispatch repository event
  */
 async function dispatchEvent(
@@ -304,6 +341,38 @@ export default {
         await dispatchEvent(eventType, payload || {}, env);
 
         console.log("Dispatch successful");
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+          }),
+          {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+      }
+
+      // =========================
+      // HANDLE FILE DELETE
+      // =========================
+      if (body.action === "delete-file") {
+        const {
+          path,
+          sha,
+        }: {
+          path: string;
+          sha: string;
+        } = body;
+
+        if (!path || !sha) {
+          throw new Error("Missing path or sha");
+        }
+
+        await deleteFromGithub(path, sha, env);
 
         return new Response(
           JSON.stringify({
