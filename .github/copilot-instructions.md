@@ -12,10 +12,11 @@ Stack: React Router v6, Bootstrap 5, react-bootstrap, GitHub Actions, gh-pages b
 
 Study the existing codebase before suggesting anything. Specifically:
 
-- How `src/components/Projects/Projects.jsx` and `ProjectCards.jsx` are structured
-- How `src/App.jsx` defines routes
-- How `src/components/Navbar.jsx` adds nav items
-- How `.github/workflows/deploy.yml` and `build-resume.yml` work
+-- How `src/components/Projects/Projects.jsx` and `ProjectCards.jsx` are structured
+-- How `src/App.jsx` defines routes
+-- How `src/components/Navbar.jsx` adds nav items
+-- How `.github/workflows/deploy.yml` works
+
 - The dark theme CSS variables in `src/style.css` and `src/App.css`
 
 Every suggestion must be consistent with those patterns. Do not introduce new patterns
@@ -39,10 +40,7 @@ functions. The repo is the database.
    Each tab has a form to add new entries (name, description, image upload, URLs, etc).
    Certifications also accept a PDF upload.
 
-3. **GitHub Actions CMS workflow** — a new `cms-update.yml` that listens on
-   `repository_dispatch` events fired by the Admin UI. It validates the admin JWT,
-   commits the new JSON + uploaded assets directly to the repo, then triggers `deploy.yml`
-   so the site rebuilds automatically. No manual steps after form submission.
+3. **CMS Processing** — Uploads are handled by the Cloudflare Worker in production or by the GitHub API in development. The worker/API validates the admin JWT, writes assets and JSON to the repository, and ensures `deploy.yml` runs to rebuild the site. No manual steps after form submission.
 
 ---
 
@@ -115,15 +113,13 @@ const AdminApp = React.lazy(() => import("./components/Admin/AdminApp"));
 All admin components live in `src/components/Admin/`. They are never imported by any
 non-admin component. The public bundle has zero admin code.
 
-### GitHub Actions integration
+### CMS Processing (Worker / API)
 
-- Admin form submission → `dispatchCmsEvent()` → GitHub API `repository_dispatch`
+- Admin form submission → `dispatchCmsEvent()` → Cloudflare Worker (production) or GitHub API (development)
 - Event types: `add-project`, `update-project`, `delete-project`,
   `add-cert`, `update-cert`, `delete-cert`
-- `cms-update.yml` receives the event, validates JWT, reads JSON, applies change with
-  `jq` or Python, commits, pushes, then runs `gh workflow run deploy.yml`.
-- `deploy.yml` is untouched. It still builds and pushes to gh-pages as before.
-- Never string-concat JSON in shell. Use `jq` or Python for all JSON manipulation.
+- Processing: Worker/API validates JWT, decodes files, updates JSON, and pushes changes; `deploy.yml` handles deployment.
+- Never string-concat JSON in shell. Use `jq` or Python for any server-side JSON manipulation.
 - Sanitize all payload fields before using them in file paths (no path traversal).
 
 ### Image handling in the browser
@@ -155,7 +151,7 @@ public/data/
   certs.json               ← start as []
 
 .github/workflows/
-  cms-update.yml           ← new workflow
+  deploy.yml               ← Deploy workflow
 
 .env.local (never commit)
   VITE_ADMIN_PASSWORD=
@@ -163,7 +159,6 @@ public/data/
 
 GitHub Secrets
   ADMIN_SECRET             ← same value as VITE_ADMIN_PASSWORD
-  OVERLEAF_PROJECT_ID      ← existing, unchanged
 ```
 
 ---
@@ -191,7 +186,7 @@ GitHub Secrets
 - Netlify or Vercel serverless functions
 - localStorage for auth tokens
 - New npm packages for JWT (use Web Crypto API)
-- Modifying `deploy.yml` or `build-resume.yml`
+  -- Modifying `deploy.yml`
 - Hardcoding secrets or PATs in source files
 - `document.cookie` for session management
 

@@ -13,7 +13,7 @@ Your portfolio now has a complete **Certification Management System** with autom
 ## How It Works (3-Step Process)
 
 1. **You submit** → Go to `your-site.com/admin`, login, fill form, upload image/PDF
-2. **Workflow processes** → `cms-update.yml` validates JWT, saves files, updates JSON
+2. **Processing** → Uploads are handled by the Cloudflare Worker in production or by the GitHub API in development.
 3. **Site rebuilds** → `deploy.yml` triggers automatically, live in ~60 seconds
 
 ## Setup (5 Minutes)
@@ -75,7 +75,7 @@ src/components/Admin/
 └── githubApi.js          ← GitHub dispatch integration
 
 .github/workflows/
-└── cms-update.yml        ← Handles uploads & updates
+└── deploy.yml            ← Deploys site to GitHub Pages
 
 public/data/
 ├── certs.json           ← Certification database
@@ -129,15 +129,13 @@ Admin Form Submit
     ↓
 Issue JWT Token
     ↓
-Send repository_dispatch
-    ↓
-GitHub Actions: cms-update.yml
+Send to Cloudflare Worker (production) or GitHub API (development)
     ↓
 [Validate JWT] → [Decode Files] → [Create Slug] → [Save Assets]
     ↓
 Update certs.json
     ↓
-Git commit & push
+Git commit & push (performed by worker/API)
     ↓
 Trigger deploy.yml
     ↓

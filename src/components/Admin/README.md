@@ -15,7 +15,7 @@ This is a GitHub-based CMS for managing certifications and projects without touc
   - `public/assets/certs/<slug>.jpg` - Certification images
   - `public/assets/certs/<slug>.pdf` - Certificate PDFs
   - `public/assets/projects/<slug>.jpg` - Project images
-- **Workflow**: GitHub Actions (`cms-update.yml`) processes dispatch events
+- **Processing**: Cloudflare Worker (production) or GitHub API (development) processes uploads.
 
 ## Setup Instructions
 
@@ -46,7 +46,6 @@ VITE_GITHUB_PAT=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 In your GitHub repository Settings → Secrets and variables → Actions:
 
 1. Create secret `ADMIN_SECRET` with the same value as `VITE_ADMIN_PASSWORD`
-2. (Optional) Create secret `OVERLEAF_PROJECT_ID` if using resume sync
 
 ### 3. Test the Admin Panel
 
@@ -73,16 +72,17 @@ In your GitHub repository Settings → Secrets and variables → Actions:
 
 1. Admin UI encodes files to base64
 2. Issues JWT token signed with admin password
-3. Sends `repository_dispatch` event to GitHub Actions with JWT
-4. `cms-update.yml` workflow:
-   - Validates JWT with admin secret
-   - Decodes files from base64
-   - Creates slug from name (kebab-case)
-   - Saves image to `public/assets/certs/<slug>.jpg`
-   - Saves PDF to `public/assets/certs/<slug>.pdf`
-   - Appends entry to `public/data/certs.json`
-   - Commits changes with message "chore: update certifications from CMS"
-   - Triggers `deploy.yml` to rebuild the site
+3. Sends the upload to the Cloudflare Worker (production) or uses `repository_dispatch` to call the GitHub API in development.
+4. Worker/API processing:
+
+- Validates JWT with admin secret
+- Decodes files from base64
+- Creates slug from name (kebab-case)
+- Saves image to `public/assets/certs/<slug>.jpg`
+- Saves PDF to `public/assets/certs/<slug>.pdf`
+- Appends entry to `public/data/certs.json`
+- Commits changes and pushes to the repo
+- Triggers `deploy.yml` to rebuild the site
 
 ## Data Schema
 
@@ -147,7 +147,7 @@ Ensure `ADMIN_SECRET` in GitHub Secrets exactly matches `VITE_ADMIN_PASSWORD`
 ### Changes not appearing
 
 1. Check GitHub Actions tab in repo settings
-2. Verify `cms-update.yml` workflow ran successfully
+2. Verify the worker/API processing completed successfully (check worker logs or Actions)
 3. Check the `deploy.yml` workflow also completed
 4. Hard-refresh browser cache (Ctrl+Shift+R)
 
@@ -175,7 +175,7 @@ src/components/Admin/
 └── githubApi.js              # GitHub dispatch integration
 
 .github/workflows/
-└── cms-update.yml            # GitHub Actions workflow
+└── (processing handled by Cloudflare Worker in production or GitHub API in development)
 
 .env.example                  # Environment variable template
 ```
