@@ -42,7 +42,10 @@ function useSyncPoller() {
         }
 
         try {
-          const res = await fetch(`${url}?t=${Date.now()}`);
+          const res = await fetch(`${url}?t=${Date.now()}`, {
+            cache: "no-store",
+            headers: { Pragma: "no-cache" },
+          });
           if (!res.ok) return;
           const data = await res.json();
           const fresh = Array.isArray(data) ? data : [];
@@ -83,7 +86,10 @@ function CertsTab() {
 
   const fetchCerts = () => {
     setLoading(true);
-    fetch(`${certsDataUrl}?t=${Date.now()}`)
+    fetch(`${certsDataUrl}?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { Pragma: "no-cache" },
+    })
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => setCerts(Array.isArray(d) ? d : []))
       .catch(() => setCerts([]))
@@ -337,7 +343,10 @@ function ProjectsTab() {
 
   const fetchProjects = () => {
     setLoading(true);
-    fetch(`${projectsDataUrl}?t=${Date.now()}`)
+    fetch(`${projectsDataUrl}?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { Pragma: "no-cache" },
+    })
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => setProjects(Array.isArray(d) ? d : []))
       .catch(() => setProjects([]))
