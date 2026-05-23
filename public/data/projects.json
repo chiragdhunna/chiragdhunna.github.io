@@ -1,11 +1,8 @@
 [
   {
     "slug": "chat-go",
-    "categories": [
-      "Web",
-      "Full Stack"
-    ],
-    "imageUrl": "/assets/projects/chat_go_logo.jpeg",
+    "categories": ["Web", "Full Stack"],
+    "imageUrl": "/assets/projects/chat-go-logo.jpeg",
     "name": "Chat Go",
     "description": "Chat GO is a modern and feature-rich real-time chat application built with React Vite and Node.js.",
     "ghLink": "https://github.com/chiragdhunna/chat_go",
@@ -13,9 +10,7 @@
   },
   {
     "slug": "chat-go-backend",
-    "categories": [
-      "Backend"
-    ],
+    "categories": ["Backend"],
     "imageUrl": "/assets/projects/chat-go-backend.png",
     "name": "Chat Go Backend",
     "description": "Chat GO Backend is a real-time messaging API using Node.js, supporting authentication, WebSocket messaging, and media uploads.",
@@ -24,10 +19,8 @@
   },
   {
     "slug": "booking-calendar",
-    "categories": [
-      "Mobile"
-    ],
-    "imageUrl": "/assets/projects/booking_calendar_logo.png",
+    "categories": ["Mobile"],
+    "imageUrl": "/assets/projects/booking-calendar.png",
     "name": "Booking Calendar",
     "description": "The Booking Calendar is a versatile and customizable online booking solution built for Flutter apps.",
     "ghLink": "https://github.com/radikris/booking_calendar",
@@ -35,10 +28,7 @@
   },
   {
     "slug": "montra",
-    "categories": [
-      "Mobile",
-      "Full Stack"
-    ],
+    "categories": ["Mobile", "Full Stack"],
     "imageUrl": "/assets/projects/montra.png",
     "name": "Montra",
     "description": "Montra is a smart financial manager app built with Flutter, helping users track expenses, income, budgets, and financial goals with an intuitive UI and interactive charts.",
@@ -47,9 +37,7 @@
   },
   {
     "slug": "montra-backend",
-    "categories": [
-      "Backend"
-    ],
+    "categories": ["Backend"],
     "imageUrl": "/assets/projects/montra-backend.png",
     "name": "Montra Backend",
     "description": "Montra Backend is a powerful financial management API built with Node.js and PostgreSQL, supporting secure authentication, transaction tracking, budgeting, and data exports.",
@@ -58,10 +46,8 @@
   },
   {
     "slug": "uber-eats-clone",
-    "categories": [
-      "Mobile"
-    ],
-    "imageUrl": "/assets/projects/uberEatsClone.png",
+    "categories": ["Mobile"],
+    "imageUrl": "/assets/projects/uber-eats-clone.png",
     "name": "Uber Eats Clone",
     "description": "The Uber Eats clone is a robust food delivery app built with React Native.",
     "ghLink": "https://github.com/chiragdhunna/Uber_Eats_Clone",
@@ -69,10 +55,8 @@
   },
   {
     "slug": "music-mix",
-    "categories": [
-      "Mobile"
-    ],
-    "imageUrl": "/assets/projects/musicMix.jpeg",
+    "categories": ["Mobile"],
+    "imageUrl": "/assets/projects/music-mix.jpeg",
     "name": "Music Mix",
     "description": "Music Mix is a dynamic and feature-rich music player app crafted for Android devices.",
     "ghLink": "https://github.com/chiragdhunna/Music_Mix",
@@ -80,10 +64,8 @@
   },
   {
     "slug": "gpt-jr",
-    "categories": [
-      "Mobile"
-    ],
-    "imageUrl": "/assets/projects/gptJr.png",
+    "categories": ["Mobile"],
+    "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
     "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
@@ -91,14 +73,20 @@
   },
   {
     "slug": "linkedin-post-generator",
-    "categories": [
-      "Web",
-      "Backend"
-    ],
-    "imageUrl": "/assets/projects/linkedin_post_generator.png",
+    "categories": ["Web", "Backend"],
+    "imageUrl": "/assets/projects/linkedin-post-generator.png",
     "name": "LinkedIn Post Generator!!!!",
     "description": "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving.",
     "ghLink": "https://github.com/chiragdhunna/linkedin_post_generator",
     "demoLink": null
+  },
+  {
+    "slug": "portfolio-admin-panel",
+    "categories": ["Web", "Full Stack"],
+    "imageUrl": "/assets/projects/portfolio-admin-panel.png",
+    "name": "Portfolio Admin Panel",
+    "description": "A private CMS dashboard for managing portfolio projects and certifications directly from the codebase.",
+    "ghLink": "https://github.com/chiragdhunna/chiragdhunna.github.io",
+    "demoLink": "https://chiragdhunna.github.io/admin"
   }
 ]
