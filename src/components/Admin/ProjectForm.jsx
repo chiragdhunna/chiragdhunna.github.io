@@ -27,6 +27,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
   const [loading, setLoading] = useState(false);
   const [msgOk, setMsgOk] = useState("");
   const [msgErr, setMsgErr] = useState("");
+  const [customCatInput, setCustomCatInput] = useState("");
 
   useEffect(() => {
     if (editProject) {
@@ -51,6 +52,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
     setImageFile(null);
     setMsgOk("");
     setMsgErr("");
+    setCustomCatInput("");
   }, [editProject]);
 
   const handleInput = (e) => {
@@ -65,6 +67,14 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
         ? p.categories.filter((c) => c !== cat)
         : [...p.categories, cat],
     }));
+  };
+
+  const addCustomCat = () => {
+    const val = customCatInput.trim();
+    if (val && !formData.categories.includes(val)) {
+      setFormData((p) => ({ ...p, categories: [...p.categories, val] }));
+    }
+    setCustomCatInput("");
   };
 
   const handleImage = (e) => {
@@ -207,6 +217,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
               categories <span className="pf-req">*</span>
             </label>
             <div className="pf-cats">
+              {/* Predefined category pills */}
               {CATEGORY_OPTIONS.map((cat) => (
                 <button
                   key={cat}
@@ -218,6 +229,40 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
                   {cat}
                 </button>
               ))}
+
+              {/* Custom category pills */}
+              {formData.categories
+                .filter((c) => !CATEGORY_OPTIONS.includes(c))
+                .map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    className="pf-cat pf-cat--on pf-cat--custom"
+                    onClick={() => toggleCat(cat)}
+                    disabled={loading}
+                    title="click to remove"
+                  >
+                    {cat} ✕
+                  </button>
+                ))}
+
+              {/* Custom category input */}
+              <div className="pf-cat-add">
+                <input
+                  className="pf-cat-input"
+                  type="text"
+                  placeholder="+ custom…"
+                  value={customCatInput}
+                  onChange={(e) => setCustomCatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addCustomCat();
+                    }
+                  }}
+                  disabled={loading}
+                />
+              </div>
             </div>
           </div>
 

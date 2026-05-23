@@ -263,3 +263,44 @@
 .pf-btn--save:hover:not(:disabled) {
   background: rgba(91, 156, 246, 0.18);
 }
+
+.pf-cat--custom {
+  background: rgba(91, 156, 246, 0.1);
+  border-color: #5b9cf6;
+  color: #5b9cf6;
+}
+
+.pf-cat-add {
+  display: flex;
+  align-items: center;
+}
+
+.pf-cat-input {
+  background: #1d1f21;
+  border: 1px dashed #35383c;
+  border-radius: 4px;
+  color: #e8eaed;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  outline: none;
+  width: 120px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.pf-cat-input:focus {
+  border-color: #c8891a;
+  border-style: solid;
+  box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.08);
+}
+
+.pf-cat-input::placeholder {
+  color: #5f6368;
+}
+
+.pf-cat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
