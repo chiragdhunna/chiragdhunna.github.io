@@ -31,16 +31,5 @@
     "pdfUrl": "/assets/certs/azure-administrator-associate.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-21T14:07:41.676Z"
-  },
-  {
-    "id": "test-certificate-chirag-dhunna",
-    "slug": "test-certificate-chirag-dhunna",
-    "name": "Test Certificate Chirag Dhunna",
-    "issuer": "AWS",
-    "issueDate": null,
-    "imageUrl": "/assets/certs/test-certificate-chirag-dhunna.jpg",
-    "pdfUrl": null,
-    "credentialUrl": null,
-    "createdAt": "2026-05-23T11:16:59.197Z"
   }
 ]
