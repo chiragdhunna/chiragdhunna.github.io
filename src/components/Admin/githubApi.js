@@ -375,22 +375,89 @@ export async function addCertification(certData) {
 }
 
 /**
- * Update an existing certification
+ * Delete a certification by slug
  */
-export async function updateCertification(certId, certData) {
-  return dispatchCmsEvent("update-cert", {
-    id: certId,
-    ...certData,
-  });
+export async function deleteCertification(slug) {
+  const certsPath = "public/data/certs.json";
+
+  console.log(`[deleteCertification] Reading certs.json...`);
+  const existing = await getFileFromGitHub(certsPath);
+
+  if (!existing || !Array.isArray(existing.content)) {
+    throw new Error("[deleteCertification] Could not read certs.json");
+  }
+
+  const filtered = existing.content.filter((c) => c.slug !== slug);
+
+  if (filtered.length === existing.content.length) {
+    throw new Error(`[deleteCertification] No cert found with slug: ${slug}`);
+  }
+
+  console.log(
+    `[deleteCertification] Removing "${slug}", ${filtered.length} remaining...`,
+  );
+
+  const updatedContent = toBase64(JSON.stringify(filtered, null, 2));
+  await uploadFileToGitHub(
+    certsPath,
+    `data:application/json;base64,${updatedContent}`,
+  );
+
+  return dispatchCmsEvent("delete-cert", { slug });
 }
 
 /**
- * Delete a certification
+ * Update an existing certification by slug
  */
-export async function deleteCertification(certId) {
-  return dispatchCmsEvent("delete-cert", {
-    id: certId,
-  });
+export async function updateCertification(slug, updatedData) {
+  const certsPath = "public/data/certs.json";
+
+  console.log(`[updateCertification] Reading certs.json...`);
+  const existing = await getFileFromGitHub(certsPath);
+
+  if (!existing || !Array.isArray(existing.content)) {
+    throw new Error("[updateCertification] Could not read certs.json");
+  }
+
+  const index = existing.content.findIndex((c) => c.slug === slug);
+
+  if (index === -1) {
+    throw new Error(`[updateCertification] No cert found with slug: ${slug}`);
+  }
+
+  // Upload new image if provided
+  if (updatedData.imageBase64) {
+    const imagePath = `public/assets/certs/${slug}.jpg`;
+    console.log(`[updateCertification] Uploading new image...`);
+    await uploadFileToGitHub(imagePath, updatedData.imageBase64);
+    updatedData.imageUrl = `/assets/certs/${slug}.jpg`;
+    delete updatedData.imageBase64;
+  }
+
+  // Upload new PDF if provided
+  if (updatedData.pdfBase64) {
+    const pdfPath = `public/assets/certs/${slug}.pdf`;
+    console.log(`[updateCertification] Uploading new PDF...`);
+    await uploadFileToGitHub(pdfPath, updatedData.pdfBase64);
+    updatedData.pdfUrl = `/assets/certs/${slug}.pdf`;
+    delete updatedData.pdfBase64;
+  }
+
+  existing.content[index] = {
+    ...existing.content[index],
+    ...updatedData,
+    slug,
+  };
+
+  console.log(`[updateCertification] Saving updated certs.json...`);
+
+  const updatedContent = toBase64(JSON.stringify(existing.content, null, 2));
+  await uploadFileToGitHub(
+    certsPath,
+    `data:application/json;base64,${updatedContent}`,
+  );
+
+  return dispatchCmsEvent("update-cert", { slug, ...updatedData });
 }
 
 /**
