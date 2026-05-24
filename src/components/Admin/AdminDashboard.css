@@ -743,11 +743,18 @@
 @media (max-width: 768px) {
   .cms-shell {
     grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
   }
   .proj-sidebar {
     border-right: none;
     border-bottom: 1px solid #2a2c2f;
+    max-height: none;
+    overflow: visible;
+  }
+  .proj-list {
     max-height: 260px;
+    overflow-y: auto;
   }
 }
 
