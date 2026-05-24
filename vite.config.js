@@ -1,12 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "path";
 
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ command }) => ({
+  plugins: [react(), command === "serve" && basicSsl()].filter(Boolean),
   base: "/",
   server: {
     port: 3000,
+    host: true,
+    https: true,
   },
   optimizeDeps: {
     include: ["react-pdf", "pdfjs-dist"],
@@ -19,4 +22,4 @@ export default defineConfig({
     },
   },
   assetsInclude: ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.svg", "**/*.gif"],
-});
+}));

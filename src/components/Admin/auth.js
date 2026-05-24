@@ -6,19 +6,62 @@
 const TOKEN_KEY = "admin_token";
 const TOKEN_EXPIRY_HOURS = 4;
 
+function getSubtleCrypto() {
+  const cryptoApi = globalThis.crypto;
+  const subtle = cryptoApi?.subtle ?? cryptoApi?.webkitSubtle;
+
+  return subtle || null;
+}
+
+function toBase64Url(input) {
+  return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+
+function createTokenPayload() {
+  const now = Math.floor(Date.now() / 1000);
+
+  return {
+    iat: now,
+    exp: now + TOKEN_EXPIRY_HOURS * 3600,
+    type: "admin",
+  };
+}
+
+function createFallbackToken() {
+  const header = { alg: "none", typ: "JWT" };
+  const payload = createTokenPayload();
+
+  return `${toBase64Url(JSON.stringify(header))}.${toBase64Url(JSON.stringify(payload))}.fallback`;
+}
+
 /**
  * Issue a JWT token signed with HMAC-SHA256
  * @param {string} password - The admin password
  * @returns {Promise<string>} - The JWT token
  */
 export async function issueToken(password) {
+  const subtle = getSubtleCrypto();
+
+  if (!subtle) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        "[auth] crypto.subtle unavailable (insecure context). Using unsigned fallback token - DEV only.",
+      );
+      const token = createFallbackToken();
+      sessionStorage.setItem(TOKEN_KEY, token);
+      return token;
+    }
+
+    throw new Error(
+      "Admin login requires a secure connection (HTTPS). crypto.subtle is not available in this context.",
+    );
+  }
+
   const secret = new TextEncoder().encode(password);
   const algorithm = { name: "HMAC", hash: "SHA-256" };
 
   // Import the secret as a key
-  const key = await crypto.subtle.importKey("raw", secret, algorithm, false, [
-    "sign",
-  ]);
+  const key = await subtle.importKey("raw", secret, algorithm, false, ["sign"]);
 
   // Create header and payload
   const header = { alg: "HS256", typ: "JWT" };
@@ -30,30 +73,18 @@ export async function issueToken(password) {
   };
 
   // Encode to base64url
-  const headerEncoded = btoa(JSON.stringify(header))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-
-  const payloadEncoded = btoa(JSON.stringify(payload))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
+  const headerEncoded = toBase64Url(JSON.stringify(header));
+  const payloadEncoded = toBase64Url(JSON.stringify(payload));
 
   const message = `${headerEncoded}.${payloadEncoded}`;
   const messageEncoded = new TextEncoder().encode(message);
 
   // Sign the message
-  const signatureBuffer = await crypto.subtle.sign(
-    algorithm,
-    key,
-    messageEncoded,
-  );
+  const signatureBuffer = await subtle.sign(algorithm, key, messageEncoded);
   const signatureArray = Array.from(new Uint8Array(signatureBuffer));
-  const signatureEncoded = btoa(String.fromCharCode.apply(null, signatureArray))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
+  const signatureEncoded = toBase64Url(
+    String.fromCharCode.apply(null, signatureArray),
+  );
 
   const token = `${message}.${signatureEncoded}`;
 
