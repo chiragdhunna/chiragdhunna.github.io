@@ -756,6 +756,9 @@
     max-height: 260px;
     overflow-y: auto;
   }
+  .proj-actions {
+    opacity: 1;
+  }
 }
 
 /* Search */
