@@ -42,5 +42,16 @@
     "pdfUrl": "/assets/certs/azure-solutions-architect-expert.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-23T20:36:23.576Z"
+  },
+  {
+    "id": "azure-data-scientist-associate-certification",
+    "slug": "azure-data-scientist-associate-certification",
+    "name": "Azure Data Scientist Associate certification",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-data-scientist-associate-certification.jpg",
+    "pdfUrl": "/assets/certs/azure-data-scientist-associate-certification.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-26T12:16:21.145Z"
   }
 ]
