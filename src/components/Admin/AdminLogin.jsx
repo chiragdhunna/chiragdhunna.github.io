@@ -14,15 +14,8 @@ function AdminLogin({ onLoginSuccess, onGoHome }) {
     setLoading(true);
 
     try {
-      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-      if (!adminPassword) {
-        setError("Admin password not configured");
-        setLoading(false);
-        return;
-      }
-
-      if (password !== adminPassword) {
-        setError("Invalid password");
+      if (!password.trim()) {
+        setError("Enter your admin password");
         setLoading(false);
         return;
       }

@@ -128,10 +128,6 @@ In your GitHub repository Settings → Secrets and variables → Actions:
 
 ## Troubleshooting
 
-### "Admin password not configured"
-
-Add `VITE_ADMIN_PASSWORD` to `.env.local`
-
 ### "GitHub API error: 401"
 
 Check your `VITE_GITHUB_PAT`:
