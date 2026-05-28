@@ -1143,7 +1143,24 @@
         }
 
         .projects-grid {
-          columns: 1;
+          display: flex;
+          gap: 16px;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          scroll-snap-type: x mandatory;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .projects-grid::-webkit-scrollbar {
+          display: none;
+        }
+
+        .project-card {
+          min-width: 290px;
+          width: 290px;
+          margin-bottom: 0;
+          scroll-snap-align: start;
         }
 
         .cert-grid-wrap {
