@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Preloader from "./components/Pre";
 import Navbar from "./components/Navbar";
-import Home from "./components/Home/Home";
 import About from "./components/About/About";
 import Projects from "./components/Projects/Projects";
 import Certifications from "./components/Certifications/Certifications";
@@ -25,24 +24,23 @@ const Portfolio = React.lazy(() => import("./components/Portfolio/Portfolio"));
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
-  const isPortfolioRoute = location.pathname === "/portfolio";
+  const isPortfolioRoute = location.pathname === "/";
 
   return (
     <div className="App" id={isAdminRoute ? "no-scroll" : "scroll"}>
       {!isAdminRoute && !isPortfolioRoute ? <Navbar /> : null}
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/project" element={<Projects />} />
-        <Route path="/certifications" element={<Certifications />} />
         <Route
-          path="/portfolio"
+          path="/"
           element={
             <Suspense fallback={<Preloader load={true} />}>
               <Portfolio />
             </Suspense>
           }
         />
+        <Route path="/project" element={<Projects />} />
+        <Route path="/certifications" element={<Certifications />} />
         <Route path="/about" element={<About />} />
         <Route path="/resume" element={<Resume />} />
         <Route
