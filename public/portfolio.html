@@ -1,0 +1,2139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Chirag Dhunna — Software Developer, Flutter & MERN Stack specialist based in Bangalore, India."
+    />
+    <meta name="theme-color" content="#0c0a14" />
+    <title>Chirag Dhunna | Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0c0a14;
+        --bg-card: #13111f;
+        --bg-line: #1e1a2e;
+        --accent: #9b5de5;
+        --accent-2: #f72585;
+        --accent-3: #00f5d4;
+        --text-1: #f0ece8;
+        --text-2: #9b97a8;
+        --text-3: #4e4a5e;
+        --border: rgba(155, 93, 229, 0.18);
+        --glow: 0 0 32px rgba(155, 93, 229, 0.25);
+        --container: 1200px;
+        --step-0: 1rem;
+        --step-1: 1.25rem;
+        --step-2: 1.563rem;
+        --step-3: 1.953rem;
+        --step-4: 2.441rem;
+        --step-5: 3.052rem;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 96px;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at 50% 10%,
+            rgba(155, 93, 229, 0.18),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 0%,
+            rgba(247, 37, 133, 0.08),
+            transparent 22%
+          ),
+          linear-gradient(180deg, #09070f 0%, #0c0a14 50%, #0a0811 100%);
+        color: var(--text-1);
+        font-family: "Space Grotesk", sans-serif;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 16px;
+        top: -48px;
+        z-index: 1000;
+        background: var(--accent);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        transition: top 0.2s ease;
+      }
+
+      .skip-link:focus {
+        top: 16px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: var(--container);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 72px;
+        padding: 0 24px;
+        background: rgba(12, 10, 20, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-logo {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+        font-size: 0.95rem;
+        letter-spacing: 0.18em;
+      }
+
+      .nav-dots {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex: 1;
+        justify-content: center;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--text-3);
+        box-shadow: 0 0 0 4px transparent;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .dot:hover,
+      .dot:focus-visible {
+        transform: scale(1.4);
+        background: var(--text-1);
+        box-shadow: 0 0 0 4px rgba(155, 93, 229, 0.14);
+        outline: none;
+      }
+
+      .dot.active {
+        background: var(--accent);
+        box-shadow: 0 0 0 5px rgba(155, 93, 229, 0.16);
+      }
+
+      .btn-hire,
+      .button-link,
+      .btn,
+      .filter-pill,
+      .contact-row,
+      .social-btn {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn-hire {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        padding: 8px 20px;
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        color: var(--accent);
+        text-decoration: none;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease,
+          box-shadow 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .btn-hire:hover,
+      .btn-hire:focus-visible {
+        background: var(--accent);
+        color: white;
+        box-shadow: var(--glow);
+        outline: none;
+      }
+
+      /* Hire chooser modal styles */
+      .hire-chooser {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(4, 4, 6, 0.6);
+        z-index: 9999;
+      }
+      .hire-chooser-inner {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 20px;
+        width: min(420px, 92%);
+        border-radius: 12px;
+        box-shadow: var(--glow);
+        color: var(--text-1);
+      }
+      .hire-chooser-title {
+        font-weight: 600;
+        margin: 0 0 6px;
+      }
+      .hire-chooser-desc {
+        margin: 0 0 12px;
+        color: var(--text-2);
+      }
+      .hire-chooser-actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .hire-btn {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: var(--text-1);
+        cursor: pointer;
+      }
+      .hire-btn.gmail {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: white;
+        border: none;
+      }
+      .hire-btn.client {
+        background: transparent;
+        border: 1px solid var(--border);
+      }
+      .hire-btn.cancel {
+        background: transparent;
+        color: var(--text-2);
+      }
+      .hire-remember {
+        display: block;
+        font-size: 13px;
+        color: var(--text-2);
+      }
+
+      main {
+        padding-top: 72px;
+      }
+
+      section {
+        position: relative;
+        padding: 88px 0;
+        scroll-margin-top: 88px;
+      }
+
+      section::before {
+        content: "";
+        display: block;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+        margin-bottom: 80px;
+      }
+
+      section:first-child::before {
+        display: none;
+      }
+
+      .section-label {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--accent);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+
+      .section-heading {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .section-heading strong {
+        color: var(--accent);
+      }
+
+      .section-lead {
+        margin: 14px 0 0;
+        color: var(--text-2);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 760px;
+      }
+
+      .hero {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding-top: 80px;
+        padding-bottom: 88px;
+        background-image: radial-gradient(
+          circle,
+          var(--bg-line) 1px,
+          transparent 1px
+        );
+        background-size: 24px 24px;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            circle at 50% 42%,
+            rgba(155, 93, 229, 0.18),
+            transparent 18%
+          ),
+          radial-gradient(
+            circle at 52% 45%,
+            rgba(247, 37, 133, 0.08),
+            transparent 32%
+          );
+        pointer-events: none;
+      }
+
+      #particles {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        align-items: center;
+        gap: 36px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 20px;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text-2);
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::after {
+        content: "";
+        width: 12px;
+        height: 1px;
+        background: var(--accent-3);
+        animation: blink 1.1s step-end infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .hero-name {
+        margin: 0;
+        font-size: clamp(3rem, 8vw, 5.3rem);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        text-wrap: balance;
+      }
+
+      .hero-name span {
+        color: var(--accent);
+      }
+
+      .hero-subtitle {
+        margin: 22px 0 0;
+        max-width: 700px;
+        color: var(--text-2);
+        font-size: clamp(1.1rem, 2vw, 1.45rem);
+        line-height: 1.7;
+      }
+
+      .hero-type {
+        margin-top: 22px;
+        min-height: 2.2em;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text-1);
+        font-size: 1rem;
+        letter-spacing: 0.02em;
+      }
+
+      .hero-type .accent {
+        color: var(--accent);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .btn,
+      .social-btn,
+      .filter-pill,
+      .project-btn,
+      .contact-row {
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(19, 17, 31, 0.88);
+        color: var(--text-1);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        letter-spacing: 0.04em;
+      }
+
+      .btn:hover,
+      .btn:focus-visible {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+        box-shadow: var(--glow);
+        outline: none;
+      }
+
+      .btn-primary {
+        border-color: rgba(155, 93, 229, 0.5);
+        color: white;
+        background: linear-gradient(
+          135deg,
+          rgba(155, 93, 229, 0.95),
+          rgba(247, 37, 133, 0.85)
+        );
+      }
+
+      .btn-primary:hover,
+      .btn-primary:focus-visible {
+        border-color: var(--accent);
+      }
+
+      .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+      }
+
+      .social-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(19, 17, 31, 0.9);
+        color: var(--text-2);
+        font-size: 1.05rem;
+      }
+
+      .social-btn:hover,
+      .social-btn:focus-visible {
+        transform: translateY(-2px);
+        color: white;
+        border-color: var(--accent);
+        box-shadow: var(--glow);
+        outline: none;
+      }
+
+      .hero-card {
+        position: relative;
+        padding: 26px;
+        border-radius: 24px;
+        background: linear-gradient(
+          180deg,
+          rgba(19, 17, 31, 0.96),
+          rgba(19, 17, 31, 0.82)
+        );
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 90px rgba(0, 0, 0, 0.35);
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(
+          135deg,
+          rgba(155, 93, 229, 0.45),
+          rgba(0, 245, 212, 0.18),
+          rgba(247, 37, 133, 0.22)
+        );
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .hero-avatar-wrap {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 1 / 1.08;
+        border-radius: 24px;
+        background:
+          radial-gradient(
+            circle at 50% 35%,
+            rgba(155, 93, 229, 0.18),
+            transparent 30%
+          ),
+          rgba(15, 13, 24, 0.95);
+        border: 1px solid var(--border);
+        box-shadow:
+          0 0 0 1px rgba(155, 93, 229, 0.06),
+          0 30px 100px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .hero-avatar-wrap img {
+        width: min(100%, 360px);
+        height: auto;
+        filter: drop-shadow(0 0 32px rgba(155, 93, 229, 0.2));
+      }
+
+      .hero-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(19, 17, 31, 0.9);
+        color: var(--text-2);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+      }
+
+      .intro-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+        gap: 28px;
+        align-items: start;
+      }
+
+      .quote-card {
+        padding: 28px;
+        border-radius: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent);
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.24);
+      }
+
+      .quote-card p {
+        margin: 0;
+        color: var(--text-2);
+        font-size: 1.02rem;
+        line-height: 1.85;
+      }
+
+      .quote-card strong,
+      .quote-card .accent,
+      .hero-copy strong {
+        color: var(--text-1);
+      }
+
+      .about-list {
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .about-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-1);
+      }
+
+      .about-list li::before {
+        content: "⬡";
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .signature {
+        margin-top: 18px;
+        color: var(--accent-2);
+        font-style: italic;
+      }
+
+      .avatar-frame {
+        display: grid;
+        place-items: center;
+        padding: 22px;
+        border-radius: 24px;
+        background:
+          radial-gradient(
+            circle at 50% 25%,
+            rgba(155, 93, 229, 0.15),
+            transparent 32%
+          ),
+          var(--bg-card);
+        border: 1px solid var(--border);
+        box-shadow: var(--glow);
+      }
+
+      .avatar-frame img {
+        width: 100%;
+        max-width: 340px;
+        height: auto;
+        filter: drop-shadow(0 0 24px rgba(155, 93, 229, 0.32));
+      }
+
+      .stack-groups {
+        display: grid;
+        gap: 28px;
+      }
+
+      .stack-group h3,
+      .mini-title {
+        margin: 0 0 14px;
+        font-size: 1.2rem;
+        letter-spacing: -0.02em;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip,
+      .filter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-2);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        cursor: default;
+      }
+
+      .chip:hover,
+      .chip:focus-visible,
+      .filter-pill:hover,
+      .filter-pill:focus-visible {
+        border-color: var(--accent);
+        color: var(--text-1);
+        box-shadow: 0 0 16px rgba(155, 93, 229, 0.2);
+        transform: scale(1.04);
+        outline: none;
+      }
+
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 26px 0 24px;
+      }
+
+      .filter-pill {
+        cursor: pointer;
+      }
+
+      .filter-pill.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+        box-shadow: 0 4px 20px rgba(155, 93, 229, 0.4);
+      }
+
+      .filter-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 11px;
+      }
+
+      .projects-meta {
+        margin: 0 0 22px;
+        color: var(--text-2);
+      }
+
+      .projects-meta strong {
+        color: var(--text-1);
+      }
+
+      .projects-grid {
+        columns: 3 280px;
+        column-gap: 22px;
+      }
+
+      .project-card,
+      .cert-card {
+        break-inside: avoid;
+        margin: 0 0 22px;
+        border-radius: 18px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        box-shadow: 0 12px 44px rgba(0, 0, 0, 0.22);
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .project-card.revealed,
+      .cert-card.revealed,
+      .reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .project-card:hover,
+      .cert-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+        box-shadow: var(--glow);
+      }
+
+      .project-image,
+      .cert-image {
+        width: 100%;
+        background: rgba(8, 7, 14, 0.88);
+      }
+
+      .project-image {
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .cert-image {
+        aspect-ratio: 16 / 9;
+        object-fit: contain;
+        padding: 16px;
+      }
+
+      .card-body {
+        padding: 18px 18px 20px;
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 1.15rem;
+        line-height: 1.35;
+      }
+
+      .card-subtitle {
+        margin: 8px 0 0;
+        color: var(--text-2);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .card-description {
+        margin: 12px 0 0;
+        color: var(--text-2);
+        font-size: 0.95rem;
+        line-height: 1.75;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .card-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--text-2);
+      }
+
+      .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .project-btn,
+      .card-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-1);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+      }
+
+      .project-btn:hover,
+      .project-btn:focus-visible,
+      .card-link:hover,
+      .card-link:focus-visible {
+        transform: translateY(-1px);
+        border-color: var(--accent);
+        box-shadow: 0 0 18px rgba(155, 93, 229, 0.16);
+        outline: none;
+      }
+
+      .project-btn.primary,
+      .card-link.primary {
+        background: linear-gradient(
+          135deg,
+          rgba(155, 93, 229, 0.92),
+          rgba(247, 37, 133, 0.72)
+        );
+        border-color: rgba(155, 93, 229, 0.45);
+      }
+
+      .empty-state {
+        padding: 28px;
+        border-radius: 18px;
+        border: 1px dashed var(--border);
+        color: var(--text-2);
+        background: rgba(19, 17, 31, 0.7);
+      }
+
+      .cert-grid-wrap {
+        display: grid;
+        gap: 22px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .contrib-wrap {
+        margin-top: 34px;
+        padding: 22px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: rgba(19, 17, 31, 0.72);
+      }
+
+      .contrib-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .contrib-head p {
+        margin: 0;
+        color: var(--text-2);
+        font-size: 0.95rem;
+      }
+
+      .contrib-scroll {
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      #contrib-grid {
+        display: grid;
+        grid-template-columns: repeat(52, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+        grid-auto-flow: column;
+        gap: 3px;
+        min-width: 720px;
+      }
+
+      .contrib-cell {
+        aspect-ratio: 1;
+        min-width: 10px;
+        border-radius: 2px;
+        outline: 1px solid rgba(255, 255, 255, 0.03);
+      }
+
+      .contact-section {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent 42%),
+          repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.025) 0,
+            rgba(255, 255, 255, 0.025) 1px,
+            transparent 1px,
+            transparent 16px
+          ),
+          rgba(10, 8, 17, 0.98);
+      }
+
+      .contact-copy {
+        max-width: 780px;
+      }
+
+      .contact-list {
+        margin-top: 26px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .contact-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: rgba(19, 17, 31, 0.8);
+      }
+
+      .contact-row:hover,
+      .contact-row:focus-visible {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+        box-shadow: var(--glow);
+        outline: none;
+      }
+
+      .contact-row span {
+        color: var(--text-2);
+      }
+
+      .contact-row strong {
+        color: var(--text-1);
+      }
+
+      footer {
+        padding: 28px 24px 36px;
+        border-top: 1px solid var(--border);
+        background: rgba(8, 7, 14, 0.85);
+      }
+
+      .footer-inner {
+        max-width: var(--container);
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        color: var(--text-2);
+      }
+
+      .admin-footer-link {
+        opacity: 0.15;
+        transition:
+          opacity 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .admin-footer-link:hover,
+      .admin-footer-link:focus-visible {
+        opacity: 1;
+        color: var(--accent);
+        outline: none;
+      }
+
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+
+      [data-reveal].revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 1024px) {
+        .hero-grid,
+        .intro-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-avatar-wrap {
+          max-width: 520px;
+          margin: 0 auto;
+        }
+
+        .cert-grid-wrap {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 767px) {
+        .nav {
+          padding: 0 16px;
+        }
+
+        .nav-dots {
+          display: none;
+        }
+
+        .container {
+          padding: 0 16px;
+        }
+
+        section {
+          padding: 72px 0;
+        }
+
+        .hero {
+          padding-top: 92px;
+        }
+
+        .hero-name {
+          font-size: clamp(2.5rem, 14vw, 3.8rem);
+        }
+
+        .hero-subtitle {
+          font-size: 1rem;
+        }
+
+        .hero-actions,
+        .social-links,
+        .filter-bar,
+        .card-actions,
+        .contact-list {
+          gap: 10px;
+        }
+
+        .projects-grid {
+          columns: 1;
+        }
+
+        .cert-grid-wrap {
+          display: flex;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          scroll-snap-type: x mandatory;
+        }
+
+        .cert-card {
+          min-width: 290px;
+          scroll-snap-align: start;
+        }
+
+        .contrib-wrap {
+          padding: 18px;
+        }
+
+        #contrib-grid {
+          min-width: 640px;
+        }
+
+        .contact-row {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+
+        #particles {
+          display: none;
+        }
+
+        [data-reveal],
+        .project-card,
+        .cert-card,
+        .reveal {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <span class="nav-logo" aria-label="Chirag Dhunna">CD_</span>
+      <div class="nav-dots" aria-label="Section navigation">
+        <a href="#hero" class="dot active" aria-label="Hero section"></a>
+        <a href="#about" class="dot" aria-label="About section"></a>
+        <a href="#stack" class="dot" aria-label="Tech stack section"></a>
+        <a href="#projects" class="dot" aria-label="Projects section"></a>
+        <a href="#certs" class="dot" aria-label="Certifications section"></a>
+        <a href="#contact" class="dot" aria-label="Contact section"></a>
+      </div>
+      <a href="mailto:chiragdhunna@gmail.com" class="btn-hire" id="hire-link"
+        >Hire Me ↗</a
+      >
+    </nav>
+
+    <main id="main-content">
+      <section id="hero" class="hero" aria-labelledby="hero-heading">
+        <canvas id="particles" aria-hidden="true"></canvas>
+        <div class="container hero-inner">
+          <div class="hero-grid">
+            <div class="hero-copy" data-reveal>
+              <p class="eyebrow">Hi There 👋</p>
+              <h1 id="hero-heading" class="hero-name">
+                I’m <span>CHIRAG DHUNNA</span>
+              </h1>
+              <p class="hero-subtitle">
+                Currently at BlueMango Labs building mobile and web products. My
+                work centers on Flutter, MERN, and practical automation that
+                ships.
+              </p>
+              <div class="hero-type" aria-live="polite">
+                <span class="accent">I build:</span>
+                <span id="typewriter"></span>
+                <span class="sr-only">
+                  Software Developer, Freelancer, MERN Stack Developer, Open
+                  Source Contributor, Mobile Developer, App Developer
+                </span>
+              </div>
+              <div class="hero-actions">
+                // Hire Me chooser: prefer stored choice, otherwise show chooser
+                to open Gmail or mailto
+                <a href="#projects" class="btn btn-primary">View Projects</a>
+                <a
+                  href="/resume/Chirag_Dhunna.pdf"
+                  class="btn"
+                  download="Chirag_Dhunna_Resume.pdf"
+                  >Download Resume</a
+                >
+                <a href="mailto:chiragdhunna@gmail.com" class="btn"
+                  >Contact Me</a
+                >
+              </div>
+              <div class="social-links" aria-label="Social links">
+                <a
+                  class="social-btn"
+                  href="https://github.com/chiragdhunna"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GitHub"
+                >
+                  <i class="ti ti-brand-github"></i>
+                </a>
+                <a
+                  class="social-btn"
+                  href="https://www.linkedin.com/in/chiragdhunna/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <i class="ti ti-brand-linkedin"></i>
+                </a>
+                <a
+                  class="social-btn"
+                  href="https://x.com/ChiragDhunna"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Twitter/X"
+                >
+                  <i class="ti ti-brand-x"></i>
+                </a>
+                <a
+                  class="social-btn"
+                  href="https://www.instagram.com/chiragdhunna/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram"
+                >
+                  <i class="ti ti-brand-instagram"></i>
+                </a>
+              </div>
+              <div class="hero-badges" aria-label="Highlights">
+                <span class="tag">Flutter</span>
+                <span class="tag">MERN Stack</span>
+                <span class="tag">Mobile Apps</span>
+                <span class="tag">Automation</span>
+              </div>
+            </div>
+            <div class="hero-card" data-reveal>
+              <div class="hero-avatar-wrap">
+                <img
+                  src="/assets/avatar.svg"
+                  alt="Illustrated avatar of Chirag Dhunna"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" aria-labelledby="about-heading">
+        <div class="container">
+          <span class="section-label">02. About</span>
+          <h2 id="about-heading" class="section-heading" data-reveal>
+            Know Who I’M
+          </h2>
+          <p class="section-lead" data-reveal>
+            Here’s the short version: I build mobile and web products, care
+            about clean delivery, and like shipping work that is useful before
+            it is clever.
+          </p>
+
+          <div class="intro-grid" style="margin-top: 30px">
+            <div class="quote-card" data-reveal>
+              <p>
+                Hi Everyone, I am <strong>Chirag Dhunna</strong> from
+                <strong>Bangalore, India</strong>. <br /><br />
+                Currently employed as a software developer at
+                <strong>BlueMango Labs</strong>. <br /><br />
+                Completed
+                <strong
+                  >Integrated B.Tech in Computer Science at RGPV
+                  University</strong
+                >. <br /><br />
+                Apart from coding:
+              </p>
+              <ul class="about-list">
+                <li>Playing Games</li>
+                <li>Stand Up Comedy</li>
+                <li>Travelling</li>
+              </ul>
+              <p class="signature">
+                “Do the thing which everyone thinks is not possible” — Chirag
+              </p>
+            </div>
+            <div class="avatar-frame" data-reveal>
+              <img
+                src="/assets/avatar.svg"
+                alt="Illustrated avatar portrait of Chirag Dhunna"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stack" aria-labelledby="stack-heading">
+        <div class="container">
+          <span class="section-label">03. Tech Stack</span>
+          <h2 id="stack-heading" class="section-heading" data-reveal>
+            Languages, frameworks, and tools
+          </h2>
+          <p class="section-lead" data-reveal>
+            The stack is centered on mobile and full-stack delivery, with the
+            tools I use to keep the work moving.
+          </p>
+
+          <div class="stack-groups" style="margin-top: 30px">
+            <div class="stack-group" data-reveal>
+              <h3>Languages & Frameworks</h3>
+              <div class="chips" id="framework-chips"></div>
+            </div>
+            <div class="stack-group" data-reveal>
+              <h3>Tools</h3>
+              <div class="chips" id="tool-chips"></div>
+            </div>
+          </div>
+
+          <div class="contrib-wrap" id="contrib-section" data-reveal>
+            <div class="contrib-head">
+              <div>
+                <span class="section-label" style="margin-bottom: 8px"
+                  >GitHub Activity</span
+                >
+                <h3 class="mini-title">Days I Code</h3>
+              </div>
+              <p>Last year on GitHub</p>
+            </div>
+            <div class="contrib-scroll">
+              <div
+                id="contrib-grid"
+                role="img"
+                aria-label="GitHub contribution calendar"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" aria-labelledby="projects-heading">
+        <div class="container">
+          <span class="section-label">04. Projects</span>
+          <h2 id="projects-heading" class="section-heading" data-reveal>
+            Selected work
+          </h2>
+          <p class="section-lead" data-reveal>
+            The project feed reads from the same CMS data file the public site
+            already uses, with an offline fallback.
+          </p>
+
+          <div
+            class="filter-bar"
+            id="filter-bar"
+            role="group"
+            aria-label="Filter projects by category"
+          ></div>
+          <p class="projects-meta" id="projects-meta" aria-live="polite"></p>
+          <div class="projects-grid" id="projects-grid"></div>
+        </div>
+      </section>
+
+      <section id="certs" aria-labelledby="certs-heading">
+        <div class="container">
+          <span class="section-label">05. Certifications</span>
+          <h2 id="certs-heading" class="section-heading" data-reveal>
+            Certifications and credentials
+          </h2>
+          <p class="section-lead" data-reveal>
+            This section is powered by the same cert JSON feed and degrades
+            gracefully when it is empty.
+          </p>
+          <div class="cert-grid-wrap" id="certs-grid"></div>
+          <div class="empty-state" id="certs-empty" hidden>
+            No certifications yet.
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="contact"
+        class="contact-section"
+        aria-labelledby="contact-heading"
+      >
+        <div class="container">
+          <span class="section-label">06. Contact</span>
+          <h2 id="contact-heading" class="section-heading" data-reveal>
+            Let’s build something
+          </h2>
+          <p class="section-lead contact-copy" data-reveal>
+            Feel free to connect. I keep the public site intentionally simple:
+            fast to scan, direct to contact, and easy to trust.
+          </p>
+
+          <div class="contact-list" data-reveal>
+            <a
+              class="contact-row"
+              href="https://github.com/chiragdhunna"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div>
+                <strong>GitHub</strong><br />
+                <span>github.com/chiragdhunna</span>
+              </div>
+              <i class="ti ti-arrow-up-right"></i>
+            </a>
+            <a
+              class="contact-row"
+              href="https://www.linkedin.com/in/chiragdhunna/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div>
+                <strong>LinkedIn</strong><br />
+                <span>linkedin.com/in/chiragdhunna</span>
+              </div>
+              <i class="ti ti-arrow-up-right"></i>
+            </a>
+            <a
+              class="contact-row"
+              href="https://x.com/ChiragDhunna"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div>
+                <strong>Twitter / X</strong><br />
+                <span>x.com/ChiragDhunna</span>
+              </div>
+              <i class="ti ti-arrow-up-right"></i>
+            </a>
+            <a
+              class="contact-row"
+              href="https://www.instagram.com/chiragdhunna/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div>
+                <strong>Instagram</strong><br />
+                <span>instagram.com/chiragdhunna</span>
+              </div>
+              <i class="ti ti-arrow-up-right"></i>
+            </a>
+            <a class="contact-row" href="mailto:chiragdhunna@gmail.com">
+              <div>
+                <strong>Email</strong><br />
+                <span>chiragdhunna@gmail.com</span>
+              </div>
+              <i class="ti ti-mail"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <p>Chirag Dhunna · Portfolio CMS v2 · Admin Panel</p>
+        <a href="/admin" class="admin-footer-link" aria-label="Admin panel"
+          >Admin Panel</a
+        >
+      </div>
+    </footer>
+
+    <script>
+      const FALLBACK_PROJECTS = [
+        {
+          slug: "chat-go",
+          categories: ["Web", "Full Stack"],
+          imageUrl: "/assets/projects/chat-go-logo.jpeg",
+          name: "Chat Go",
+          description:
+            "Chat GO is a modern and feature-rich real-time chat application built with React Vite and Node.js.",
+          ghLink: "https://github.com/chiragdhunna/chat_go",
+          demoLink: "https://chatgo.chiragdhunna.com/",
+        },
+        {
+          slug: "chat-go-backend",
+          categories: ["Backend"],
+          imageUrl: "/assets/projects/chat-go-backend.png",
+          name: "Chat Go Backend",
+          description:
+            "Chat GO Backend is a real-time messaging API using Node.js, supporting authentication, WebSocket messaging, and media uploads.",
+          ghLink: "https://github.com/chiragdhunna/chat_go_backend",
+          demoLink: "https://chat-go-backend.onrender.com/api/v1/docs/",
+        },
+        {
+          slug: "booking-calendar",
+          categories: ["Mobile"],
+          imageUrl: "/assets/projects/booking-calendar.png",
+          name: "Booking Calendar",
+          description:
+            "The Booking Calendar is a versatile and customizable online booking solution built for Flutter apps.",
+          ghLink: "https://github.com/radikris/booking_calendar",
+          demoLink: "https://pub.dev/packages/booking_calendar",
+        },
+        {
+          slug: "montra",
+          categories: ["Mobile", "Full Stack"],
+          imageUrl: "/assets/projects/montra.png",
+          name: "Montra",
+          description:
+            "Montra is a smart financial manager app built with Flutter, helping users track expenses, income, budgets, and financial goals with an intuitive UI and interactive charts.",
+          ghLink: "https://github.com/chiragdhunna/montra",
+          demoLink: "https://github.com/chiragdhunna/montra/releases/",
+        },
+        {
+          slug: "montra-backend",
+          categories: ["Backend"],
+          imageUrl: "/assets/projects/montra-backend.png",
+          name: "Montra Backend",
+          description:
+            "Montra Backend is a powerful financial management API built with Node.js and PostgreSQL, supporting secure authentication, transaction tracking, budgeting, and data exports.",
+          ghLink: "https://github.com/chiragdhunna/montra_backend",
+          demoLink: "https://montra-backend-b45c.onrender.com/api/v1/docs/s",
+        },
+        {
+          slug: "uber-eats-clone",
+          categories: ["Mobile"],
+          imageUrl: "/assets/projects/uber-eats-clone.png",
+          name: "Uber Eats Clone",
+          description:
+            "The Uber Eats clone is a robust food delivery app built with React Native.",
+          ghLink: "https://github.com/chiragdhunna/Uber_Eats_Clone",
+          demoLink: "https://github.com/chiragdhunna/uber_eats_clone/releases/",
+        },
+        {
+          slug: "music-mix",
+          categories: ["Mobile"],
+          imageUrl: "/assets/projects/music-mix.jpeg",
+          name: "Music Mix",
+          description:
+            "Music Mix is a dynamic and feature-rich music player app crafted for Android devices.",
+          ghLink: "https://github.com/chiragdhunna/Music_Mix",
+          demoLink: null,
+        },
+        {
+          slug: "gpt-jr",
+          categories: ["Mobile"],
+          imageUrl: "/assets/projects/gpt-jr.png",
+          name: "GPT Jr",
+          description:
+            "GPT Jr is a Flutter app integrating ChatGPT and DALL·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+          ghLink: "https://github.com/chiragdhunna/GPT-Jr",
+          demoLink: "https://github.com/chiragdhunna/gpt_jr/releases/",
+        },
+        {
+          slug: "linkedin-post-generator",
+          categories: ["Web", "Backend"],
+          imageUrl: "/assets/projects/linkedin-post-generator.png",
+          name: "LinkedIn Post Generator",
+          description:
+            "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving.",
+          ghLink: "https://github.com/chiragdhunna/linkedin_post_generator",
+          demoLink: null,
+        },
+        {
+          slug: "portfolio-admin-panel",
+          categories: ["Web", "Full Stack"],
+          imageUrl: "/assets/projects/portfolio-admin-panel.png",
+          name: "Portfolio Admin Panel!!",
+          description:
+            "A private CMS dashboard for managing portfolio projects and certifications directly from the codebase.",
+          ghLink: "https://github.com/chiragdhunna/chiragdhunna.github.io",
+          demoLink: "https://chiragdhunna.github.io/admin",
+        },
+      ];
+
+      const FILTERS = ["All", "Web", "Mobile", "Full Stack", "Backend"];
+      const techFrameworks = [
+        "C++",
+        "JavaScript",
+        "Java",
+        "Dart/Flutter",
+        "React",
+        "Node.js",
+        "Next.js",
+        "MongoDB",
+        "MySQL",
+        "Firebase",
+      ];
+      const techTools = [
+        "macOS",
+        "VS Code",
+        "Postman",
+        "Slack",
+        "Vercel",
+        "Android Studio",
+        "Xcode",
+        "Fastlane",
+      ];
+      const typewriterStrings = [
+        "Software Developer",
+        "Freelancer",
+        "MERN Stack Developer",
+        "Open Source Contributor",
+        "Mobile Developer",
+        "App Developer",
+      ];
+      const contributorColors = [
+        "var(--text-3)",
+        "#6b21a8",
+        "#7e22ce",
+        "#9b5de5",
+        "#c084fc",
+      ];
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const frameworkWrap = document.getElementById("framework-chips");
+      const toolWrap = document.getElementById("tool-chips");
+      const filterBar = document.getElementById("filter-bar");
+      const projectsGrid = document.getElementById("projects-grid");
+      const projectsMeta = document.getElementById("projects-meta");
+      const certsGrid = document.getElementById("certs-grid");
+      const certsEmpty = document.getElementById("certs-empty");
+      const contribSection = document.getElementById("contrib-section");
+      const contribGrid = document.getElementById("contrib-grid");
+      const navDots = Array.from(document.querySelectorAll(".dot"));
+      const revealTargets = document.querySelectorAll("[data-reveal]");
+      const sectionCards = document.querySelectorAll(
+        ".project-card, .cert-card",
+      );
+      const typewriterEl = document.getElementById("typewriter");
+      let currentProjects = [];
+      let revealObserver = null;
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function createChip(label) {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = label;
+        return chip;
+      }
+
+      function createFilterPill(label, count) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "filter-pill";
+        button.dataset.filter = label;
+        button.setAttribute("aria-pressed", label === "All" ? "true" : "false");
+        button.innerHTML = `<span>${escapeHtml(label)}</span><span class="filter-count">${count}</span>`;
+        button.addEventListener("click", () =>
+          renderProjects(label, currentProjects),
+        );
+        return button;
+      }
+
+      function cardImageMarkup(item, className, altText) {
+        const imageUrl = item.imageUrl || "";
+        const fallback = `<div class="${className}" style="display:grid;place-items:center;min-height:220px;color:var(--text-2);font-family:JetBrains Mono, monospace;">No image</div>`;
+        if (!imageUrl) {
+          return fallback;
+        }
+        return `<img class="${className}" loading="lazy" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(altText)}" />`;
+      }
+
+      function createProjectCard(project, index) {
+        const article = document.createElement("article");
+        article.className = "project-card reveal";
+        article.style.setProperty("--i", index);
+        article.setAttribute("data-reveal", "");
+
+        const tags = Array.isArray(project.categories)
+          ? project.categories
+          : [];
+        const tagMarkup = tags
+          .map((tag) => `<span class="card-tag">${escapeHtml(tag)}</span>`)
+          .join("");
+
+        article.innerHTML = `
+          ${cardImageMarkup(project, "project-image", project.name)}
+          <div class="card-body">
+            <h3 class="card-title">${escapeHtml(project.name)}</h3>
+            <p class="card-description">${escapeHtml(project.description || "")}</p>
+            <div class="card-tags">${tagMarkup}</div>
+            <div class="card-actions">
+              <a class="project-btn primary" href="${escapeHtml(project.ghLink)}" target="_blank" rel="noreferrer">
+                <i class="ti ti-brand-github"></i> GitHub
+              </a>
+              ${project.demoLink ? `<a class="project-btn" href="${escapeHtml(project.demoLink)}" target="_blank" rel="noreferrer"><i class="ti ti-world"></i> Demo</a>` : ""}
+            </div>
+          </div>
+        `;
+        return article;
+      }
+
+      function createCertCard(cert, index) {
+        const article = document.createElement("article");
+        article.className = "cert-card reveal";
+        article.style.setProperty("--i", index);
+        article.setAttribute("data-reveal", "");
+
+        const issuedYear = cert.issueDate
+          ? new Date(cert.issueDate).getFullYear()
+          : "";
+        const issuedText = issuedYear
+          ? `${escapeHtml(cert.issuer || "")} · ${issuedYear}`
+          : escapeHtml(cert.issuer || "");
+        const pdfButton = cert.pdfUrl
+          ? `<a class="card-link primary" href="${escapeHtml(cert.pdfUrl)}" target="_blank" rel="noreferrer"><i class="ti ti-file-certificate"></i> View Certificate ↗</a>`
+          : "";
+        const verifyButton = cert.credentialUrl
+          ? `<a class="card-link" href="${escapeHtml(cert.credentialUrl)}" target="_blank" rel="noreferrer"><i class="ti ti-shield-check"></i> Verify ↗</a>`
+          : "";
+
+        article.innerHTML = `
+          ${cardImageMarkup(cert, "cert-image", cert.name)}
+          <div class="card-body">
+            <h3 class="card-title">${escapeHtml(cert.name)}</h3>
+            <p class="card-subtitle">${issuedText}</p>
+            <div class="card-actions">
+              ${pdfButton}
+              ${verifyButton}
+            </div>
+          </div>
+        `;
+        return article;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("/data/projects.json");
+          if (!response.ok) throw new Error("Failed to fetch projects");
+          const data = await response.json();
+          return Array.isArray(data) ? data : FALLBACK_PROJECTS;
+        } catch {
+          return FALLBACK_PROJECTS;
+        }
+      }
+
+      async function loadCerts() {
+        try {
+          const response = await fetch("/data/certs.json");
+          if (!response.ok) throw new Error("Failed to fetch certs");
+          const data = await response.json();
+          return Array.isArray(data) ? data : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function renderProjects(filter, projects) {
+        const selectedFilter = filter || "All";
+        currentProjects = projects;
+        const filteredProjects =
+          selectedFilter === "All"
+            ? projects
+            : projects.filter(
+                (project) =>
+                  Array.isArray(project.categories) &&
+                  project.categories.includes(selectedFilter),
+              );
+
+        filterBar.querySelectorAll(".filter-pill").forEach((button) => {
+          const isActive = button.dataset.filter === selectedFilter;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+
+        projectsMeta.innerHTML = `Showing <strong>${filteredProjects.length}</strong> ${filteredProjects.length === 1 ? "project" : "projects"}${selectedFilter !== "All" ? ` in <strong>${escapeHtml(selectedFilter)}</strong>` : ""}.`;
+        projectsGrid.innerHTML = "";
+
+        if (!filteredProjects.length) {
+          projectsGrid.innerHTML =
+            '<div class="empty-state">No projects available for this filter.</div>';
+          return;
+        }
+
+        filteredProjects.forEach((project, index) => {
+          projectsGrid.appendChild(createProjectCard(project, index));
+        });
+        // ensure newly added reveal elements are observed
+        if (revealObserver && !prefersReducedMotion) {
+          document
+            .querySelectorAll("[data-reveal]:not(.revealed)")
+            .forEach((el) => revealObserver.observe(el));
+        }
+        // immediately reveal any cards that are already in the viewport
+        revealIfVisible();
+      }
+
+      async function renderContributionGraph() {
+        try {
+          const response = await fetch(
+            "https://github-contributions-api.jogruber.de/v4/chiragdhunna?y=last",
+          );
+          if (!response.ok) throw new Error("Contribution fetch failed");
+          const data = await response.json();
+          const contributions = Array.isArray(data.contributions)
+            ? data.contributions
+            : [];
+          contribGrid.innerHTML = "";
+          contributions.slice(-364).forEach((day) => {
+            const cell = document.createElement("div");
+            cell.className = "contrib-cell";
+            cell.style.background =
+              contributorColors[day.level] || contributorColors[0];
+            cell.title = `${day.date}: ${day.count} contributions`;
+            contribGrid.appendChild(cell);
+          });
+        } catch {
+          contribSection.hidden = true;
+        }
+      }
+
+      function renderStacks() {
+        frameworkWrap.innerHTML = "";
+        toolWrap.innerHTML = "";
+        techFrameworks.forEach((item) =>
+          frameworkWrap.appendChild(createChip(item)),
+        );
+        techTools.forEach((item) => toolWrap.appendChild(createChip(item)));
+      }
+
+      function renderFilters(projects) {
+        const counts = Object.fromEntries(FILTERS.map((filter) => [filter, 0]));
+        projects.forEach((project) => {
+          counts.All += 1;
+          (project.categories || []).forEach((category) => {
+            if (Object.prototype.hasOwnProperty.call(counts, category)) {
+              counts[category] += 1;
+            }
+          });
+        });
+
+        filterBar.innerHTML = "";
+        FILTERS.forEach((filter, index) => {
+          const pill = createFilterPill(filter, counts[filter] || 0);
+          if (index === 0) pill.classList.add("active");
+          filterBar.appendChild(pill);
+        });
+      }
+
+      function renderCertifications(certs) {
+        certsGrid.innerHTML = "";
+        certsEmpty.hidden = certs.length > 0;
+        if (!certs.length) {
+          return;
+        }
+        certs.forEach((cert, index) => {
+          certsGrid.appendChild(createCertCard(cert, index));
+        });
+        // observe newly created cert reveal elements
+        if (revealObserver && !prefersReducedMotion) {
+          document
+            .querySelectorAll("[data-reveal]:not(.revealed)")
+            .forEach((el) => revealObserver.observe(el));
+        }
+        revealIfVisible();
+      }
+
+      function revealIfVisible() {
+        if (prefersReducedMotion) return;
+        document
+          .querySelectorAll("[data-reveal]:not(.revealed)")
+          .forEach((el) => {
+            const r = el.getBoundingClientRect();
+            if (r.top < window.innerHeight * 0.9 && r.bottom > 0) {
+              el.classList.add("revealed");
+              try {
+                revealObserver && revealObserver.unobserve(el);
+              } catch (e) {}
+            }
+          });
+      }
+
+      function setupRevealObserver() {
+        if (prefersReducedMotion) {
+          revealTargets.forEach((target) => target.classList.add("revealed"));
+          return;
+        }
+
+        revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("revealed");
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: "0px 0px -60px 0px" },
+        );
+
+        document
+          .querySelectorAll("[data-reveal]")
+          .forEach((element) => revealObserver.observe(element));
+      }
+
+      function setupNavObserver() {
+        if (!navDots.length) return;
+
+        const sections = document.querySelectorAll("section[id]");
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                navDots.forEach((dot) => dot.classList.remove("active"));
+                const activeDot = document.querySelector(
+                  `.dot[href="#${entry.target.id}"]`,
+                );
+                if (activeDot) activeDot.classList.add("active");
+              }
+            });
+          },
+          { threshold: 0.5 },
+        );
+
+        sections.forEach((section) => observer.observe(section));
+
+        navDots.forEach((dot) => {
+          dot.addEventListener("click", (event) => {
+            event.preventDefault();
+            const target = document.querySelector(dot.getAttribute("href"));
+            if (target) {
+              target.scrollIntoView({
+                behavior: prefersReducedMotion ? "auto" : "smooth",
+                block: "start",
+              });
+            }
+          });
+        });
+      }
+
+      function setupTypewriter() {
+        if (prefersReducedMotion) {
+          typewriterEl.textContent = typewriterStrings[0];
+          return;
+        }
+
+        class Typewriter {
+          constructor(el, strings, speed = 80, pause = 2000) {
+            this.el = el;
+            this.strings = strings;
+            this.speed = speed;
+            this.pause = pause;
+            this.si = 0;
+            this.ci = 0;
+            this.deleting = false;
+            this.tick();
+          }
+
+          tick() {
+            const current = this.strings[this.si];
+            this.el.textContent = this.deleting
+              ? current.slice(0, --this.ci)
+              : current.slice(0, ++this.ci);
+            let delay = this.deleting ? this.speed / 2 : this.speed;
+            if (!this.deleting && this.ci === current.length) {
+              delay = this.pause;
+              this.deleting = true;
+            } else if (this.deleting && this.ci === 0) {
+              this.deleting = false;
+              this.si = (this.si + 1) % this.strings.length;
+            }
+            this.timeout = window.setTimeout(() => this.tick(), delay);
+          }
+        }
+
+        new Typewriter(typewriterEl, typewriterStrings, 80, 1800);
+      }
+
+      function setupParticles() {
+        const canvas = document.getElementById("particles");
+        const context = canvas.getContext("2d");
+        if (!canvas || !context || prefersReducedMotion) return;
+
+        let width = 0;
+        let height = 0;
+        let dpr = Math.max(1, window.devicePixelRatio || 1);
+        let animationFrame = 0;
+        let running = true;
+        const particles = [];
+        const count = 80;
+
+        function resize() {
+          const rect = canvas.getBoundingClientRect();
+          width = rect.width;
+          height = rect.height;
+          dpr = Math.max(1, window.devicePixelRatio || 1);
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function resetParticle(particle) {
+          particle.x = Math.random() * width;
+          particle.y = Math.random() * height;
+          particle.vx = (Math.random() - 0.5) * 0.35;
+          particle.vy = (Math.random() - 0.5) * 0.35;
+          particle.r = 1 + Math.random() * 1.5;
+        }
+
+        function initParticles() {
+          particles.length = 0;
+          for (let index = 0; index < count; index += 1) {
+            const particle = {};
+            resetParticle(particle);
+            particles.push(particle);
+          }
+        }
+
+        function draw() {
+          if (!running) return;
+          context.clearRect(0, 0, width, height);
+          for (let index = 0; index < particles.length; index += 1) {
+            const particle = particles[index];
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+
+            if (particle.x < 0 || particle.x > width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > height) particle.vy *= -1;
+            particle.x = Math.max(0, Math.min(width, particle.x));
+            particle.y = Math.max(0, Math.min(height, particle.y));
+
+            for (
+              let otherIndex = index + 1;
+              otherIndex < particles.length;
+              otherIndex += 1
+            ) {
+              const other = particles[otherIndex];
+              const dx = particle.x - other.x;
+              const dy = particle.y - other.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < 120) {
+                context.beginPath();
+                context.strokeStyle = `rgba(155, 93, 229, ${(1 - distance / 120) * 0.12})`;
+                context.lineWidth = 1;
+                context.moveTo(particle.x, particle.y);
+                context.lineTo(other.x, other.y);
+                context.stroke();
+              }
+            }
+
+            context.beginPath();
+            context.fillStyle = "rgba(240, 236, 232, 0.55)";
+            context.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+            context.fill();
+          }
+
+          animationFrame = window.requestAnimationFrame(draw);
+        }
+
+        resize();
+        initParticles();
+        draw();
+
+        window.addEventListener("resize", () => {
+          resize();
+          initParticles();
+        });
+
+        document.addEventListener("visibilitychange", () => {
+          running = document.visibilityState === "visible";
+          if (running) {
+            animationFrame = window.requestAnimationFrame(draw);
+          } else {
+            window.cancelAnimationFrame(animationFrame);
+          }
+        });
+      }
+
+      function init() {
+        renderStacks();
+        setupTypewriter();
+        setupNavObserver();
+        setupRevealObserver();
+        setupParticles();
+
+        Promise.all([loadProjects(), loadCerts()]).then(([projects, certs]) => {
+          renderFilters(projects);
+          renderProjects("All", projects);
+          renderCertifications(certs);
+          renderContributionGraph();
+
+          if (prefersReducedMotion) {
+            document
+              .querySelectorAll("[data-reveal]")
+              .forEach((el) => el.classList.add("revealed"));
+            document
+              .querySelectorAll(".project-card, .cert-card")
+              .forEach((el) => el.classList.add("revealed"));
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>
