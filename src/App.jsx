@@ -27,7 +27,7 @@ function AppLayout() {
   const isPortfolioRoute = location.pathname === "/";
 
   return (
-    <div className="App" id={isAdminRoute ? "no-scroll" : "scroll"}>
+    <div className="App" id={isAdminRoute ? undefined : "scroll"}>
       {!isAdminRoute && !isPortfolioRoute ? <Navbar /> : null}
       <ScrollToTop />
       <Routes>
