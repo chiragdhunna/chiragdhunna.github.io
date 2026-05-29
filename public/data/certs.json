@@ -53,5 +53,16 @@
     "pdfUrl": "/assets/certs/azure-data-scientist-associate-certification.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-26T12:16:21.145Z"
+  },
+  {
+    "id": "devops-engineer-expert",
+    "slug": "devops-engineer-expert",
+    "name": "DevOps Engineer Expert",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/devops-engineer-expert.jpg",
+    "pdfUrl": "/assets/certs/devops-engineer-expert.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-29T22:26:18.530Z"
   }
 ]
