@@ -178,10 +178,8 @@ function Portfolio() {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
-
     updatePreference();
     mediaQuery.addEventListener("change", updatePreference);
-
     return () => mediaQuery.removeEventListener("change", updatePreference);
   }, []);
 
@@ -194,12 +192,10 @@ function Portfolio() {
           fetch(projectsDataUrl),
           fetch(certsDataUrl),
         ]);
-
         const projectData = projectsResponse.ok
           ? await projectsResponse.json()
           : FALLBACK_PROJECTS;
         const certData = certsResponse.ok ? await certsResponse.json() : [];
-
         if (!cancelled) {
           setProjects(
             Array.isArray(projectData) ? projectData : FALLBACK_PROJECTS,
@@ -215,7 +211,6 @@ function Portfolio() {
     }
 
     loadData();
-
     return () => {
       cancelled = true;
     };
@@ -234,19 +229,13 @@ function Portfolio() {
         const list = Array.isArray(data.contributions)
           ? data.contributions
           : [];
-
-        if (!cancelled) {
-          setContributions(list.slice(-364));
-        }
+        if (!cancelled) setContributions(list.slice(-364));
       } catch {
-        if (!cancelled) {
-          setContributions([]);
-        }
+        if (!cancelled) setContributions([]);
       }
     }
 
     loadContributions();
-
     return () => {
       cancelled = true;
     };
@@ -269,7 +258,6 @@ function Portfolio() {
       setTypewriterText(current.slice(0, charIndex));
 
       let delay = deleting ? 40 : 80;
-
       if (!deleting && charIndex === current.length) {
         deleting = true;
         delay = 1800;
@@ -283,7 +271,6 @@ function Portfolio() {
     };
 
     tick();
-
     return () => window.clearTimeout(timeoutId);
   }, [prefersReducedMotion]);
 
@@ -301,16 +288,13 @@ function Portfolio() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
         });
       },
       { threshold: 0.5 },
     );
 
     sections.forEach((section) => observer.observe(section));
-
     return () => observer.disconnect();
   }, [prefersReducedMotion]);
 
@@ -338,13 +322,11 @@ function Portfolio() {
     );
 
     nodes.forEach((node) => observer.observe(node));
-
     return () => observer.disconnect();
   }, [prefersReducedMotion, projects, certs, contributions, selectedFilter]);
 
   const filterCounts = useMemo(() => {
     const counts = Object.fromEntries(FILTERS.map((filter) => [filter, 0]));
-
     projects.forEach((project) => {
       counts.All += 1;
       (project.categories || []).forEach((category) => {
@@ -353,15 +335,11 @@ function Portfolio() {
         }
       });
     });
-
     return counts;
   }, [projects]);
 
   const filteredProjects = useMemo(() => {
-    if (selectedFilter === "All") {
-      return projects;
-    }
-
+    if (selectedFilter === "All") return projects;
     return projects.filter((project) =>
       Array.isArray(project.categories)
         ? project.categories.includes(selectedFilter)
@@ -372,7 +350,6 @@ function Portfolio() {
   const scrollToSection = (event, sectionId) => {
     event.preventDefault();
     const target = pageRef.current?.querySelector(`#${sectionId}`);
-
     if (target) {
       target.scrollIntoView({
         behavior: prefersReducedMotion ? "auto" : "smooth",
@@ -415,6 +392,7 @@ function Portfolio() {
       </nav>
 
       <main id="main-content">
+        {/* ── HERO ── */}
         <section id="hero" className="hero" aria-labelledby="hero-heading">
           <Particle />
           <div className="container hero-inner">
@@ -517,6 +495,7 @@ function Portfolio() {
           </div>
         </section>
 
+        {/* ── ABOUT ── */}
         <section id="about" aria-labelledby="about-heading">
           <div className="container">
             <span className="section-label">02. About</span>
@@ -531,63 +510,101 @@ function Portfolio() {
               unnecessary complexity.
             </p>
 
-            <div className="intro-grid" style={{ marginTop: "30px" }}>
+            {/* Two-column grid — quote left, experience right */}
+            <div className="about-grid">
+              {/* LEFT — Bio card */}
               <div className="quote-card" data-reveal>
-                <p>
-                  Hi Everyone, I am <strong>Chirag Dhunna</strong> from{" "}
-                  <strong>Pune, Maharashtra, India</strong>.
-                  <br />
-                  <br />
-                  Currently working as a{" "}
-                  <strong>
-                    Full-Stack Software Engineer at Tata Consultancy Services
-                  </strong>{" "}
-                  , building enterprise conversational AI solutions across AWS
-                  and Azure.
-                  <br />
-                  <br />
-                  Previously worked as a{" "}
-                  <strong>
-                    Software Development Engineer at BlueMango Labs
-                  </strong>{" "}
-                  , where I automated Fastlane release pipelines, improved
-                  LiveKit call reliability, and shipped Flutter products for
-                  production users.
-                  <br />
-                  <br />
-                  Completed{" "}
-                  <strong>
-                    Bachelor of Engineering in Computer Science at RGPV
-                    University
-                  </strong>{" "}
-                  with a <strong>GPA of 8.7/10.0</strong>.
-                  <br />
-                  <br />
-                  I enjoy work that blends product delivery, cloud systems, and
-                  AI workflows.
-                  <br />
-                  <br />
-                  Apart from coding:
-                </p>
-                <ul className="about-list">
-                  <li>Playing Games</li>
-                  <li>Stand Up Comedy</li>
-                  <li>Travelling</li>
-                </ul>
-                <p className="signature">
-                  "Do the thing which everyone thinks is not possible" — Chirag
-                </p>
+                <div className="quote-card-inner">
+                  <div className="quote-avatar-row">
+                    <div className="quote-initials" aria-hidden="true">
+                      CD
+                    </div>
+                    <div>
+                      <p className="quote-name">Chirag Dhunna</p>
+                      <p className="quote-location">
+                        📍 Pune, Maharashtra, India
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="quote-body">
+                    I'm a full-stack engineer passionate about building scalable
+                    systems and shipping quality products. I enjoy work that
+                    blends product delivery, cloud systems, and AI workflows.
+                  </p>
+
+                  <div className="quote-divider" />
+
+                  <p className="quote-hobbies-label">When I'm not coding:</p>
+                  <ul className="about-list">
+                    <li>Playing Games</li>
+                    <li>Performing Stand Up Comedy</li>
+                    <li>Travelling &amp; Exploring</li>
+                  </ul>
+
+                  <p className="signature">
+                    "Do the thing which everyone thinks is not possible" —
+                    Chirag
+                  </p>
+                </div>
               </div>
-              <div className="avatar-frame" data-reveal>
-                <img
-                  src="/assets/avatar.svg"
-                  alt="Illustrated avatar portrait of Chirag Dhunna"
-                />
+
+              {/* RIGHT — Experience timeline */}
+              <div className="experience-section" data-reveal>
+                <div className="exp-scroll-container">
+                  <div className="exp-card">
+                    <div className="exp-timeline-dot" aria-hidden="true" />
+                    <div className="exp-card-content">
+                      <span className="exp-year">Present</span>
+                      <h4 className="exp-title">
+                        Full-Stack Software Engineer
+                      </h4>
+                      <span className="exp-company">
+                        Tata Consultancy Services
+                      </span>
+                      <p className="exp-description">
+                        Building enterprise conversational AI solutions across
+                        AWS and Azure with scalable microservices architecture.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="exp-card">
+                    <div className="exp-timeline-dot" aria-hidden="true" />
+                    <div className="exp-card-content">
+                      <span className="exp-year">2023 – 2024</span>
+                      <h4 className="exp-title">
+                        Software Development Engineer
+                      </h4>
+                      <span className="exp-company">BlueMango Labs</span>
+                      <p className="exp-description">
+                        Automated Fastlane pipelines, improved LiveKit
+                        reliability, shipped Flutter products to production
+                        users.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="exp-card">
+                    <div className="exp-timeline-dot" aria-hidden="true" />
+                    <div className="exp-card-content">
+                      <span className="exp-year">Graduated</span>
+                      <h4 className="exp-title">B.E. Computer Science</h4>
+                      <span className="exp-company">RGPV University</span>
+                      <p className="exp-description">
+                        <strong>GPA: 8.7 / 10.0</strong> — Strong foundation in
+                        algorithms, systems design, and software engineering
+                        principles.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
+        {/* ── STACK ── */}
         <section id="stack" aria-labelledby="stack-heading">
           <div className="container">
             <span className="section-label">03. Tech Stack</span>
@@ -602,7 +619,7 @@ function Portfolio() {
 
             <div className="stack-groups" style={{ marginTop: "30px" }}>
               <div className="stack-group" data-reveal>
-                <h3>Languages & Frameworks</h3>
+                <h3>Languages &amp; Frameworks</h3>
                 <div className="chips">
                   {techFrameworks.map((item) => (
                     <span className="chip" key={item}>
@@ -612,7 +629,7 @@ function Portfolio() {
                 </div>
               </div>
               <div className="stack-group" data-reveal>
-                <h3>Cloud, DevOps & Other Tools</h3>
+                <h3>Cloud, DevOps &amp; Other Tools</h3>
                 <div className="chips">
                   {techTools.map((item) => (
                     <span className="chip" key={item}>
@@ -666,6 +683,7 @@ function Portfolio() {
           </div>
         </section>
 
+        {/* ── PROJECTS ── */}
         <section id="projects" aria-labelledby="projects-heading">
           <div className="container">
             <span className="section-label">04. Projects</span>
@@ -776,6 +794,7 @@ function Portfolio() {
           </div>
         </section>
 
+        {/* ── CERTS ── */}
         <section id="certs" aria-labelledby="certs-heading">
           <div className="container">
             <span className="section-label">05. Certifications</span>
@@ -792,7 +811,6 @@ function Portfolio() {
                   const issuedYear = cert.issueDate
                     ? new Date(cert.issueDate).getFullYear()
                     : "";
-
                   return (
                     <article
                       className="cert-card reveal"
@@ -849,6 +867,7 @@ function Portfolio() {
           </div>
         </section>
 
+        {/* ── CONTACT ── */}
         <section
           id="contact"
           className="contact-section"
