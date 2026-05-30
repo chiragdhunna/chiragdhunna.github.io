@@ -64,5 +64,16 @@
     "pdfUrl": "/assets/certs/devops-engineer-expert.pdf",
     "credentialUrl": null,
     "createdAt": "2026-05-29T22:26:18.530Z"
+  },
+  {
+    "id": "aws-certified-solutions-architect-associate",
+    "slug": "aws-certified-solutions-architect-associate",
+    "name": "AWS Certified Solutions Architect - Associate",
+    "issuer": "AWS",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/aws-certified-solutions-architect-associate.jpg",
+    "pdfUrl": "/assets/certs/aws-certified-solutions-architect-associate.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-30T15:55:06.696Z"
   }
 ]
