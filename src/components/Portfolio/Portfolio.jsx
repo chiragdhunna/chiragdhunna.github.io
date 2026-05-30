@@ -340,7 +340,7 @@ function Portfolio() {
     nodes.forEach((node) => observer.observe(node));
 
     return () => observer.disconnect();
-  }, [prefersReducedMotion, projects, certs, contributions]);
+  }, [prefersReducedMotion, projects, certs, contributions, selectedFilter]);
 
   const filterCounts = useMemo(() => {
     const counts = Object.fromEntries(FILTERS.map((filter) => [filter, 0]));
@@ -422,7 +422,7 @@ function Portfolio() {
               <div className="hero-copy" data-reveal>
                 <p className="eyebrow">Hi There 👋</p>
                 <h1 id="hero-heading" className="hero-name">
-                  I’m <span>CHIRAG DHUNNA</span>
+                  I'm <span>CHIRAG DHUNNA</span>
                 </h1>
                 <p className="hero-subtitle">
                   Full-Stack Software Engineer with 1+ years of experience
@@ -524,7 +524,7 @@ function Portfolio() {
               Know Who I Am
             </h2>
             <p className="section-lead" data-reveal>
-              Here’s the short version: I am a full-stack software engineer at
+              Here's the short version: I am a full-stack software engineer at
               TCS with experience across AWS, Azure, React, Spring Boot,
               Flutter, and AI-integrated systems. I care about clean delivery,
               measurable results, and shipping work that scales without
@@ -575,7 +575,7 @@ function Portfolio() {
                   <li>Travelling</li>
                 </ul>
                 <p className="signature">
-                  “Do the thing which everyone thinks is not possible” — Chirag
+                  "Do the thing which everyone thinks is not possible" — Chirag
                 </p>
               </div>
               <div className="avatar-frame" data-reveal>
@@ -857,7 +857,7 @@ function Portfolio() {
           <div className="container">
             <span className="section-label">06. Contact</span>
             <h2 id="contact-heading" className="section-heading" data-reveal>
-              Let’s build something
+              Let's build something
             </h2>
             <p className="section-lead contact-copy" data-reveal>
               Feel free to connect. I keep the public site intentionally simple:
