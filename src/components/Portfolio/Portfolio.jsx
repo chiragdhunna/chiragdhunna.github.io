@@ -910,11 +910,7 @@ function Portfolio() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <div>
-                    <strong>{label}</strong>
-                    <br />
-                    <span>{text}</span>
-                  </div>
+                  <div><strong>{label}</strong><br /><span>{text}</span></div>
                   <i className="ti ti-arrow-up-right" />
                 </a>
               ))}
@@ -922,11 +918,7 @@ function Portfolio() {
                 className="contact-row"
                 href="mailto:chiragdhunna2468@gmail.com"
               >
-                <div>
-                  <strong>Email</strong>
-                  <br />
-                  <span>chiragdhunna2468@gmail.com</span>
-                </div>
+                <div><strong>Email</strong><br /><span>chiragdhunna2468@gmail.com</span></div>
                 <i className="ti ti-mail" />
               </a>
             </div>
