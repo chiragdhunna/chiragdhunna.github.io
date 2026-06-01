@@ -365,7 +365,6 @@ function Portfolio() {
       </a>
 
       <nav className="nav" aria-label="Main navigation">
-        <span className="nav-logo" aria-hidden="true" />
         <div className="nav-dots" aria-label="Section navigation">
           {[
             ["hero", "Hero section"],

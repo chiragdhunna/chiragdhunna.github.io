@@ -88,13 +88,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-.portfolio-page .nav-logo {
-  font-family: "JetBrains Mono", monospace;
-  color: var(--accent);
-  font-size: 0.95rem;
-  letter-spacing: 0.18em;
-}
-
 .portfolio-page .nav-dots {
   display: flex;
   align-items: center;
