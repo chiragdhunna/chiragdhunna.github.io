@@ -1073,6 +1073,10 @@
 .portfolio-page .contact-row strong {
   color: var(--text-1);
 }
+.portfolio-page .contact-row-content {
+  display: flex;
+  flex-direction: column;
+}
 
 /* ── FOOTER ── */
 .portfolio-page .portfolio-footer {
