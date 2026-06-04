@@ -86,5 +86,16 @@
     "pdfUrl": "/assets/certs/azure-fundamentals.pdf",
     "credentialUrl": null,
     "createdAt": "2026-06-03T19:37:20.179Z"
+  },
+  {
+    "id": "azure-ai-fundamentals",
+    "slug": "azure-ai-fundamentals",
+    "name": "Azure AI Fundamentals",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-ai-fundamentals.jpg",
+    "pdfUrl": "/assets/certs/azure-ai-fundamentals.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-06-04T19:12:06.392Z"
   }
 ]
