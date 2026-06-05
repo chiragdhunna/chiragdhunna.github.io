@@ -97,5 +97,16 @@
     "pdfUrl": "/assets/certs/azure-ai-fundamentals.pdf",
     "credentialUrl": null,
     "createdAt": "2026-06-04T19:12:06.392Z"
+  },
+  {
+    "id": "azure-developer-associate",
+    "slug": "azure-developer-associate",
+    "name": "Azure Developer Associate",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-developer-associate.jpg",
+    "pdfUrl": "/assets/certs/azure-developer-associate.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-06-05T19:51:36.442Z"
   }
 ]
