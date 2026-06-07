@@ -1,7 +1,10 @@
 [
   {
     "slug": "chat-go",
-    "categories": ["Web", "Full Stack"],
+    "categories": [
+      "Web",
+      "Full Stack"
+    ],
     "imageUrl": "/assets/projects/chat-go-logo.jpeg",
     "name": "Chat Go",
     "description": "Chat GO is a modern and feature-rich real-time chat application built with React Vite and Node.js.",
@@ -10,7 +13,9 @@
   },
   {
     "slug": "chat-go-backend",
-    "categories": ["Backend"],
+    "categories": [
+      "Backend"
+    ],
     "imageUrl": "/assets/projects/chat-go-backend.png",
     "name": "Chat Go Backend",
     "description": "Chat GO Backend is a real-time messaging API using Node.js, supporting authentication, WebSocket messaging, and media uploads.",
@@ -19,7 +24,9 @@
   },
   {
     "slug": "booking-calendar",
-    "categories": ["Mobile"],
+    "categories": [
+      "Mobile"
+    ],
     "imageUrl": "/assets/projects/booking-calendar.png",
     "name": "Booking Calendar",
     "description": "The Booking Calendar is a versatile and customizable online booking solution built for Flutter apps.",
@@ -28,7 +35,10 @@
   },
   {
     "slug": "montra",
-    "categories": ["Mobile", "Full Stack"],
+    "categories": [
+      "Mobile",
+      "Full Stack"
+    ],
     "imageUrl": "/assets/projects/montra.png",
     "name": "Montra",
     "description": "Montra is a smart financial manager app built with Flutter, helping users track expenses, income, budgets, and financial goals with an intuitive UI and interactive charts.",
@@ -37,7 +47,9 @@
   },
   {
     "slug": "montra-backend",
-    "categories": ["Backend"],
+    "categories": [
+      "Backend"
+    ],
     "imageUrl": "/assets/projects/montra-backend.png",
     "name": "Montra Backend",
     "description": "Montra Backend is a powerful financial management API built with Node.js and PostgreSQL, supporting secure authentication, transaction tracking, budgeting, and data exports.",
@@ -46,7 +58,9 @@
   },
   {
     "slug": "uber-eats-clone",
-    "categories": ["Mobile"],
+    "categories": [
+      "Mobile"
+    ],
     "imageUrl": "/assets/projects/uber-eats-clone.png",
     "name": "Uber Eats Clone",
     "description": "The Uber Eats clone is a robust food delivery app built with React Native.",
@@ -55,7 +69,9 @@
   },
   {
     "slug": "music-mix",
-    "categories": ["Mobile"],
+    "categories": [
+      "Mobile"
+    ],
     "imageUrl": "/assets/projects/music-mix.jpeg",
     "name": "Music Mix",
     "description": "Music Mix is a dynamic and feature-rich music player app crafted for Android devices.",
@@ -64,16 +80,21 @@
   },
   {
     "slug": "gpt-jr",
-    "categories": ["Mobile"],
+    "categories": [
+      "Mobile"
+    ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALL·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
   {
     "slug": "linkedin-post-generator",
-    "categories": ["Web", "Backend"],
+    "categories": [
+      "Web",
+      "Backend"
+    ],
     "imageUrl": "/assets/projects/linkedin-post-generator.png",
     "name": "LinkedIn Post Generator",
     "description": "Automates daily LinkedIn posts using Ollama for content generation and GitHub Actions for scheduling, publishing, and archiving.",
@@ -82,11 +103,27 @@
   },
   {
     "slug": "portfolio-admin-panel",
-    "categories": ["Web", "Full Stack"],
+    "categories": [
+      "Web",
+      "Full Stack"
+    ],
     "imageUrl": "/assets/projects/portfolio-admin-panel.png",
     "name": "Portfolio Admin Panel!!",
     "description": "A private CMS dashboard for managing portfolio projects and certifications directly from the codebase.",
     "ghLink": "https://github.com/chiragdhunna/chiragdhunna.github.io",
     "demoLink": "https://chiragdhunna.github.io/admin"
+  },
+  {
+    "id": "pesa-barbaadi",
+    "slug": "pesa-barbaadi",
+    "name": "Pesa Barbaadi",
+    "description": "Flutter app to split petrol costs with a friend, synced via Firebase and exportable to Excel/PDF/CSV.",
+    "categories": [
+      "Mobile"
+    ],
+    "imageUrl": "/assets/projects/pesa-barbaadi.jpg",
+    "ghLink": "https://github.com/chiragdhunna/pesa_barbaadi",
+    "demoLink": "https://github.com/chiragdhunna/pesa_barbaadi/releases",
+    "createdAt": "2026-06-07T01:46:55.151Z"
   }
 ]
