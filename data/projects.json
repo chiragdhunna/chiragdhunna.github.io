@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -125,5 +125,19 @@
     "ghLink": "https://github.com/chiragdhunna/pesa_barbaadi",
     "demoLink": "https://github.com/chiragdhunna/pesa_barbaadi/releases",
     "createdAt": "2026-06-07T01:46:55.151Z"
+  },
+  {
+    "id": "pesa-barbaadi-admin-panel",
+    "slug": "pesa-barbaadi-admin-panel",
+    "name": "Pesa Barbaadi Admin Panel",
+    "description": "A Streamlit-powered admin dashboard for managing users, trips, expenses, settlements, and analytics in the Pesa Barbaadi travel expense tracking ecosystem. Built with Firebase for real-time data management, reporting, and operational oversight.",
+    "categories": [
+      "Web",
+      "Backend"
+    ],
+    "imageUrl": "/assets/projects/pesa-barbaadi-admin-panel.jpg",
+    "ghLink": "https://github.com/chiragdhunna/pesa_barbaadi_admin_panel",
+    "demoLink": "https://pesabarbaadiapppanel-cytaucw82yp56ymudaut23.streamlit.app/",
+    "createdAt": "2026-06-10T22:20:45.564Z"
   }
 ]
