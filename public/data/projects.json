@@ -9,7 +9,7 @@
     "name": "Chat Go",
     "description": "Chat GO is a modern and feature-rich real-time chat application built with React Vite and Node.js.",
     "ghLink": "https://github.com/chiragdhunna/chat_go",
-    "demoLink": "https://chatgo.chiragdhunna.com/"
+    "demoLink": "https://chat-go-taupe.vercel.app/"
   },
   {
     "slug": "chat-go-backend",
@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
