@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -165,7 +165,7 @@
     ],
     "imageUrl": "/assets/projects/pizza-striker-backend.jpg",
     "ghLink": "https://github.com/chiragdhunna/pizza_striker_backend#-pizza-striker-backend",
-    "demoLink": "https://pizza-striker-backend-bmu6.onrender.com",
+    "demoLink": "https://pizza-striker-backend-bmu6.onrender.com/docs",
     "createdAt": "2026-06-12T20:23:34.438Z"
   }
 ]
