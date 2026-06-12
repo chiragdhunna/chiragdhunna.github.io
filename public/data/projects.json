@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -139,5 +139,19 @@
     "ghLink": "https://github.com/chiragdhunna/pesa_barbaadi_admin_panel",
     "demoLink": "https://pesabarbaadiapppanel-cytaucw82yp56ymudaut23.streamlit.app/",
     "createdAt": "2026-06-10T22:20:45.564Z"
+  },
+  {
+    "id": "pizza-striker",
+    "slug": "pizza-striker",
+    "name": "Pizza Striker",
+    "description": "This is a fun project which I created for my office colleagues where the task is, whenever a employee do something which they are not suppose to do, they get a strike. After 3 strikes, they have to give pizza party to all of the colleagues of the office.",
+    "categories": [
+      "Mobile",
+      "Full Stack"
+    ],
+    "imageUrl": "/assets/projects/pizza-striker.jpg",
+    "ghLink": "https://github.com/chiragdhunna/pizza_striker",
+    "demoLink": "https://github.com/chiragdhunna/pizza_striker/releases",
+    "createdAt": "2026-06-12T20:20:07.608Z"
   }
 ]
