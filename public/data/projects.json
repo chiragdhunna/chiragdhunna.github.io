@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -153,5 +153,19 @@
     "ghLink": "https://github.com/chiragdhunna/pizza_striker",
     "demoLink": "https://github.com/chiragdhunna/pizza_striker/releases",
     "createdAt": "2026-06-12T20:20:07.608Z"
+  },
+  {
+    "id": "pizza-striker-backend",
+    "slug": "pizza-striker-backend",
+    "name": "Pizza Striker Backend",
+    "description": "The backend service for a fun, strike-based gamified app for office teams! Employees who goof up get a strike, and once they collect 3 strikes, they owe everyone a pizza party!",
+    "categories": [
+      "Full Stack",
+      "Backend"
+    ],
+    "imageUrl": "/assets/projects/pizza-striker-backend.jpg",
+    "ghLink": "https://github.com/chiragdhunna/pizza_striker_backend#-pizza-striker-backend",
+    "demoLink": "https://pizza-striker-backend-bmu6.onrender.com",
+    "createdAt": "2026-06-12T20:23:34.438Z"
   }
 ]
