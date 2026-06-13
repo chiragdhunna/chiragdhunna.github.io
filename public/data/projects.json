@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
+    "description": "GPT Jr is a Flutter app integrating ChatGPT and DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E APIs, enabling voice-based conversations and AI-generated images for an interactive experience.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -167,5 +167,19 @@
     "ghLink": "https://github.com/chiragdhunna/pizza_striker_backend#-pizza-striker-backend",
     "demoLink": "https://pizza-striker-backend-bmu6.onrender.com/docs",
     "createdAt": "2026-06-12T20:23:34.438Z"
+  },
+  {
+    "id": "vyra",
+    "slug": "vyra",
+    "name": "Vyra",
+    "description": "Vyra is a beautifully crafted AI-powered mobile companion designed to make everyday tasks delightful. Combining conversational intelligence, expressive visuals, voice interaction, and real-world awareness, Vyra brings an emotionally engaging assistant directly to your smartphone.",
+    "categories": [
+      "Mobile",
+      "AI"
+    ],
+    "imageUrl": "/assets/projects/vyra.jpg",
+    "ghLink": "https://github.com/chiragdhunna/vyra",
+    "demoLink": "https://github.com/chiragdhunna/vyra/releases",
+    "createdAt": "2026-06-13T19:21:39.557Z"
   }
 ]
