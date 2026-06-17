@@ -1052,6 +1052,7 @@
   border-radius: 16px;
   border: 1px solid var(--border);
   background: rgba(19, 17, 31, 0.8);
+  text-align: left;
 }
 .portfolio-page .contact-row:hover,
 .portfolio-page .contact-row:focus-visible {
