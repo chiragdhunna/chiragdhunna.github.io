@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app that blends ChatGPTÃ¢ÂÂpowered conversations with DALLÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
+    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂ¢ÃÂÃÂpowered conversations with DALLÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -180,5 +180,18 @@
     "ghLink": "https://github.com/chiragdhunna/pizza_striker_backend#-pizza-striker-backend",
     "demoLink": "https://pizza-striker-backend-bmu6.onrender.com/docs",
     "createdAt": "2026-06-13T22:24:52.879Z"
+  },
+  {
+    "id": "vyra-backend",
+    "slug": "vyra-backend",
+    "name": "Vyra Backend",
+    "description": "FastAPI brain for the Vyra AI companion: swappable local (Ollama) or cloud LLMs and real-time, interruptible voice.",
+    "categories": [
+      "Backend"
+    ],
+    "imageUrl": "/assets/projects/vyra-backend.jpg",
+    "ghLink": "https://github.com/chiragdhunna/vyra-backend",
+    "demoLink": null,
+    "createdAt": "2026-07-04T21:56:52.764Z"
   }
 ]
