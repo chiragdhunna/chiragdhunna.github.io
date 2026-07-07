@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂ¢ÃÂÃÂpowered conversations with DALLÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
+    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂÃÂ¢ÃÂÃÂÃÂÃÂpowered conversations with DALLÃÂÃÂÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -193,5 +193,18 @@
     "ghLink": "https://github.com/chiragdhunna/vyra-backend",
     "demoLink": null,
     "createdAt": "2026-07-04T21:56:52.764Z"
+  },
+  {
+    "id": "autovault",
+    "slug": "autovault",
+    "name": "AutoVault",
+    "description": "A secure, local-first browser extension that remembers your job-application details once and fills any application form in a click.",
+    "categories": [
+      "Web"
+    ],
+    "imageUrl": "/assets/projects/autovault.jpg",
+    "ghLink": "https://github.com/chiragdhunna/AutoVault",
+    "demoLink": null,
+    "createdAt": "2026-07-07T20:36:00.392Z"
   }
 ]
