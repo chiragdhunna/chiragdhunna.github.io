@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂÃÂ¢ÃÂÃÂÃÂÃÂpowered conversations with DALLÃÂÃÂÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
+    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂpowered conversations with DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -206,5 +206,19 @@
     "ghLink": "https://github.com/chiragdhunna/AutoVault",
     "demoLink": null,
     "createdAt": "2026-07-07T20:36:00.392Z"
+  },
+  {
+    "id": "jobctl",
+    "slug": "jobctl",
+    "name": "jobctl",
+    "description": "Self-hosted job search pipeline — discovers openings, scores fit against your resume, and drafts tailored resumes and outreach with local/cloud LLMs. You review and send; jobctl finds and drafts.",
+    "categories": [
+      "Automation",
+      "Backend"
+    ],
+    "imageUrl": "/assets/projects/jobctl.jpg",
+    "ghLink": "https://github.com/chiragdhunna/jobctl",
+    "demoLink": null,
+    "createdAt": "2026-07-07T20:39:46.877Z"
   }
 ]
