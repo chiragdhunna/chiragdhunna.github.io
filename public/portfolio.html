@@ -1009,12 +1009,26 @@
       .contact-row {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: 18px;
+        width: 100%;
         padding: 16px 18px;
         border-radius: 16px;
         border: 1px solid var(--border);
         background: rgba(19, 17, 31, 0.8);
+        text-align: left;
+      }
+
+      .contact-row > div {
+        flex: 0 1 auto;
+        min-width: 0;
+      }
+
+      .contact-row > i {
+        margin-left: auto;
+        flex-shrink: 0;
+        font-size: 1.1rem;
+        color: var(--text-2);
       }
 
       .contact-row:hover,

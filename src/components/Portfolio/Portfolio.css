@@ -27,6 +27,7 @@
     linear-gradient(180deg, #09070f 0%, #0c0a14 50%, #0a0811 100%);
   color: var(--text-1);
   font-family: "Space Grotesk", sans-serif;
+  text-align: left;
   overflow-x: hidden;
 }
 
@@ -757,8 +758,7 @@
 .portfolio-page .chips,
 .portfolio-page .filter-bar,
 .portfolio-page .card-tags,
-.portfolio-page .card-actions,
-.portfolio-page .contact-list {
+.portfolio-page .card-actions {
   display: flex;
   flex-wrap: wrap;
 }
@@ -1038,20 +1038,34 @@
 }
 
 .portfolio-page .contact-list {
-  margin-top: 26px;
+  display: grid;
   gap: 14px;
+  margin-top: 26px;
 }
 
 .portfolio-page .contact-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 18px;
   width: 100%;
   padding: 16px 18px;
   border-radius: 16px;
   border: 1px solid var(--border);
   background: rgba(19, 17, 31, 0.8);
+  text-align: left;
+}
+
+.portfolio-page .contact-row > div {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.portfolio-page .contact-row > i {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  color: var(--text-2);
 }
 .portfolio-page .contact-row:hover,
 .portfolio-page .contact-row:focus-visible {
