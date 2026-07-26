@@ -211,3 +211,50 @@ test("Image state machine: clearing image vs replacing image vs keeping current 
   assert.strictEqual(payloadKept.imageBase64, undefined);
   assert.strictEqual(payloadKept.imageCleared, undefined);
 });
+
+test("Certification Form & API state machine: clearing and replacing certification images and PDFs", () => {
+  let certState = {
+    imageFile: null,
+    imagePreview: "/assets/certs/aws.jpg",
+    imageCleared: false,
+    pdfFile: null,
+    pdfName: "existing.pdf",
+    pdfCleared: false,
+  };
+
+  // Clear certification image and PDF
+  const clearCertAssets = () => {
+    certState.imageFile = null;
+    certState.imagePreview = null;
+    certState.imageCleared = true;
+    certState.pdfFile = null;
+    certState.pdfName = "";
+    certState.pdfCleared = true;
+  };
+
+  clearCertAssets();
+  assert.strictEqual(certState.imagePreview, null);
+  assert.strictEqual(certState.imageCleared, true);
+  assert.strictEqual(certState.pdfName, "");
+  assert.strictEqual(certState.pdfCleared, true);
+
+  // Build payload for updateCertification
+  const buildCertPayload = (s) => {
+    const payload = { name: "AWS Cert", issuer: "AWS" };
+    if (s.imageFile) {
+      payload.imageBase64 = "base64_img";
+    } else if (s.imageCleared) {
+      payload.imageCleared = true;
+    }
+    if (s.pdfFile) {
+      payload.pdfBase64 = "base64_pdf";
+    } else if (s.pdfCleared) {
+      payload.pdfCleared = true;
+    }
+    return payload;
+  };
+
+  let payload = buildCertPayload(certState);
+  assert.strictEqual(payload.imageCleared, true);
+  assert.strictEqual(payload.pdfCleared, true);
+});

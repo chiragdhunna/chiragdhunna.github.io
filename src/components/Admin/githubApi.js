@@ -554,8 +554,38 @@ export async function updateCertification(slug, updatedData) {
     throw new Error(`[updateCertification] No cert found with slug: ${slug}`);
   }
 
-  // Upload new image if provided
-  if (updatedData.imageBase64) {
+  const cert = existing.content[index];
+
+  // Handle image clearing
+  if (updatedData.imageCleared) {
+    if (cert?.imageUrl?.startsWith("/assets/certs/")) {
+      const oldImagePath = `public${cert.imageUrl}`;
+      console.log(`[updateCertification] Deleting old image: ${oldImagePath}`);
+      await deleteFileFromGitHub(oldImagePath).catch((err) =>
+        console.warn(
+          `[updateCertification] Old image delete failed (non-fatal): ${err.message}`,
+        ),
+      );
+    }
+    updatedData.imageUrl = null;
+    delete updatedData.imageCleared;
+  }
+  // Upload new image if provided (replacement)
+  else if (updatedData.imageBase64) {
+    if (cert?.imageUrl?.startsWith("/assets/certs/")) {
+      const oldImagePath = `public${cert.imageUrl}`;
+      const newImagePath = `public/assets/certs/${slug}.jpg`;
+      if (oldImagePath !== newImagePath) {
+        console.log(
+          `[updateCertification] Deleting old image with different path: ${oldImagePath}`,
+        );
+        await deleteFileFromGitHub(oldImagePath).catch((err) =>
+          console.warn(
+            `[updateCertification] Old image delete failed (non-fatal): ${err.message}`,
+          ),
+        );
+      }
+    }
     const imagePath = `public/assets/certs/${slug}.jpg`;
     console.log(`[updateCertification] Uploading new image...`);
     await uploadFileToGitHub(imagePath, updatedData.imageBase64);
@@ -563,8 +593,36 @@ export async function updateCertification(slug, updatedData) {
     delete updatedData.imageBase64;
   }
 
-  // Upload new PDF if provided
-  if (updatedData.pdfBase64) {
+  // Handle PDF clearing
+  if (updatedData.pdfCleared) {
+    if (cert?.pdfUrl?.startsWith("/assets/certs/")) {
+      const oldPdfPath = `public${cert.pdfUrl}`;
+      console.log(`[updateCertification] Deleting old PDF: ${oldPdfPath}`);
+      await deleteFileFromGitHub(oldPdfPath).catch((err) =>
+        console.warn(
+          `[updateCertification] Old PDF delete failed (non-fatal): ${err.message}`,
+        ),
+      );
+    }
+    updatedData.pdfUrl = null;
+    delete updatedData.pdfCleared;
+  }
+  // Upload new PDF if provided (replacement)
+  else if (updatedData.pdfBase64) {
+    if (cert?.pdfUrl?.startsWith("/assets/certs/")) {
+      const oldPdfPath = `public${cert.pdfUrl}`;
+      const newPdfPath = `public/assets/certs/${slug}.pdf`;
+      if (oldPdfPath !== newPdfPath) {
+        console.log(
+          `[updateCertification] Deleting old PDF with different path: ${oldPdfPath}`,
+        );
+        await deleteFileFromGitHub(oldPdfPath).catch((err) =>
+          console.warn(
+            `[updateCertification] Old PDF delete failed (non-fatal): ${err.message}`,
+          ),
+        );
+      }
+    }
     const pdfPath = `public/assets/certs/${slug}.pdf`;
     console.log(`[updateCertification] Uploading new PDF...`);
     await uploadFileToGitHub(pdfPath, updatedData.pdfBase64);
