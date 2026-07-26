@@ -21,8 +21,10 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageCleared, setImageCleared] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfName, setPdfName] = useState("");
+  const [pdfCleared, setPdfCleared] = useState(false);
   const [loading, setLoading] = useState(false);
   const [msgOk, setMsgOk] = useState("");
   const [msgErr, setMsgErr] = useState("");
@@ -43,7 +45,9 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
       setPdfName("");
     }
     setImageFile(null);
+    setImageCleared(false);
     setPdfFile(null);
+    setPdfCleared(false);
     setMsgOk("");
     setMsgErr("");
   }, [editCert]);
@@ -61,6 +65,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     if (file.size > 5 * 1024 * 1024)
       return setMsgErr("Image must be under 5MB");
     setImageFile(file);
+    setImageCleared(false);
     setMsgErr("");
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target.result);
@@ -76,17 +81,20 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
       return setMsgErr("PDF must be under 10MB");
     setPdfFile(file);
     setPdfName(file.name);
+    setPdfCleared(false);
     setMsgErr("");
   };
 
   const clearImage = () => {
     setImageFile(null);
-    setImagePreview(isEditMode ? editCert?.imageUrl || null : null);
+    setImagePreview(null);
+    setImageCleared(true);
   };
 
   const clearPdf = () => {
     setPdfFile(null);
-    setPdfName(isEditMode && editCert?.pdfUrl ? "existing PDF" : "");
+    setPdfName("");
+    setPdfCleared(true);
   };
 
   const resizeImage = (file) =>
@@ -138,8 +146,17 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
           issueDate: formData.issueDate || null,
           credentialUrl: formData.credentialUrl.trim() || null,
         };
-        if (imageFile) payload.imageBase64 = await resizeImage(imageFile);
-        if (pdfFile) payload.pdfBase64 = await fileToBase64(pdfFile);
+        if (imageFile) {
+          payload.imageBase64 = await resizeImage(imageFile);
+        } else if (imageCleared) {
+          payload.imageCleared = true;
+        }
+
+        if (pdfFile) {
+          payload.pdfBase64 = await fileToBase64(pdfFile);
+        } else if (pdfCleared) {
+          payload.pdfCleared = true;
+        }
 
         await updateCertification(editCert.slug, payload);
         setMsgOk("✓ updated! deploying in ~60s");
