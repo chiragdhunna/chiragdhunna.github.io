@@ -730,8 +730,39 @@ export async function updateProject(slug, updatedData) {
     throw new Error(`[updateProject] No project found with slug: ${slug}`);
   }
 
+  const project = existing.content[index];
+
+  // If image was cleared
+  if (updatedData.imageCleared) {
+    if (project?.imageUrl?.startsWith("/assets/projects/")) {
+      const oldImagePath = `public${project.imageUrl}`;
+      console.log(`[updateProject] Deleting old image: ${oldImagePath}`);
+      await deleteFileFromGitHub(oldImagePath).catch((err) =>
+        console.warn(
+          `[updateProject] Old image delete failed (non-fatal): ${err.message}`,
+        ),
+      );
+    }
+    updatedData.imageUrl = null;
+    delete updatedData.imageCleared;
+  }
   // If a new image was provided, upload it
-  if (updatedData.imageBase64) {
+  else if (updatedData.imageBase64) {
+    if (project?.imageUrl?.startsWith("/assets/projects/")) {
+      const oldImagePath = `public${project.imageUrl}`;
+      const newImagePath = `public/assets/projects/${slug}.jpg`;
+      if (oldImagePath !== newImagePath) {
+        console.log(
+          `[updateProject] Deleting old image with different path: ${oldImagePath}`,
+        );
+        await deleteFileFromGitHub(oldImagePath).catch((err) =>
+          console.warn(
+            `[updateProject] Old image delete failed (non-fatal): ${err.message}`,
+          ),
+        );
+      }
+    }
+
     const imagePath = `public/assets/projects/${slug}.jpg`;
     console.log(`[updateProject] Uploading new image to ${imagePath}...`);
     await uploadFileToGitHub(imagePath, updatedData.imageBase64);

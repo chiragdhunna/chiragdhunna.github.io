@@ -24,6 +24,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageCleared, setImageCleared] = useState(false);
   const [loading, setLoading] = useState(false);
   const [msgOk, setMsgOk] = useState("");
   const [msgErr, setMsgErr] = useState("");
@@ -50,6 +51,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
       setImagePreview(null);
     }
     setImageFile(null);
+    setImageCleared(false);
     setMsgOk("");
     setMsgErr("");
     setCustomCatInput("");
@@ -85,6 +87,7 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
     if (file.size > 5 * 1024 * 1024)
       return setMsgErr("Image must be under 5MB");
     setImageFile(file);
+    setImageCleared(false);
     setMsgErr("");
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target.result);
@@ -93,7 +96,8 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
 
   const clearImage = () => {
     setImageFile(null);
-    setImagePreview(isEditMode ? editProject?.imageUrl || null : null);
+    setImagePreview(null);
+    setImageCleared(true);
   };
 
   const resizeImage = (file) =>
@@ -145,7 +149,11 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
           demoLink: demoLink.trim() || null,
           categories,
         };
-        if (imageFile) payload.imageBase64 = await resizeImage(imageFile);
+        if (imageFile) {
+          payload.imageBase64 = await resizeImage(imageFile);
+        } else if (imageCleared) {
+          payload.imageCleared = true;
+        }
         await updateProject(editProject.slug, payload);
         setMsgOk("✓ updated! deploying in ~60s");
       } else {
