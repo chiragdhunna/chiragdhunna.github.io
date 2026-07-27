@@ -313,6 +313,16 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
                   aria-hidden="true"
                 ></i>
                 <span className="cf-pdf-name">{pdfName}</span>
+                <label className="cf-pdf-replace" title="Replace PDF">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handlePdf}
+                    disabled={loading}
+                    style={{ display: "none" }}
+                  />
+                  <span className="cf-pdf-replace-link">replace</span>
+                </label>
                 <button
                   type="button"
                   className="cf-pdf-clear"
