@@ -214,6 +214,28 @@
   color: #e05252;
 }
 
+.cf-pdf-replace {
+  cursor: pointer;
+  background: none;
+  border: 1px solid #2a2c2f;
+  border-radius: 4px;
+  color: #5f6368;
+  font-size: 11px;
+  padding: 2px 7px;
+  font-family: "IBM Plex Mono", monospace;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+
+.cf-pdf-replace:hover {
+  border-color: #f0a500;
+  color: #f0a500;
+}
+
+.cf-pdf-replace-link {
+  color: inherit;
+}
+
 /* Footer */
 .cf-footer {
   padding: 14px 20px;
