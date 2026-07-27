@@ -23,7 +23,7 @@
     "dev": "vite",
     "build": "vite build && cp dist/index.html dist/404.html",
     "preview": "vite preview",
-    "test": "node --test src/components/Admin/admin.test.js src/components/Home/home.test.js",
+    "test": "node --test src/components/Admin/admin.test.js src/components/Home/home.test.js src/tests/repo-comprehensive.test.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "deploy-worker": "wrangler deploy workers/index.ts"
