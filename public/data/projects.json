@@ -85,7 +85,7 @@
     ],
     "imageUrl": "/assets/projects/gpt-jr.png",
     "name": "GPT Jr",
-    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂpowered conversations with DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
+    "description": "GPT Jr is a Flutter app that blends ChatGPTÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂpowered conversations with DALLÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ·E image generation. Featuring voice input, natural replies, and automated CI/CD, it delivers an interactive AI experience on mobile.",
     "ghLink": "https://github.com/chiragdhunna/GPT-Jr",
     "demoLink": "https://github.com/chiragdhunna/gpt_jr/releases/"
   },
@@ -211,7 +211,7 @@
     "id": "jobctl",
     "slug": "jobctl",
     "name": "jobctl",
-    "description": "Self-hosted job search pipeline — discovers openings, scores fit against your resume, and drafts tailored resumes and outreach with local/cloud LLMs. You review and send; jobctl finds and drafts.",
+    "description": "Self-hosted job search pipeline â discovers openings, scores fit against your resume, and drafts tailored resumes and outreach with local/cloud LLMs. You review and send; jobctl finds and drafts.",
     "categories": [
       "Automation",
       "Backend"
@@ -220,5 +220,20 @@
     "ghLink": "https://github.com/chiragdhunna/jobctl",
     "demoLink": null,
     "createdAt": "2026-07-07T20:39:46.877Z"
+  },
+  {
+    "id": "proxima",
+    "slug": "proxima",
+    "name": "Proxima",
+    "description": "Proxima — an open-source proximity-based virtual office powered by Phaser.js, React, Socket.IO, and WebRTC. Move around a 2D workspace, automatically connect with nearby teammates, and communicate through real-time proximity audio/video.",
+    "categories": [
+      "Web",
+      "Full Stack",
+      "Backend"
+    ],
+    "imageUrl": "/assets/projects/proxima.jpg",
+    "ghLink": "https://github.com/chiragdhunna/proxima",
+    "demoLink": null,
+    "createdAt": "2026-08-22T20:19:52.305Z"
   }
 ]
