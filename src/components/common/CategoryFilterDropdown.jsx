@@ -9,6 +9,7 @@ function CategoryFilterDropdown({
   label = "Filter",
   isActive = false,
   toggleClassName = "",
+  allLabel = "All",
 }) {
   const [open, setOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -44,14 +45,22 @@ function CategoryFilterDropdown({
       }
     };
 
+    const handleFocusOutside = (event) => {
+      if (!rootRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleOutside);
     document.addEventListener("touchstart", handleOutside);
     document.addEventListener("keydown", handleEscape);
+    document.addEventListener("focusin", handleFocusOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("touchstart", handleOutside);
       document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("focusin", handleFocusOutside);
     };
   }, [open]);
 
@@ -122,12 +131,15 @@ function CategoryFilterDropdown({
         <div
           className="filter-dropdown__menu"
           role="menu"
-          aria-label={`${label} categories`}
+          aria-label={label === "Filter" ? `${label} categories` : `${label} options`}
           onKeyDown={handleMenuKeyDown}
         >
           {options.map((category, index) => {
             const active = matchesCategory(selected, category);
             const count = getCount ? getCount(category) : null;
+            const displayText = matchesCategory(category, "All")
+              ? allLabel
+              : category;
 
             return (
               <button
@@ -144,8 +156,8 @@ function CategoryFilterDropdown({
                   buttonRef.current?.focus();
                 }}
               >
-                <span className="filter-dropdown__item-text" title={category}>
-                  {category}
+                <span className="filter-dropdown__item-text" title={displayText}>
+                  {displayText}
                 </span>
                 {count !== null && (
                   <span className="filter-dropdown__count">{count}</span>
