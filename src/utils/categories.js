@@ -39,5 +39,33 @@ export function getAvailableCategories(items, defaults = []) {
 }
 
 export function categoryMatches(category, targetCategory) {
-  return getCategoryKey(category) === getCategoryKey(targetCategory);
+  const keyA = getCategoryKey(category);
+  const keyB = getCategoryKey(targetCategory);
+  if (!keyA || !keyB) return false;
+  return keyA === keyB;
 }
+
+export function getItemCount(items, category = "All") {
+  if (!Array.isArray(items)) return 0;
+  if (!category || categoryMatches(category, "All")) {
+    return items.length;
+  }
+  return items.filter(
+    (item) =>
+      Array.isArray(item?.categories) &&
+      item.categories.some((cat) => categoryMatches(cat, category)),
+  ).length;
+}
+
+export function filterItemsByCategory(items, category = "All") {
+  if (!Array.isArray(items)) return [];
+  if (!category || categoryMatches(category, "All")) {
+    return items;
+  }
+  return items.filter(
+    (item) =>
+      Array.isArray(item?.categories) &&
+      item.categories.some((cat) => categoryMatches(cat, category)),
+  );
+}
+

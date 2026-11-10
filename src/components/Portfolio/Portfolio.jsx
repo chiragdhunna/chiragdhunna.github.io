@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Particle from "../Particle";
 import "./Portfolio.css";
+import CategoryFilterDropdown from "../common/CategoryFilterDropdown";
+import {
+  categoryMatches,
+  filterItemsByCategory,
+  getAvailableCategories,
+  getItemCount,
+} from "../../utils/categories";
 import {
   AiFillGithub,
   AiFillInstagram,
@@ -170,6 +177,7 @@ function Portfolio() {
   const [projects, setProjects] = useState([]);
   const [certs, setCerts] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [selectedCertFilter, setSelectedCertFilter] = useState("All");
   const [typewriterText, setTypewriterText] = useState("");
   const [activeSection, setActiveSection] = useState("hero");
   const [contributions, setContributions] = useState([]);
@@ -323,29 +331,60 @@ function Portfolio() {
 
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [prefersReducedMotion, projects, certs, contributions, selectedFilter]);
+  }, [
+    prefersReducedMotion,
+    projects,
+    certs,
+    contributions,
+    selectedFilter,
+    selectedCertFilter,
+  ]);
 
-  const filterCounts = useMemo(() => {
-    const counts = Object.fromEntries(FILTERS.map((filter) => [filter, 0]));
-    projects.forEach((project) => {
-      counts.All += 1;
-      (project.categories || []).forEach((category) => {
-        if (Object.prototype.hasOwnProperty.call(counts, category)) {
-          counts[category] += 1;
-        }
-      });
-    });
-    return counts;
-  }, [projects]);
+  const defaultProjectCategories = useMemo(
+    () => FILTERS.filter((f) => f !== "All"),
+    [],
+  );
+  const availableCategories = useMemo(
+    () => getAvailableCategories(projects, defaultProjectCategories),
+    [projects, defaultProjectCategories],
+  );
 
-  const filteredProjects = useMemo(() => {
-    if (selectedFilter === "All") return projects;
-    return projects.filter((project) =>
-      Array.isArray(project.categories)
-        ? project.categories.includes(selectedFilter)
-        : false,
+  useEffect(() => {
+    if (categoryMatches(selectedFilter, "All")) return;
+    const exists = availableCategories.some((category) =>
+      categoryMatches(category, selectedFilter),
     );
-  }, [projects, selectedFilter]);
+    if (!exists) {
+      setSelectedFilter("All");
+    }
+  }, [availableCategories, selectedFilter]);
+
+  const getProjectCount = (category) => getItemCount(projects, category);
+
+  const filteredProjects = useMemo(
+    () => filterItemsByCategory(projects, selectedFilter),
+    [projects, selectedFilter],
+  );
+
+  const certCategories = useMemo(() => getAvailableCategories(certs), [certs]);
+  const showCertFilterBar = certCategories.length > 0;
+
+  useEffect(() => {
+    if (categoryMatches(selectedCertFilter, "All")) return;
+    const exists = certCategories.some((category) =>
+      categoryMatches(category, selectedCertFilter),
+    );
+    if (!exists) {
+      setSelectedCertFilter("All");
+    }
+  }, [certCategories, selectedCertFilter]);
+
+  const getCertCount = (category) => getItemCount(certs, category);
+
+  const filteredCerts = useMemo(
+    () => filterItemsByCategory(certs, selectedCertFilter),
+    [certs, selectedCertFilter],
+  );
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault();
@@ -698,7 +737,7 @@ function Portfolio() {
               aria-label="Filter projects by category"
             >
               {FILTERS.map((filter) => {
-                const active = selectedFilter === filter;
+                const active = categoryMatches(selectedFilter, filter);
                 return (
                   <button
                     key={filter}
@@ -709,17 +748,29 @@ function Portfolio() {
                   >
                     <span>{filter}</span>
                     <span className="filter-count">
-                      {filterCounts[filter] || 0}
+                      {getProjectCount(filter)}
                     </span>
                   </button>
                 );
               })}
+              <CategoryFilterDropdown
+                categories={availableCategories}
+                selected={selectedFilter}
+                onSelect={setSelectedFilter}
+                getCount={getProjectCount}
+                isActive={
+                  !categoryMatches(selectedFilter, "All") &&
+                  !defaultProjectCategories.some((cat) =>
+                    categoryMatches(cat, selectedFilter),
+                  )
+                }
+              />
             </div>
 
             <p className="projects-meta" aria-live="polite">
               Showing <strong>{filteredProjects.length}</strong>{" "}
               {filteredProjects.length === 1 ? "project" : "projects"}
-              {selectedFilter !== "All" ? (
+              {!categoryMatches(selectedFilter, "All") ? (
                 <>
                   {" "}
                   in <strong>{selectedFilter}</strong>
@@ -802,9 +853,50 @@ function Portfolio() {
               This section is powered by the same cert JSON feed and degrades
               gracefully when it is empty.
             </p>
+            {showCertFilterBar && (
+              <>
+                <div
+                  className="filter-bar"
+                  role="group"
+                  aria-label="Filter certifications by category"
+                >
+                  <button
+                    type="button"
+                    className={`filter-pill ${categoryMatches(selectedCertFilter, "All") ? "active" : ""}`}
+                    onClick={() => setSelectedCertFilter("All")}
+                    aria-pressed={categoryMatches(selectedCertFilter, "All")}
+                  >
+                    <span>All</span>
+                    <span className="filter-count">{getCertCount("All")}</span>
+                  </button>
+                  <CategoryFilterDropdown
+                    categories={certCategories}
+                    selected={selectedCertFilter}
+                    onSelect={setSelectedCertFilter}
+                    getCount={getCertCount}
+                    isActive={!categoryMatches(selectedCertFilter, "All")}
+                  />
+                </div>
+
+                <p className="projects-meta" aria-live="polite">
+                  Showing <strong>{filteredCerts.length}</strong>{" "}
+                  {filteredCerts.length === 1
+                    ? "certification"
+                    : "certifications"}
+                  {!categoryMatches(selectedCertFilter, "All") ? (
+                    <>
+                      {" "}
+                      in <strong>{selectedCertFilter}</strong>
+                    </>
+                  ) : null}
+                </p>
+              </>
+            )}
             <div className="cert-grid-wrap">
-              {certs.length > 0 ? (
-                certs.map((cert, index) => {
+              {certs.length === 0 ? (
+                <div className="empty-state">No certifications yet.</div>
+              ) : filteredCerts.length > 0 ? (
+                filteredCerts.map((cert, index) => {
                   const issuedYear = cert.issueDate
                     ? new Date(cert.issueDate).getFullYear()
                     : "";
@@ -858,7 +950,9 @@ function Portfolio() {
                   );
                 })
               ) : (
-                <div className="empty-state">No certifications yet.</div>
+                <div className="empty-state">
+                  No certifications available for this filter.
+                </div>
               )}
             </div>
           </div>
