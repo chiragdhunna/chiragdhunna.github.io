@@ -177,6 +177,7 @@ function Portfolio() {
   const [projects, setProjects] = useState([]);
   const [certs, setCerts] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [selectedCertFilter, setSelectedCertFilter] = useState("All");
   const [typewriterText, setTypewriterText] = useState("");
   const [activeSection, setActiveSection] = useState("hero");
   const [contributions, setContributions] = useState([]);
@@ -330,7 +331,14 @@ function Portfolio() {
 
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [prefersReducedMotion, projects, certs, contributions, selectedFilter]);
+  }, [
+    prefersReducedMotion,
+    projects,
+    certs,
+    contributions,
+    selectedFilter,
+    selectedCertFilter,
+  ]);
 
   const defaultProjectCategories = useMemo(
     () => FILTERS.filter((f) => f !== "All"),
@@ -356,6 +364,26 @@ function Portfolio() {
   const filteredProjects = useMemo(
     () => filterItemsByCategory(projects, selectedFilter),
     [projects, selectedFilter],
+  );
+
+  const certCategories = useMemo(() => getAvailableCategories(certs), [certs]);
+  const showCertFilterBar = certCategories.length > 0;
+
+  useEffect(() => {
+    if (categoryMatches(selectedCertFilter, "All")) return;
+    const exists = certCategories.some((category) =>
+      categoryMatches(category, selectedCertFilter),
+    );
+    if (!exists) {
+      setSelectedCertFilter("All");
+    }
+  }, [certCategories, selectedCertFilter]);
+
+  const getCertCount = (category) => getItemCount(certs, category);
+
+  const filteredCerts = useMemo(
+    () => filterItemsByCategory(certs, selectedCertFilter),
+    [certs, selectedCertFilter],
   );
 
   const scrollToSection = (event, sectionId) => {
@@ -825,9 +853,50 @@ function Portfolio() {
               This section is powered by the same cert JSON feed and degrades
               gracefully when it is empty.
             </p>
+            {showCertFilterBar && (
+              <>
+                <div
+                  className="filter-bar"
+                  role="group"
+                  aria-label="Filter certifications by category"
+                >
+                  <button
+                    type="button"
+                    className={`filter-pill ${categoryMatches(selectedCertFilter, "All") ? "active" : ""}`}
+                    onClick={() => setSelectedCertFilter("All")}
+                    aria-pressed={categoryMatches(selectedCertFilter, "All")}
+                  >
+                    <span>All</span>
+                    <span className="filter-count">{getCertCount("All")}</span>
+                  </button>
+                  <CategoryFilterDropdown
+                    categories={certCategories}
+                    selected={selectedCertFilter}
+                    onSelect={setSelectedCertFilter}
+                    getCount={getCertCount}
+                    isActive={!categoryMatches(selectedCertFilter, "All")}
+                  />
+                </div>
+
+                <p className="projects-meta" aria-live="polite">
+                  Showing <strong>{filteredCerts.length}</strong>{" "}
+                  {filteredCerts.length === 1
+                    ? "certification"
+                    : "certifications"}
+                  {!categoryMatches(selectedCertFilter, "All") ? (
+                    <>
+                      {" "}
+                      in <strong>{selectedCertFilter}</strong>
+                    </>
+                  ) : null}
+                </p>
+              </>
+            )}
             <div className="cert-grid-wrap">
-              {certs.length > 0 ? (
-                certs.map((cert, index) => {
+              {certs.length === 0 ? (
+                <div className="empty-state">No certifications yet.</div>
+              ) : filteredCerts.length > 0 ? (
+                filteredCerts.map((cert, index) => {
                   const issuedYear = cert.issueDate
                     ? new Date(cert.issueDate).getFullYear()
                     : "";
@@ -881,7 +950,9 @@ function Portfolio() {
                   );
                 })
               ) : (
-                <div className="empty-state">No certifications yet.</div>
+                <div className="empty-state">
+                  No certifications available for this filter.
+                </div>
               )}
             </div>
           </div>
