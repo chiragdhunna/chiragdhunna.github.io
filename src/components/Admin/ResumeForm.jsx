@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { uploadResume } from "./githubApi";
+import { validatePdf } from "./fileDrop";
+import { useFileDrop } from "./useFileDrop";
 import "./ResumeForm.css";
 
 function ResumeForm({ onSuccess }) {
@@ -7,25 +9,43 @@ function ResumeForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const multipleDropRef = useRef(false);
+  const fileInputRef = useRef(null);
+
+  const handleResumeFile = (file) => {
+    const validationError = validatePdf(file);
+    if (validationError) {
+      setMessageType("error");
+      setMessage(validationError);
+      multipleDropRef.current = false;
+      return;
+    }
+
+    setResumeFile(file);
+    if (multipleDropRef.current) {
+      setMessageType("error");
+      setMessage("Only the first file was used");
+      multipleDropRef.current = false;
+      return;
+    }
+    setMessage("");
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.type !== "application/pdf") {
-        setMessageType("error");
-        setMessage("Please upload a PDF file");
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        // 10MB limit
-        setMessageType("error");
-        setMessage("File size must be less than 10MB");
-        return;
-      }
-      setResumeFile(file);
-      setMessage("");
+      multipleDropRef.current = false;
+      handleResumeFile(file);
     }
   };
+
+  const { isDragging, dropProps } = useFileDrop({
+    onFile: handleResumeFile,
+    disabled: loading,
+    onMultiple: () => {
+      multipleDropRef.current = true;
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +70,9 @@ function ResumeForm({ onSuccess }) {
             "✓ Resume uploaded successfully! The site will update in ~60 seconds.",
           );
           setResumeFile(null);
-          document.getElementById("resume-input").value = "";
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
           setTimeout(() => onSuccess && onSuccess(), 2000);
         } catch (error) {
           setMessageType("error");
@@ -77,15 +99,20 @@ function ResumeForm({ onSuccess }) {
 
       <form onSubmit={handleSubmit} className="resume-form">
         <div className="form-group">
-          <label htmlFor="resume-input" className="file-input-label">
-            <div className="file-input-box">
+          <label htmlFor="resume-input" className="file-input-label" {...dropProps}>
+            <div
+              className={`file-input-box ${isDragging ? "file-input-box--dragging" : ""}`}
+            >
               <span className="file-icon">📄</span>
               <span className="file-text">
-                {resumeFile ? resumeFile.name : "Click to select PDF file"}
+                {resumeFile
+                  ? resumeFile.name
+                  : "Click to select or drag & drop a PDF"}
               </span>
             </div>
             <input
               id="resume-input"
+              ref={fileInputRef}
               type="file"
               accept=".pdf"
               onChange={handleFileChange}
