@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { addCertification, updateCertification } from "./githubApi";
+import IssuerPicker from "./IssuerPicker";
+import {
+  canonicalizeIssuer,
+  getAvailableIssuers,
+} from "../../utils/issuers";
 import "./CertForm.css";
 
 function generateSlug(name) {
@@ -22,8 +27,13 @@ function normalizeCategory(category) {
   return category.trim().toLowerCase();
 }
 
-function CertForm({ editCert, onSuccess, onCancelEdit }) {
+function CertForm({ editCert, existingCerts = [], onSuccess, onCancelEdit }) {
   const isEditMode = !!editCert;
+
+  const issuerOptions = useMemo(
+    () => getAvailableIssuers(existingCerts),
+    [existingCerts],
+  );
 
   const [formData, setFormData] = useState({
     name: "",
@@ -230,7 +240,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
       if (isEditMode) {
         const payload = {
           name: formData.name.trim(),
-          issuer: formData.issuer.trim(),
+          issuer: canonicalizeIssuer(formData.issuer, issuerOptions),
           issueDate: formData.issueDate || null,
           credentialUrl: formData.credentialUrl.trim() || null,
           categories: formData.categories,
@@ -256,7 +266,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
 
         await addCertification({
           name: formData.name.trim(),
-          issuer: formData.issuer.trim(),
+          issuer: canonicalizeIssuer(formData.issuer, issuerOptions),
           issueDate: formData.issueDate || null,
           credentialUrl: formData.credentialUrl.trim() || null,
           categories: formData.categories,
@@ -307,17 +317,16 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
           </div>
 
           <div className="cf-field">
-            <label className="cf-label">
+            <label className="cf-label" htmlFor="cert-issuer">
               issuer <span className="cf-req">*</span>
             </label>
-            <input
-              className="cf-input"
-              type="text"
-              name="issuer"
+            <IssuerPicker
+              id="cert-issuer"
               value={formData.issuer}
-              onChange={handleInput}
-              placeholder="e.g. Amazon Web Services"
+              onChange={(val) => setFormData((p) => ({ ...p, issuer: val }))}
+              options={issuerOptions}
               disabled={loading}
+              placeholder="select or type an issuer"
             />
           </div>
 

@@ -318,6 +318,7 @@ function CertsTab() {
         <CertForm
           key={editingCert?.slug ?? "new-cert"}
           editCert={editingCert}
+          existingCerts={certs}
           onSuccess={handleEditSuccess}
           onCancelEdit={() => setEditingCert(null)}
         />
