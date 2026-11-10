@@ -1,0 +1,96 @@
+.cf-issuer-picker {
+  position: relative;
+  width: 100%;
+}
+
+.cf-issuer-input {
+  width: 100%;
+}
+
+.cf-issuer-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #181a1b;
+  border: 1px solid #2a2c2f;
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+  z-index: 60;
+  padding: 4px;
+  margin: 0;
+  list-style: none;
+  font-family: "DM Sans", sans-serif;
+  box-sizing: border-box;
+}
+
+.cf-issuer-option {
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: #ccc;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+  box-sizing: border-box;
+}
+
+.cf-issuer-option-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cf-issuer-option:hover,
+.cf-issuer-option--highlighted {
+  background: rgba(240, 165, 0, 0.15);
+  color: #f0a500;
+}
+
+.cf-issuer-option--selected {
+  color: #f0a500;
+  font-weight: 600;
+}
+
+.cf-issuer-badge {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  color: #888;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.02em;
+}
+
+.cf-issuer-option--add {
+  border-top: 1px solid #2a2c2f;
+  margin-top: 4px;
+  padding-top: 8px;
+  color: #f0a500;
+  font-weight: 500;
+}
+
+.cf-issuer-option--add:hover,
+.cf-issuer-option--add.cf-issuer-option--highlighted {
+  background: rgba(240, 165, 0, 0.2);
+  color: #ffbe33;
+}
+
+.cf-issuer-empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  font-style: italic;
+}
