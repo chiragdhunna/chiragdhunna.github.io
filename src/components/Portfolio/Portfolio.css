@@ -794,11 +794,155 @@
 .portfolio-page .filter-pill {
   cursor: pointer;
 }
-.portfolio-page .filter-pill.active {
+.portfolio-page .filter-pill.active,
+.portfolio-page .filter-pill.filter-pill--active {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
   box-shadow: 0 4px 20px rgba(155, 93, 229, 0.4);
+}
+
+/* Category Filter Dropdown — Portfolio Theming */
+.portfolio-page .filter-dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+.portfolio-page .filter-dropdown__toggle {
+  min-height: unset;
+  line-height: inherit;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.portfolio-page .filter-dropdown__toggle:hover,
+.portfolio-page .filter-dropdown__toggle:focus-visible {
+  border-color: var(--accent);
+  color: var(--text-1);
+  box-shadow: 0 0 16px rgba(155, 93, 229, 0.2);
+  transform: scale(1.04);
+  outline: none;
+}
+
+.portfolio-page .filter-dropdown__toggle.active,
+.portfolio-page .filter-dropdown__toggle.filter-pill--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 4px 20px rgba(155, 93, 229, 0.4);
+}
+
+.portfolio-page .filter-dropdown__menu {
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: calc(100% + 8px);
+  width: min(92vw, 320px);
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.5),
+    var(--glow);
+  z-index: 40;
+  padding: 6px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.portfolio-page .filter-dropdown__item {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.portfolio-page .filter-dropdown__item:hover,
+.portfolio-page .filter-dropdown__item:focus-visible {
+  background: rgba(155, 93, 229, 0.15);
+  color: var(--text-1);
+  outline: none;
+}
+
+.portfolio-page .filter-dropdown__item--active {
+  background: rgba(155, 93, 229, 0.28);
+  color: #fff;
+  font-weight: 600;
+}
+
+.portfolio-page .filter-dropdown__item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portfolio-page .filter-dropdown__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  color: var(--text-2);
+  text-align: right;
+}
+
+.portfolio-page .filter-dropdown__item--active .filter-dropdown__count {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .portfolio-page .filter-bar {
+    position: relative;
+    gap: 8px;
+  }
+
+  .portfolio-page .filter-dropdown {
+    position: static;
+  }
+
+  .portfolio-page .filter-dropdown__menu {
+    left: 0;
+    right: auto;
+    width: min(92vw, 320px);
+  }
+
+  .portfolio-page .filter-dropdown__label {
+    max-width: 140px;
+  }
 }
 
 .portfolio-page .filter-count {
