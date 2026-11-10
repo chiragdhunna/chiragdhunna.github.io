@@ -57,9 +57,22 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleImage = (e) => {
-    const file = e.target.files[0];
+  const getFirstDroppedFile = (e) => {
+    const items = e.dataTransfer?.items;
+    if (items?.length) {
+      for (const item of items) {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file) return file;
+        }
+      }
+    }
+    return e.dataTransfer?.files?.[0] || null;
+  };
+
+  const handleImageFile = (file) => {
     if (!file) return;
+    if (loading) return;
     if (!file.type.startsWith("image/"))
       return setMsgErr("Please select a valid image file");
     if (file.size > 5 * 1024 * 1024)
@@ -72,9 +85,18 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     reader.readAsDataURL(file);
   };
 
-  const handlePdf = (e) => {
-    const file = e.target.files[0];
+  const handleImage = (e) => {
+    handleImageFile(e.target.files[0]);
+  };
+
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    handleImageFile(getFirstDroppedFile(e));
+  };
+
+  const handlePdfFile = (file) => {
     if (!file) return;
+    if (loading) return;
     if (file.type !== "application/pdf")
       return setMsgErr("Please select a valid PDF");
     if (file.size > 10 * 1024 * 1024)
@@ -83,6 +105,15 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     setPdfName(file.name);
     setPdfCleared(false);
     setMsgErr("");
+  };
+
+  const handlePdf = (e) => {
+    handlePdfFile(e.target.files[0]);
+  };
+
+  const handlePdfDrop = (e) => {
+    e.preventDefault();
+    handlePdfFile(getFirstDroppedFile(e));
   };
 
   const clearImage = () => {
@@ -282,7 +313,11 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
                 </span>
               </div>
             ) : (
-              <label className="cf-upload-zone">
+              <label
+                className="cf-upload-zone"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleImageDrop}
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -333,7 +368,11 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
                 </button>
               </div>
             ) : (
-              <label className="cf-upload-zone cf-upload-zone--pdf">
+              <label
+                className="cf-upload-zone cf-upload-zone--pdf"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handlePdfDrop}
+              >
                 <input
                   type="file"
                   accept=".pdf"
