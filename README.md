@@ -1,968 +1,307 @@
-# Chirag Dhunna's Portfolio
+<div align="center">
 
-A modern, responsive personal portfolio website built with React.js with an integrated **Portfolio CMS** for managing certifications and projects without touching code.
+  <img src="./docs/images/banner.svg" alt="Chirag Dhunna Portfolio and CMS Banner" width="100%" />
 
-🌐 **[View Live Portfolio](https://chiragdhunna.github.io)**
+  # Chirag Dhunna Portfolio & CMS
 
-## 📋 Quick Navigation
+  <p>
+    <strong>A high-performance personal portfolio and zero-maintenance headless CMS powered by React 18, Vite, Cloudflare Workers, and GitHub Actions.</strong>
+  </p>
 
-- [Overview](#overview)
-- [🆕 New CMS Features](#-new-cms-features)
-- [Quick Start Guide](#quick-start-guide)
-- [Core Features](#core-features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation & Setup](#installation--setup)
-- [Running the Project](#running-the-project)
-- [CMS Architecture](#cms-architecture)
-- [Data Schemas](#data-schemas)
-- [Security & Authentication](#security--authentication)
-- [Admin Panel Guide](#admin-panel-guide)
-- [Customization](#customization)
-- [Troubleshooting](#troubleshooting)
-- [Component Reference](#component-reference)
-- [License](#license)
+  <p>
+    <a href="https://chiragdhunna.github.io"><img src="https://img.shields.io/badge/Live%20Site-chiragdhunna.github.io-9b5de5?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Site Badge" /></a>
+    <a href="https://github.com/chiragdhunna/chiragdhunna.github.io/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/chiragdhunna/chiragdhunna.github.io/deploy.yml?branch=master&label=Deploy&style=for-the-badge&color=22c55e" alt="Deploy Workflow Status" /></a>
+    <a href="#-testing--quality"><img src="https://img.shields.io/badge/Tests-35%20passed-22c55e?style=for-the-badge&logo=node.js&logoColor=white" alt="Tests Passed Badge" /></a>
+    <img src="https://img.shields.io/badge/React-18.2-61dafb?style=for-the-badge&logo=react&logoColor=black" alt="React 18.2" />
+    <img src="https://img.shields.io/badge/Vite-6.2-646cff?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6.2" />
+    <img src="https://img.shields.io/badge/Cloudflare-Workers-f38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Workers" />
+    <img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-6c757d?style=for-the-badge" alt="License Badge" />
+  </p>
 
----
+  <p>
+    <a href="https://chiragdhunna.github.io"><strong>🚀 Visit Live Site</strong></a> •
+    <a href="https://chiragdhunna.github.io/admin"><strong>🔐 Admin Panel</strong></a> •
+    <a href="./docs/ARCHITECTURE.md"><strong>📐 Architecture Spec</strong></a> •
+    <a href="./docs/ADMIN_GUIDE.md"><strong>📘 Admin Guide</strong></a>
+  </p>
 
-## 🎯 Overview
-
-This portfolio showcases professional work, skills, and accomplishments with a unique feature: an **integrated Content Management System** built entirely on GitHub infrastructure. No external database, backend server, or cloud functions needed.
-
-**Live URL:** https://chiragdhunna.github.io
-
-**Key Innovation:** This portfolio uses **GitHub as a database** with **GitHub Actions workflows** to process CMS events. Edit content via an admin panel, and your changes go live automatically in ~60 seconds.
+</div>
 
 ---
 
-## 🆕 New CMS Features
+A modern, responsive personal developer portfolio engineered for speed and visual clarity, paired with a custom **Git-as-a-Database** Content Management System. The architecture eliminates recurring database subscription costs by leveraging the GitHub repository for JSON and asset persistence, Cloudflare Workers for secure tokenless edge proxying, and automated GitHub Actions workflows to rebuild and deploy changes in approximately 60 seconds.
 
-### What's New in This Version
+## ✨ System Highlights
 
-This portfolio now includes a **complete Content Management System** for zero-code management:
+| Feature | Description |
+| :--- | :--- |
+| **🌌 Single-Page Experience** | Dark space aesthetic with dynamic particle starfield, typewriter role rotation, and interactive GitHub calendar. |
+| **📦 Git-as-a-Database** | Projects, certifications, and resumes persist directly in Git (`public/data/` and `public/assets/`), providing automatic versioning and audit trails. |
+| **🛡️ Edge Worker Proxy** | Production Cloudflare Worker proxies GitHub commits so zero tokens or secrets are exposed in the client browser. |
+| **🔍 Faceted Multi-Filters** | Category and issuer filters combine with AND logic, dynamic category discovery, and live count badges. |
+| **🏷️ Smart Issuer Combobox** | Built-in presets for 18 industry issuers, automatic alias collapsing (e.g. AWS, Azure, GCP), and custom issuer support. |
+| **🔐 Web Crypto JWT Auth** | Client-side HMAC-SHA256 token issuance via native browser crypto with 4-hour `sessionStorage` sessions. |
+| **🖼️ Client-Side Media Pipeline** | Automatic canvas downscaling for images (max 1200px at 85% JPEG) and drag-and-drop file ingestion with page-level drop protection. |
+| **⚡ 60-Second CI/CD** | Automated pipeline executes 35 validation tests and compiles the Vite production bundle upon push to `master`. |
 
-#### 1. Certifications Page (`/certifications`)
+## 🛠️ Technology Stack
 
-- New navigation item between "Projects" and "Resume"
-- Displays certifications with badges, issuer info, and dates
-- One-click access to verification links and PDFs
-- Data sourced from `public/data/certs.json`
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Core** | React 18.2, Vite 6.2, React Router 6.2, React-Bootstrap 5.1 / 2.2, Tabler Icons, React Icons |
+| **Visuals & Effects** | `react-tsparticles`, `typewriter-effect`, `react-parallax-tilt`, `react-github-calendar` |
+| **Documents & Media** | `react-pdf`, `pdfjs-dist`, `@react-pdf/renderer`, HTML5 Canvas Image Resizer |
+| **CMS & Edge** | Cloudflare Workers (TypeScript, Wrangler 3.80), Web Crypto API (`crypto.subtle` HMAC-SHA256) |
+| **CI/CD & Hosting** | GitHub Actions (Node 20 runner), GitHub Pages (`gh-pages` branch) |
+| **Testing** | Node.js native test runner (`node --test`), 35 comprehensive assertions |
 
-#### 2. Admin Control Panel (`/admin`)
-
-- **Password-protected dashboard** at `/admin` route
-- **Lazy-loaded** - never shipped in public bundle
-- **Secure JWT authentication** using Web Crypto API
-- **4-hour sessions** stored in `sessionStorage` (auto-clearing)
-
-#### 3. Certification Upload Form
-
-- Upload badge image (JPG/PNG, auto-resized to 1200px)
-- Optional PDF certificate
-- Credential verification URL
-- Issue date tracking
-- Automatic slug generation
-
-#### 4. CMS Processing (Cloudflare Worker / GitHub API)
-
-- Processing is handled by the Cloudflare Worker in production or the GitHub API in development
-- Validates JWT tokens before any changes
-- Handles file encoding/decoding
-- Updates JSON database (`public/data/*.json`)
-- Triggers deployment (via `deploy.yml`) so changes go live in ~60 seconds
-
-#### 5. Navbar Update
-
-- New "Certifications" link with icon
-- Placed between "Projects" and "Resume"
-- Consistent styling with existing nav
-
----
-
-## 🚀 Quick Start Guide
-
-### ⏱️ 5-Minute Setup
-
-#### Step 1: Create Environment Variables
-
-Create `.env.local` in project root **(never commit)**:
-
-```bash
-VITE_ADMIN_PASSWORD=MySecurePassword123!
-VITE_GITHUB_PAT=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-**Generating GitHub Personal Access Token (PAT):**
-
-1. Go to [GitHub Settings → Personal Access Tokens (Fine-grained)](https://github.com/settings/personal-access-tokens/new)
-2. **Name:** `CMS Token`
-3. **Expiration:** 90 days
-4. **Repository access:** Select only `chiragdhunna.github.io`
-5. **Permissions:**
-   - ✓ Contents: Read and write
-   - ✓ Actions: Read and write
-6. Generate and copy token
-
-#### Step 2: Add GitHub Secrets
-
-In repository **Settings → Secrets and variables → Actions:**
-
-- **Name:** `ADMIN_SECRET`
-- **Value:** Same password as `VITE_ADMIN_PASSWORD`
-
-#### Step 3: Test
-
-```bash
-npm run dev
-# Visit http://localhost:5173/admin
-# Enter your password
-```
-
-### 📝 Using the Admin Panel
-
-**To Add a Certification:**
-
-1. Navigate to `/admin`
-2. Enter admin password
-3. Fill form:
-   - Certification Name (e.g., "AWS Certified AI Practitioner")
-   - Issuer (e.g., "Amazon Web Services")
-   - Issue Date (date picker)
-   - Credential URL (optional)
-   - Image file (JPG/PNG, max 5MB)
-   - PDF file (optional, max 10MB)
-4. Click "Add Certification"
-5. Wait ~60 seconds for site to update
-
-**Behind the Scenes:**
-
-1. ✅ Admin UI validates input
-2. 🖼️ Converts image to base64, resizes to 1200px
-3. 📄 Converts PDF to base64
-4. 🔐 Issues JWT token (HMAC-SHA256)
-5. 🚀 Sends GitHub Actions event
-6. ⚙️ Workflow validates JWT, saves files
-7. 📊 Updates `certs.json` with new entry
-8. 🔄 Triggers deploy workflow
-9. ✨ Site live in ~60 seconds
-
----
-
-## ✨ Core Features
-
-### Portfolio Features
-
-- **Responsive Design** - Desktop, tablet, mobile optimized
-- **Smooth Animations** - Particle effects, parallax, typewriter text
-- **Multi-page Navigation** - Home, About, Projects, Certifications, Resume
-- **Interactive Elements** - Hover effects, smooth scrolling
-- **GitHub Integration** - Activity calendar
-- **Tech Stack Showcase** - Visual skills display
-- **Dark Theme** - Professional dark mode
-- **Resume PDF** - The resume PDF is stored locally in `public/resume/Chirag_Dhunna.pdf`
-
-### CMS Features (New)
-
-- **Certification Management** - Add/manage without coding
-- **Admin Dashboard** - Password-protected panel
-- **JWT Security** - Web Crypto API authentication
-- **File Uploads** - Browser-based image/PDF upload
-- **GitHub Database** - JSON files in repository
-- **Auto Deploy** - Changes go live automatically
-- **Zero External Dependencies** - GitHub-only solution
-- **Secure Sessions** - 4-hour expiring tokens
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **React** 18.2.0 - UI framework
-- **React Router** 6.2.2 - Client-side routing
-- **Vite** 6.2.2 - Build tool
-- **Bootstrap** 5.1.3 - CSS framework
-- **React Bootstrap** 2.2.1 - Bootstrap components
-
-### CMS Tech (New)
-
-- **Web Crypto API** - JWT signing (no dependencies)
-- **HMAC-SHA256** - Token signing
-- **Base64 Encoding** - Secure file transmission
-- **GitHub Actions** - Workflow automation
-- **Python 3.11** - Workflow processing
-
-### Libraries
-
-- **react-tsparticles** - Particle animations
-- **react-parallax-tilt** - 3D tilt effects
-- **typewriter-effect** - Text animation
-- **react-icons** - Icon library
-- **react-pdf** - PDF viewing
-- **axios** - HTTP client
-
-### Build & Deployment
-
-- **gh-pages** - GitHub Pages deployment
-
----
-
-## 📁 Project Structure
-
-```
-chiragdhunna.github.io/
-├── .github/workflows/
-│   └── deploy.yml                 # Deploy to GitHub Pages
-├── public/
-│   ├── resume/Chirag_Dhunna.pdf  # Resume PDF (stored in public/resume/)
-│   ├── data/                      # 🆕 JSON databases
-│   │   ├── certs.json            # Certifications
-│   │   └── projects.json         # Projects
-│   ├── assets/
-│   │   └── certs/                # 🆕 Cert images & PDFs
-│   ├── _redirects
-│   ├── manifest.json
-│   └── robots.txt
-├── src/
-│   ├── components/
-│   │   ├── Navbar.jsx            # Updated with Certifications
-│   │   ├── Footer.jsx
-│   │   ├── Particle.jsx
-│   │   ├── Pre.jsx
-│   │   ├── ScrollToTop.jsx
-│   │   ├── Home/
-│   │   ├── About/
-│   │   ├── Projects/
-│   │   ├── Certifications/       # 🆕 New section
-│   │   │   ├── Certifications.jsx
-│   │   │   └── CertCard.jsx
-│   │   ├── Admin/                # 🆕 Admin UI (lazy-loaded)
-│   │   │   ├── AdminApp.jsx
-│   │   │   ├── AdminLogin.jsx
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── CertForm.jsx
-│   │   │   ├── ProjectForm.jsx
-│   │   │   ├── auth.js           # JWT utilities
-│   │   │   ├── githubApi.js      # GitHub integration
-│   │   │   ├── AdminLogin.css
-│   │   │   ├── AdminDashboard.css
-│   │   │   ├── CertForm.css
-│   │   │   ├── ProjectForm.css
-│   │   │   └── README.md
-│   │   └── Resume/
-│   ├── App.jsx                   # Updated with /admin route
-│   ├── App.css
-│   ├── style.css
-│   ├── index.jsx
-│   └── ...
-├── .env.local                    # 🆕 Environment variables (not committed)
-├── .env.example                  # 🆕 Template for env vars
-├── .gitignore
-├── CMS_SETUP.md                  # 🆕 CMS quick start
-├── README.md                     # This file
-├── package.json
-├── vite.config.js
-└── index.html
-```
-
----
-
-## 📋 Installation & Setup
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- **Node.js** v14.0.0+ - [Download](https://nodejs.org/)
-- **npm** v6.0.0+ - Comes with Node.js
-- **Git** - For version control
-
-### Verify Installation
+- **Node.js**: `v20.x` or higher (matching the GitHub Actions runtime)
+- **npm**: `v9.x` or higher
 
 ```bash
-node --version
-npm --version
-git --version
-```
-
-### Clone & Install
-
-```bash
-# Clone repository
+# 1. Clone repository
 git clone https://github.com/chiragdhunna/chiragdhunna.github.io.git
 cd chiragdhunna.github.io
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Setup environment variables
+# 3. Configure local environment variables
 cp .env.example .env.local
-# Edit .env.local with your values
-```
+# Set your local VITE_ADMIN_PASSWORD and optional VITE_GITHUB_PAT in .env.local
 
----
-
-## 🏃 Running the Project
-
-### Development Server
-
-```bash
+# 4. Start local development server (served over HTTPS on port 3000)
 npm run dev
 ```
 
-- Starts at `http://localhost:5173`
-- Hot Module Replacement (HMR) enabled
-- Dev-friendly error messages
+> [!NOTE]
+> The development server uses `@vitejs/plugin-basic-ssl` to serve over HTTPS at `https://localhost:3000`. HTTPS is required so the browser enables `crypto.subtle` for JWT authentication. Accept the self-signed certificate in your browser.
 
-**Test Admin Panel:**
+### Available Scripts
 
-- Navigate to `http://localhost:5173/admin`
-- Enter password from `.env.local`
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Starts Vite dev server over HTTPS on `https://localhost:3000` |
+| `npm test` | Runs all 35 unit and integration tests via `node --test` |
+| `npm run build` | Builds production bundle into `dist/` and copies `index.html` to `404.html` |
+| `npm run preview` | Previews the production build locally |
+| `npm run deploy` | Deploys `dist/` directory to GitHub Pages via `gh-pages` |
+| `npm run deploy-worker` | Deploys the Cloudflare Edge Worker via `wrangler` |
 
-### Preview Production Build
+## 🏛️ System Architecture
 
-```bash
-npm run preview
+The CMS decouples content editing from site delivery through a Git-backed workflow:
+
+```mermaid
+flowchart TD
+    subgraph Client["Browser Client"]
+        Visitor["Public Visitor<br/>(chiragdhunna.github.io)"]
+        Admin["Admin User<br/>(/admin)"]
+    end
+
+    subgraph Security["Edge & Authentication"]
+        Worker["Cloudflare Edge Worker<br/>(portfolio-cms-worker)"]
+        Auth["Web Crypto API<br/>(HMAC-SHA256 JWT, 4h)"]
+    end
+
+    subgraph Backend["GitHub Platform (Storage & CI/CD)"]
+        Repo["Git Repository (master branch)<br/>· public/data/*.json<br/>· public/assets/**"]
+        Actions["GitHub Actions Runner<br/>(deploy.yml workflow)"]
+        Pages["GitHub Pages CDN<br/>(gh-pages branch)"]
+    end
+
+    Visitor -->|"1. Reads static bundle & JSON data"| Pages
+    Admin -->|"2. Authenticates via password"| Auth
+    Admin -->|"3. Uploads / updates content"| Worker
+    Worker -->|"4. Commits changes via GitHub API"| Repo
+    Repo -->|"5. Triggers deploy workflow"| Actions
+    Actions -->|"6. Runs test suite & builds bundle"| Actions
+    Actions -->|"7. Publishes build artifacts"| Pages
+    Pages -.->|"8. Updated content live in ~60s"| Visitor
+
+    style Client fill:#140628,stroke:#9b5de5,stroke-width:2px,color:#f3e8ff
+    style Security fill:#1b0b33,stroke:#c084fc,stroke-width:2px,color:#f3e8ff
+    style Backend fill:#0a0314,stroke:#7209b7,stroke-width:2px,color:#f3e8ff
 ```
 
-- Builds and serves locally
-- Shows production-like behavior
+For complete architecture details, read the [Architecture Specification](./docs/ARCHITECTURE.md).
 
-### Build for Production
+## 🎛️ Admin CMS Overview
 
-```bash
-npm run build
-```
+The admin interface is accessible at `/admin` and operates without external database servers:
 
-- Creates optimized `dist/` folder
-- Minified JavaScript and CSS
-- Ready for deployment
+- **Projects Management**: Add, update, and remove projects. Features include slug generation, multi-select category pills, custom category creation, client-side image resizing (< 1200px), and URL validation.
+- **Certifications Management**: Add and manage credentials. Includes a Smart Issuer Picker with 18 defaults and alias collapsing, issue date selectors, image uploads, and drag-and-drop PDF ingestion.
+- **Resume Management**: Upload and replace `public/resume/Chirag_Dhunna.pdf` with live PDF preview and page-level drop protection.
+- **Production Edge Security**: In production, the Cloudflare Worker receives authenticated requests, injects the server-side GitHub PAT, and commits directly to `master`.
 
-### Deploy to GitHub Pages
+For setup steps and worker deployment instructions, consult the [Admin CMS Guide](./docs/ADMIN_GUIDE.md), [CMS Setup Guide](./CMS_SETUP.md), and [Cloudflare Worker Setup](./CLOUDFLARE_SETUP.md).
 
-```bash
-npm run deploy
-```
+## 📊 Data Schemas
 
-- Runs build automatically
-- Deploys `dist/` to `gh-pages` branch
-- Live at https://chiragdhunna.github.io
+All dynamic content is stored as clean JSON in the repository:
 
----
-
-## 📊 CMS Architecture
-
-### System Overview
-
-```
-Browser Admin Panel          GitHub Repository       Worker / GitHub API
-   ↓                              ↓                        ↓
-1. User fills form           .env.local (dev)    Worker (prod) or API (dev)
-2. Issues JWT token          .env.example
-3. Converts to base64        certs.json          Step 1: Validate token
-4. Sends to worker/API       assets/certs/       Step 2: Decode files
-5. Waits for update          ...                 Step 3: Create slug
-                                     Step 4: Save assets
-                                     Step 5: Update JSON
-                                     Step 6: Git commit & push
-                                     Step 7: Trigger deploy
-                                          ↓
-                                     Site rebuilds & goes live
-                                     ✅ Changes visible (~60s)
-```
-
-### Data Flow: Detailed
-
-1. **Admin Submission** - User fills form at `/admin`
-2. **Client Processing** - Image resized, files encoded to base64
-3. **Token Generation** - JWT created using HMAC-SHA256
-4. **Upload** - In production the Cloudflare Worker receives the payload; in development the client may call GitHub's `repository_dispatch`.
-5. **Processing** - Worker/API validates JWT, decodes files, and writes assets and JSON to the repo
-6. **Git Operations** - Changes are committed and pushed to the repository
-7. **Deploy Trigger** - `deploy.yml` workflow starts on push
-8. **Site Rebuild** - React app built with new data
-9. **Live Update** - Changes visible on site
-
-### CMS Processing (Worker / API)
-
-**Events Handled (examples):**
-
-- `add-cert` - Add certification
-- `update-cert` - Update certification (extensible)
-- `delete-cert` - Delete certification (extensible)
-- `add-project` - Add project (extensible)
-- `update-project` - Update project (extensible)
-- `delete-project` - Delete project (extensible)
-
-**Security Checks:**
-
-1. ✅ Validates JWT signature with `ADMIN_SECRET` (worker/API)
-2. ✅ Checks file MIME types (JPG/PNG for images, PDF for docs)
-3. ✅ Enforces file size limits (5MB images, 10MB PDFs)
-4. ✅ Sanitizes filenames (removes special characters)
-5. ✅ Never processes if validation fails
-
-**Operations (performed by worker/API):**
-
-1. Validate JWT
-2. Decode base64 files
-3. Save assets to `public/assets/` and update `public/data/*.json`
-4. Commit changes and push to the repository
-5. Trigger `deploy.yml` (push-based) to rebuild the site
-
----
-
-## 📋 Data Schemas
-
-### Certification Entry
+<details>
+<summary><strong>View <code>public/data/projects.json</code> Schema</strong></summary>
 
 ```json
-{
-  "id": "cert_aws",
-  "slug": "aws-certified-ai-practitioner",
-  "name": "AWS Certified AI Practitioner",
-  "issuer": "Amazon Web Services",
-  "categories": ["Cloud", "AI"],
-  "imageUrl": "/assets/certs/aws-certified-ai-practitioner.jpg",
-  "pdfUrl": "/assets/certs/aws-certified-ai-practitioner.pdf",
-  "credentialUrl": "https://aws.amazon.com/credentials",
-  "issueDate": "2026-05-17T00:00:00Z",
-  "createdAt": "2026-05-18T10:30:00Z"
-}
+[
+  {
+    "slug": "chat-go",
+    "name": "Chat Go",
+    "categories": [
+      "Web",
+      "Full Stack"
+    ],
+    "imageUrl": "/assets/projects/chat-go-logo.jpeg",
+    "description": "Chat GO is a modern real-time chat application built with React Vite and Node.js.",
+    "ghLink": "https://github.com/chiragdhunna/chat_go",
+    "demoLink": "https://chat-go-taupe.vercel.app/"
+  }
+]
 ```
+</details>
 
-**Fields:**
-
-- `id` - Unique identifier (auto-generated)
-- `slug` - URL-friendly kebab-case (auto-generated from name)
-- `name` - Certification title
-- `issuer` - Organization that issued it
-- `categories` - Optional classification tags used by the public filter bar
-- `imageUrl` - Path to badge image (JPG/PNG)
-- `pdfUrl` - Path to certificate PDF (optional)
-- `credentialUrl` - URL to verify on issuer's site (optional)
-- `issueDate` - ISO 8601 date earned
-- `createdAt` - ISO 8601 timestamp added to portfolio
-
-### Project Entry (Extensible)
+<details>
+<summary><strong>View <code>public/data/certs.json</code> Schema</strong></summary>
 
 ```json
-{
-  "id": "proj_myproject",
-  "slug": "my-awesome-project",
-  "name": "My Awesome Project",
-  "description": "Brief description",
-  "categories": ["Web", "Full Stack"],
-  "imageUrl": "/assets/projects/my-awesome-project.jpg",
-  "ghLink": "https://github.com/username/repo",
-  "demoLink": "https://demo.example.com",
-  "createdAt": "2026-05-18T00:00:00Z"
-}
+[
+  {
+    "id": "azure-ai-engineer-associate",
+    "slug": "azure-ai-engineer-associate",
+    "name": "Azure AI Engineer Associate",
+    "issuer": "Microsoft",
+    "issueDate": null,
+    "imageUrl": "/assets/certs/azure-ai-engineer-associate.jpg",
+    "pdfUrl": "/assets/certs/azure-ai-engineer-associate.pdf",
+    "credentialUrl": null,
+    "createdAt": "2026-05-21T08:28:27.528Z",
+    "categories": [
+      "Cloud",
+      "AI"
+    ]
+  }
+]
 ```
+</details>
 
----
+For field rules and alias dictionaries, see the [Data Schemas Guide](./docs/DATA_SCHEMAS.md).
 
-## 🔐 Security & Authentication
+## 🔍 Public Filtering Engine
 
-### JWT Authentication
+The portfolio includes dynamic filtering systems across projects and certifications:
 
-**How It Works:**
+- **Dynamic Categories** ([`src/utils/categories.js`](file:///home/chiragdhunna/Desktop/docs/github_projects/chiragdhunna.github.io/src/utils/categories.js)): Default category pills (`All`, `Web`, `Mobile`, `Full Stack`, `Backend`) are augmented at runtime with any custom categories extracted from `projects.json` and `certs.json`.
+- **Faceted AND Certification Filters** ([`src/utils/issuers.js`](file:///home/chiragdhunna/Desktop/docs/github_projects/chiragdhunna.github.io/src/utils/issuers.js)): Users can filter credentials by both category and issuing organization simultaneously. Issuer counts reflect selected categories and vice versa without zero-result states.
+- **Alias Collapsing**: Submissions mentioning `AWS`, `Amazon`, or `Amazon Web Services` canonicalize to `AWS`; `Azure` collapses to `Microsoft`; `GCP` collapses to `Google Cloud`.
 
-1. User enters password
-2. Client creates JWT using Web Crypto API
-3. Token = Header.Payload.Signature (all base64url encoded)
-4. Signature = HMAC-SHA256(Header.Payload, password)
-5. Stored in `sessionStorage` with 4-hour expiry
-6. Sent with every API call
-7. Workflow validates signature before processing
-
-**Token Expiration:**
-
-- Valid for 4 hours from issue time
-- Auto-cleared when tab/browser closes
-- Can manually logout anytime
-
-### Password Security
-
-**Create Strong Password:**
-
-- ✅ 12+ characters
-- ✅ Mix of uppercase, lowercase, numbers, symbols
-- ✅ Example: `Tr0p!cal_Sun$et2026`
-
-**Storage:**
-
-- `.env.local` - Development (never commit)
-- GitHub Secret `ADMIN_SECRET` - Production (encrypted)
-- Never in source code
-
-### GitHub PAT Security
-
-**Use Fine-Grained Tokens:**
-
-- Scoped to single repository
-- Limited to required permissions only
-- Set 90-day expiration
-- Rotate regularly
-
-**Required Permissions:**
-
-- ✓ Contents: Read and write
-- ✓ Actions: Read and write
-- ✗ No admin access needed
-
-**If Compromised:**
-
-1. Revoke immediately in GitHub Settings
-2. Create new token
-3. Update `.env.local` and GitHub Secrets
-4. No redeploy needed (workflow uses Secrets)
-
-### Workflow Security
-
-**JWT Validation Process:**
-
-1. Extract JWT from payload
-2. Split into 3 parts: header.payload.signature
-3. Recreate signature using `ADMIN_SECRET`
-4. Compare with provided signature
-5. If mismatch: job fails, nothing changes
-
-**File Validation:**
-
-1. Check MIME types (JPG/PNG for images, PDF for docs)
-2. Check file sizes (5MB images, 10MB PDFs)
-3. Sanitize filenames
-4. Validate JSON before writing
-
-**No External Calls:**
-
-- Everything processed in workflow
-- No third-party services
-- No tracking or analytics
-
----
-
-## 👥 Admin Panel Guide
-
-### AdminApp Component
-
-**Purpose:** Main admin container
-
-**Behavior:**
-
-1. On load: Checks for valid token in `sessionStorage`
-2. If valid: Shows AdminDashboard
-3. If not: Shows AdminLogin
-4. Handles logout and routing
-
-**Lazy Loading:**
-
-- Component loaded via `React.lazy()` in `App.jsx`
-- Only fetched when visiting `/admin`
-- Never in main production bundle
-
-### AdminLogin Component
-
-**Features:**
-
-- Fullscreen centered form
-- No navbar or particles
-- Show/hide password toggle
-- "Back to Portfolio" button
-- Error messages
-- Loading state
-
-**Process:**
-
-1. Enter password
-2. Click "Login" or press Enter
-3. JWT token created
-4. Redirect to dashboard
-
-### AdminDashboard Component
-
-**Layout:**
-
-- Tab interface (Certifications | Projects)
-- User greeting
-- Logout button (top-right)
-- Responsive design
-- Dark theme matching portfolio
-
-### CertForm Component
-
-**Form Fields:**
-
-1. **Certification Name** (required)
-   - Used to generate slug
-   - Example: "AWS Certified AI Practitioner"
-
-2. **Issuer** (required)
-   - Organization name
-   - Example: "Amazon Web Services"
-
-3. **Issue Date** (required)
-   - Date picker
-   - Used for sorting/display
-
-4. **Credential URL** (optional)
-   - Link to verify credential
-   - Opens in new tab from cert card
-
-5. **Certificate Image** (required)
-   - JPG/PNG only
-   - Max 5MB (auto-resized to 1200px)
-   - Converted to base64 before sending
-
-6. **Certificate PDF** (optional)
-   - PDF only
-   - Max 10MB
-   - Converted to base64 before sending
-
-**Submission Flow:**
-
-1. Validate all required fields
-2. Check file sizes
-3. Verify file types
-4. Resize image to 1200px max
-5. Convert to base64
-6. Get JWT token
-7. Prepare payload
-8. Send to GitHub
-9. Show loading state
-10. Display result message
-
-**Success Message:**
+## 📁 Repository Structure
 
 ```
-✅ Certification submitted!
-   The live site will update in ~60 seconds.
-   Hard refresh to see changes.
+chiragdhunna.github.io/
+├── .github/workflows/deploy.yml   # CI/CD: runs tests, builds Vite app, deploys to gh-pages
+├── docs/                          # Architecture guides, schemas, and media assets
+│   ├── images/banner.svg          # Hero banner SVG
+│   ├── ADMIN_GUIDE.md             # Operations guide for the /admin dashboard
+│   ├── ARCHITECTURE.md            # System architecture and data flow documentation
+│   ├── COMPONENT_REFERENCE.md     # Code tree and component inventory
+│   ├── DATA_SCHEMAS.md            # JSON schema specifications and filter rules
+│   └── TROUBLESHOOTING.md         # Diagnostic steps for common issues
+├── public/                        # Static assets served at root
+│   ├── assets/                    # Project logos, certificate thumbnails, and avatar
+│   ├── data/                      # projects.json and certs.json databases
+│   └── resume/Chirag_Dhunna.pdf   # Active resume document
+├── src/                           # React frontend source code
+│   ├── components/
+│   │   ├── Admin/                 # Admin CMS (dashboard, login, forms, Web Crypto auth)
+│   │   ├── Certifications/        # Credentials views and certification cards
+│   │   ├── Portfolio/             # Single-page portfolio homepage (sections 01-06)
+│   │   ├── Projects/              # Projects showcase and modal cards
+│   │   ├── Resume/                # PDF reader and download controls
+│   │   └── common/                # Shared category and issuer dropdown pickers
+│   ├── tests/                     # 35 Node.js test runner suites
+│   ├── utils/                     # Category and issuer normalization engines
+│   └── App.jsx                    # Application router and layout controller
+└── workers/index.ts               # Cloudflare Edge Worker TypeScript source
 ```
 
-### Authentication Utilities
+For component details, see the [Component Reference](./docs/COMPONENT_REFERENCE.md).
 
-**Key Functions in `auth.js`:**
+## 🧪 Testing & Quality
 
-```javascript
-issueToken(password); // Create JWT (4-hour valid)
-getStoredToken(); // Get token from sessionStorage
-verifyToken(token); // Check if token expired
-clearToken(); // Remove token (logout)
-```
-
-### GitHub Integration
-
-**Key Function in `githubApi.js`:**
-
-```javascript
-dispatchCmsEvent(eventType, payload, token);
-// Sends repository_dispatch event to trigger workflow
-```
-
-**Handles:**
-
-- Authentication headers
-- JWT in payload
-- GitHub REST API call
-- Error handling
-
----
-
-## ✏️ Customization
-
-### Add Certifications (No Coding)
-
-1. Visit `/admin`
-2. Login with password
-3. Fill form and submit
-4. Wait ~60 seconds
-5. New certification appears on site
-
-### Add Certifications (Manual)
-
-Edit `public/data/certs.json` and add entry with schema from [Data Schemas](#data-schemas).
-
-### Update Home Section
-
-Edit [src/components/Home/Home.jsx](src/components/Home/Home.jsx):
-
-- Introduction text
-- Social links
-- Tagline
-
-### Update About Section
-
-Edit [src/components/About/About.jsx](src/components/About/About.jsx):
-
-- Bio
-- Skills
-- Tools
-
-### Update Projects
-
-Edit [src/components/Projects/Projects.jsx](src/components/Projects/Projects.jsx) or add via admin (future feature).
-
-### Update Resume
-
-The resume PDF is stored locally in the repository at `public/resume/Chirag_Dhunna.pdf`.
-To update the resume, replace that file and push changes; the site will rebuild via the normal deploy workflow.
-
-### Style Customization
-
-**CSS Files:**
-
-- [src/style.css](src/style.css) - Global styles
-- [src/App.css](src/App.css) - App styles
-- `src/components/Admin/*.css` - Admin styles
-
-**Theme Colors:**
-
-- Dark background: `#0d1117`
-- Card background: `#161b22`
-- Text: `#c9d1d9`
-- Purple accent: `#c770f0`
-
-Modify CSS variables to customize globally.
-
-### Add New Features
-
-**For Project Management:**
-
-1. Enhance `ProjectForm.jsx`
-2. Add to AdminDashboard tabs
-3. Handle events: `add-project`, `update-project`, `delete-project`
-4. Update server-side processing (Cloudflare Worker or GitHub workflow)
-
-**For Other Content:**
-
-1. Create `public/data/<content>.json`
-2. Create display React component
-3. Create form in `Admin/`
-4. Add to dashboard
-5. Update workflow
-6. Add route in `App.jsx`
-
----
-
-## 🐛 Troubleshooting
-
-### Setup Issues
-
-#### "Admin password not configured"
-
-**Solution:**
-
-1. Create `.env.local` in project root
-2. Add: `VITE_ADMIN_PASSWORD=your_password_here`
-3. Restart dev server: `npm run dev`
-
-#### "GitHub API error: 401"
-
-**Solution:**
-
-1. Check `.env.local` has `VITE_GITHUB_PAT`
-2. Verify token not expired
-3. Check permissions: Contents + Actions
-4. Create new token if needed
-5. Update `.env.local` and GitHub Secrets
-
-#### "JWT validation failed"
-
-**Problem:** `ADMIN_SECRET` doesn't match password
-
-**Solution:**
-
-1. Go to GitHub repo Settings → Secrets
-2. Edit `ADMIN_SECRET`
-3. Ensure **exactly matches** `.env.local` password
-4. Try again
-
-### CMS Issues
-
-#### "Changes not appearing"
-
-**Checklist:**
-
-1. Wait 60+ seconds
-2. Check Cloudflare Worker logs (production) or GitHub Actions → latest run (development)
-3. Verify the worker/API processing completed successfully
-4. Verify `deploy.yml` also ran (or was triggered by the processing)
-5. Hard refresh: `Ctrl+Shift+R`
-6. Check browser console for errors
-
-#### "Image too large"
-
-**Limits:**
-
-- Max 5MB
-- Auto-resized to 1200px width
-
-**Solution:**
-
-1. Compress image
-2. Retry upload
-
-#### "Failed to validate MIME type"
-
-**Accepted:**
-
-- Images: JPG, PNG only
-- PDFs: PDF only
-
-**Solution:**
-
-1. Convert to supported format
-2. Retry upload
-
-#### "Can't login to admin panel"
-
-**Debugging:**
-
-1. Check password spelling
-2. Verify `.env.local` configured
-3. Clear `sessionStorage`: F12 → Console → `sessionStorage.clear()`
-4. Refresh page
-
-#### "Admin panel not loading"
-
-**Solution:**
-
-1. Open DevTools (F12)
-2. Check Console for errors
-3. Check Network tab for failures
-4. Hard refresh: `Ctrl+Shift+R`
-5. Try incognito mode
-
-#### "Workflow runs but no changes"
-
-**Problem:** Workflow succeeded but `deploy.yml` didn't run
-
-**Solution:**
-
-1. Check GitHub Actions → `deploy.yml`
-2. Verify it was triggered by the worker/API push or other commit
-3. If not: check Actions enabled in Settings
-4. Verify `deploy.yml` has `on: push` trigger
-
-#### "Token expired"
-
-**Expected:** 4-hour expiration
-
-**Solution:**
-
-1. Logout from admin
-2. Login again
-3. New token created
-
-#### "Can't find certs.json"
-
-**Solution:**
-
-1. Check `public/data/certs.json` exists
-2. If missing: create with `[]`
-3. Hard refresh browser
-4. Check browser Network tab
-
-#### "Certifications page empty"
-
-**Troubleshooting:**
-
-1. Upload test certification
-2. Wait 60 seconds
-3. Hard refresh: `Ctrl+Shift+R`
-4. Check browser DevTools Network tab
-
-### Build Issues
-
-#### Build fails locally
+The codebase enforces strict test coverage using Node.js's native test runner (`node:test`):
 
 ```bash
-# Clean and reinstall
-rm -rf node_modules package-lock.json
-npm install
-npm run build
+npm test
 ```
 
-#### Port 5173 already in use
+The test suite validates:
+- **Admin Utilities**: Slug generation, category toggling, URL validation, and form state transitions.
+- **File Validation**: Image MIME/size checks (< 5 MB), PDF validation (< 10 MB), and drag-and-drop helpers.
+- **Authentication**: JWT token signing, expiry verification, and malformed token rejection.
+- **Category & Issuer Engines**: Case-insensitive matching, alias canonicalization, and faceted AND query counts.
+- **Component Wiring**: Correct helper imports and prop passing across `Portfolio.jsx` and `Certifications.jsx`.
 
-```bash
-npm run dev -- --port 3001
-```
+## ⚙️ Environment Variables
 
----
+Copy `.env.example` to `.env.local` for local execution. Never commit `.env.local`.
 
-## 📚 Component Reference
+| Variable Name | Environment | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `VITE_ADMIN_PASSWORD` | Local (`.env.local`) | Yes (for `/admin`) | Password used to authenticate into the local admin dashboard |
+| `VITE_GITHUB_PAT` | Local (`.env.local`) | Optional | GitHub Personal Access Token for direct API commits during local dev |
+| `ADMIN_SECRET` | Production (Worker / Actions) | Yes | Secret matched during production authentication and build workflows |
+| `GITHUB_PAT` | Production (Cloudflare Worker) | Yes | Scoped PAT (`contents:write`, `actions:write`) held securely by the Worker |
+| `GITHUB_OWNER` | Production (`wrangler.toml`) | Yes | Repository owner username (`chiragdhunna`) |
+| `GITHUB_REPO` | Production (`wrangler.toml`) | Yes | Repository name (`chiragdhunna.github.io`) |
 
-### Page Sections
+## 🔧 Troubleshooting
 
-**Home** (`src/components/Home/`)
+<details>
+<summary><strong>Browser warns "Your connection is not private" (SSL Warning)</strong></summary>
 
-- Home.jsx, Home2.jsx, Type.jsx
+Vite runs with `@vitejs/plugin-basic-ssl` to enable HTTPS on `https://localhost:3000`. This is required for `window.crypto.subtle` to function in a secure context. Click **Advanced** → **Proceed to localhost (unsafe)** in your browser.
+</details>
 
-**About** (`src/components/About/`)
+<details>
+<summary><strong>Admin panel displays 401 Unauthorized</strong></summary>
 
-- About.jsx, AboutCard.jsx, Techstack.jsx, Toolstack.jsx, Github.jsx
+Verify that `VITE_ADMIN_PASSWORD` is defined in `.env.local` for local development, or that `ADMIN_SECRET` is configured in your Cloudflare Worker and GitHub repository secrets.
+</details>
 
-**Projects** (`src/components/Projects/`)
+<details>
+<summary><strong>GitHub API returns 409 Conflict</strong></summary>
 
-- Projects.jsx, ProjectCards.jsx
+A conflict occurs if the remote JSON file was updated concurrently. Refresh the `/admin` page to reload the newest Git commit SHA before submitting your changes.
+</details>
 
-**Certifications** (`src/components/Certifications/`)
+<details>
+<summary><strong>Uploaded changes do not appear immediately on live site</strong></summary>
 
-- Certifications.jsx, CertCard.jsx
+GitHub Actions requires ~60 seconds to execute tests, compile the bundle, and deploy to `gh-pages`. In addition, GitHub Pages CDN may cache static JSON responses; perform a hard refresh (`Ctrl + Shift + R`).
+</details>
 
-**Admin** (`src/components/Admin/`)
+<details>
+<summary><strong>Port 3000 is already in use</strong></summary>
 
-- AdminApp.jsx, AdminLogin.jsx, AdminDashboard.jsx, CertForm.jsx, ProjectForm.jsx
-- auth.js, githubApi.js
+Start Vite on a different port using `npx vite --port 3001` or terminate the existing process with `lsof -i :3000`.
+</details>
 
-**Resume** (`src/components/Resume/`)
+For additional solutions, see the complete [Troubleshooting Guide](./docs/TROUBLESHOOTING.md).
 
-- ResumeNew.jsx
+## 📄 License & Ownership
 
-### Layout Components
+- **Author**: [Chirag Dhunna](https://github.com/chiragdhunna)
+- **License**: All rights reserved. This repository contains personal portfolio code and content; unauthorized redistribution is prohibited.
 
-- **Navbar.jsx** - Navigation (updated with Certifications)
-- **Footer.jsx** - Footer
-- **Pre.jsx** - Preloader
-- **Particle.jsx** - Particle background
-- **ScrollToTop.jsx** - Scroll button
+## 📬 Contact & Connect
 
----
-
-## 🔄 Resume
-
-The resume PDF is stored locally in the repository at `public/resume/Chirag_Dhunna.pdf`.
-To update the resume, replace that file and push changes; the site will rebuild via the normal deploy workflow.
-
----
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Feel free to fork and submit pull requests.
-
----
-
-## 📧 Contact & Links
-
-- **GitHub:** [chiragdhunna](https://github.com/chiragdhunna)
-- **Portfolio:** [chiragdhunna.github.io](https://chiragdhunna.github.io)
-
----
-
-## 📚 Reference Documents
-
-- **[CMS_SETUP.md](CMS_SETUP.md)** - Quick CMS setup guide
-- **[src/components/Admin/README.md](src/components/Admin/README.md)** - Admin component docs
-
----
-
-**Last Updated:** May 21, 2026  
-**Status:** CMS complete and functional  
-**Next Steps:** Project management via CMS (extensible architecture ready)
+- **Portfolio**: [chiragdhunna.github.io](https://chiragdhunna.github.io)
+- **GitHub**: [@chiragdhunna](https://github.com/chiragdhunna)
+- **LinkedIn**: [in/chiragdhunna](https://www.linkedin.com/in/chiragdhunna/)
+- **Twitter / X**: [@ChiragDhunna](https://x.com/ChiragDhunna)
+- **Email**: [chiragdhunna2468@gmail.com](mailto:chiragdhunna2468@gmail.com)
