@@ -420,6 +420,7 @@ Browser Admin Panel          GitHub Repository       Worker / GitHub API
   "slug": "aws-certified-ai-practitioner",
   "name": "AWS Certified AI Practitioner",
   "issuer": "Amazon Web Services",
+  "categories": ["Cloud", "AI"],
   "imageUrl": "/assets/certs/aws-certified-ai-practitioner.jpg",
   "pdfUrl": "/assets/certs/aws-certified-ai-practitioner.pdf",
   "credentialUrl": "https://aws.amazon.com/credentials",
@@ -434,6 +435,7 @@ Browser Admin Panel          GitHub Repository       Worker / GitHub API
 - `slug` - URL-friendly kebab-case (auto-generated from name)
 - `name` - Certification title
 - `issuer` - Organization that issued it
+- `categories` - Optional classification tags used by the public filter bar
 - `imageUrl` - Path to badge image (JPG/PNG)
 - `pdfUrl` - Path to certificate PDF (optional)
 - `credentialUrl` - URL to verify on issuer's site (optional)
@@ -448,10 +450,10 @@ Browser Admin Panel          GitHub Repository       Worker / GitHub API
   "slug": "my-awesome-project",
   "name": "My Awesome Project",
   "description": "Brief description",
+  "categories": ["Web", "Full Stack"],
   "imageUrl": "/assets/projects/my-awesome-project.jpg",
-  "projectUrl": "https://github.com/username/repo",
-  "demoUrl": "https://demo.example.com",
-  "tags": ["React", "Node.js"],
+  "ghLink": "https://github.com/username/repo",
+  "demoLink": "https://demo.example.com",
   "createdAt": "2026-05-18T00:00:00Z"
 }
 ```

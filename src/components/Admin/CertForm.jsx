@@ -10,6 +10,18 @@ function generateSlug(name) {
     .replace(/^-+|-+$/g, "");
 }
 
+const CERT_CATEGORY_OPTIONS = [
+  "Cloud",
+  "AI",
+  "Security",
+  "Development",
+  "Data",
+];
+
+function normalizeCategory(category) {
+  return category.trim().toLowerCase();
+}
+
 function CertForm({ editCert, onSuccess, onCancelEdit }) {
   const isEditMode = !!editCert;
 
@@ -18,6 +30,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     issuer: "",
     issueDate: "",
     credentialUrl: "",
+    categories: [],
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -28,6 +41,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
   const [loading, setLoading] = useState(false);
   const [msgOk, setMsgOk] = useState("");
   const [msgErr, setMsgErr] = useState("");
+  const [customCatInput, setCustomCatInput] = useState("");
 
   useEffect(() => {
     if (editCert) {
@@ -36,11 +50,18 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
         issuer: editCert.issuer || "",
         issueDate: editCert.issueDate ? editCert.issueDate.slice(0, 10) : "",
         credentialUrl: editCert.credentialUrl || "",
+        categories: Array.isArray(editCert.categories) ? editCert.categories : [],
       });
       setImagePreview(editCert.imageUrl || null);
       setPdfName(editCert.pdfUrl ? "existing PDF" : "");
     } else {
-      setFormData({ name: "", issuer: "", issueDate: "", credentialUrl: "" });
+      setFormData({
+        name: "",
+        issuer: "",
+        issueDate: "",
+        credentialUrl: "",
+        categories: [],
+      });
       setImagePreview(null);
       setPdfName("");
     }
@@ -50,11 +71,47 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
     setPdfCleared(false);
     setMsgOk("");
     setMsgErr("");
+    setCustomCatInput("");
   }, [editCert]);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
+  };
+
+  const toggleCat = (category) => {
+    const normalizedCategory = category.trim();
+    setFormData((prev) => {
+      const existingIndex = prev.categories.findIndex(
+        (entry) => normalizeCategory(entry) === normalizeCategory(normalizedCategory),
+      );
+
+      if (existingIndex >= 0) {
+        return {
+          ...prev,
+          categories: prev.categories.filter((_, index) => index !== existingIndex),
+        };
+      }
+
+      return {
+        ...prev,
+        categories: [...prev.categories, normalizedCategory],
+      };
+    });
+  };
+
+  const addCustomCat = () => {
+    const value = customCatInput.trim();
+    if (!value) return;
+
+    const exists = formData.categories.some(
+      (category) => normalizeCategory(category) === normalizeCategory(value),
+    );
+
+    if (!exists) {
+      setFormData((prev) => ({ ...prev, categories: [...prev.categories, value] }));
+    }
+    setCustomCatInput("");
   };
 
   const getFirstDroppedFile = (e) => {
@@ -176,6 +233,7 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
           issuer: formData.issuer.trim(),
           issueDate: formData.issueDate || null,
           credentialUrl: formData.credentialUrl.trim() || null,
+          categories: formData.categories,
         };
         if (imageFile) {
           payload.imageBase64 = await resizeImage(imageFile);
@@ -201,17 +259,25 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
           issuer: formData.issuer.trim(),
           issueDate: formData.issueDate || null,
           credentialUrl: formData.credentialUrl.trim() || null,
+          categories: formData.categories,
           imageBase64,
           pdfBase64,
           slug,
         });
 
         setMsgOk("✓ added! deploying in ~60s");
-        setFormData({ name: "", issuer: "", issueDate: "", credentialUrl: "" });
+        setFormData({
+          name: "",
+          issuer: "",
+          issueDate: "",
+          credentialUrl: "",
+          categories: [],
+        });
         setImageFile(null);
         setImagePreview(null);
         setPdfFile(null);
         setPdfName("");
+        setCustomCatInput("");
       }
       if (onSuccess) setTimeout(onSuccess, 2000);
     } catch (err) {
@@ -282,6 +348,64 @@ function CertForm({ editCert, onSuccess, onCancelEdit }) {
               placeholder="https://example.com/verify"
               disabled={loading}
             />
+          </div>
+
+          <div className="cf-field cf-full">
+            <label className="cf-label">
+              categories <span className="cf-optional">optional</span>
+            </label>
+            <div className="cf-cats">
+              {CERT_CATEGORY_OPTIONS.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={`cf-cat ${formData.categories.some((entry) => normalizeCategory(entry) === normalizeCategory(category)) ? "cf-cat--on" : ""}`}
+                  onClick={() => toggleCat(category)}
+                  disabled={loading}
+                >
+                  {category}
+                </button>
+              ))}
+
+              {formData.categories
+                .filter(
+                  (category) =>
+                    !CERT_CATEGORY_OPTIONS.some(
+                      (defaultCategory) =>
+                        normalizeCategory(defaultCategory) ===
+                        normalizeCategory(category),
+                    ),
+                )
+                .map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    className="cf-cat cf-cat--on cf-cat--custom"
+                    onClick={() => toggleCat(category)}
+                    disabled={loading}
+                    title="click to remove"
+                  >
+                    {category} ✕
+                  </button>
+                ))}
+
+              <div className="cf-cat-add">
+                <input
+                  className="cf-cat-input"
+                  type="text"
+                  placeholder="+ custom…"
+                  value={customCatInput}
+                  onChange={(e) => setCustomCatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addCustomCat();
+                    }
+                  }}
+                  disabled={loading}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="cf-field cf-full">

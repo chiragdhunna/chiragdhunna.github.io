@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import ProjectCard from "./ProjectCards";
 import Particle from "../Particle";
+import CategoryFilterDropdown from "../common/CategoryFilterDropdown";
+import { categoryMatches, getAvailableCategories } from "../../utils/categories";
 
 const CATEGORIES = [
   { label: "All", icon: "⬡" },
@@ -35,6 +37,24 @@ function Projects() {
       .finally(() => setLoading(false));
   }, []);
 
+  const defaultCategoryLabels = CATEGORIES
+    .filter((category) => category.label !== "All")
+    .map((category) => category.label);
+  const availableCategories = getAvailableCategories(
+    projects,
+    defaultCategoryLabels,
+  );
+
+  useEffect(() => {
+    if (selectedCategory === "All") return;
+    const exists = availableCategories.some((category) =>
+      categoryMatches(category, selectedCategory),
+    );
+    if (!exists) {
+      setSelectedCategory("All");
+    }
+  }, [availableCategories, selectedCategory]);
+
   const handleCategoryChange = (category) => {
     if (category === selectedCategory) return;
     setAnimating(true);
@@ -47,12 +67,18 @@ function Projects() {
   const filteredProjects =
     selectedCategory === "All"
       ? projects
-      : projects.filter((p) => p.categories?.includes(selectedCategory));
+      : projects.filter((project) =>
+          project.categories?.some((category) =>
+            categoryMatches(category, selectedCategory),
+          ),
+        );
 
   const getCount = (label) =>
     label === "All"
       ? projects.length
-      : projects.filter((p) => p.categories?.includes(label)).length;
+      : projects.filter((project) =>
+          project.categories?.some((category) => categoryMatches(category, label)),
+        ).length;
 
   return (
     <Container fluid className="project-section" style={{ minHeight: "100vh" }}>
@@ -85,6 +111,18 @@ function Projects() {
                 </button>
               );
             })}
+            <CategoryFilterDropdown
+              categories={availableCategories}
+              selected={selectedCategory}
+              onSelect={handleCategoryChange}
+              getCount={getCount}
+              isActive={
+                selectedCategory !== "All" &&
+                !defaultCategoryLabels.some((category) =>
+                  categoryMatches(category, selectedCategory),
+                )
+              }
+            />
           </div>
         </div>
 
@@ -117,7 +155,7 @@ function Projects() {
               <Col
                 md={4}
                 className="project-card"
-                key={`${selectedCategory}-${index}`}
+                key={project.id || project.slug || `${project.name}-${index}`}
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <ProjectCard
