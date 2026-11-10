@@ -1,3 +1,5 @@
+import { categoryMatches } from "./categories.js";
+
 export const DEFAULT_ISSUERS = [
   "AWS",
   "Microsoft",
@@ -106,4 +108,49 @@ export function getAvailableIssuers(certs, defaults = DEFAULT_ISSUERS) {
   dynamicIssuers.sort((a, b) => a.localeCompare(b));
 
   return [...defaultList, ...dynamicIssuers];
+}
+
+export function getPublicIssuers(certs) {
+  if (!Array.isArray(certs)) return [];
+
+  const seenKeys = new Set();
+  const result = [];
+
+  certs.forEach((cert) => {
+    const raw = cert?.issuer;
+    const normalized = normalizeIssuer(raw);
+    if (!normalized) return;
+
+    const key = getIssuerKey(normalized);
+    if (!key || seenKeys.has(key)) return;
+    seenKeys.add(key);
+
+    const displayText = canonicalizeIssuer(normalized);
+    result.push(displayText || normalized);
+  });
+
+  result.sort((a, b) => a.localeCompare(b));
+  return result;
+}
+
+export function filterCerts(certs, { category = "All", issuer = "All" } = {}) {
+  if (!Array.isArray(certs)) return [];
+
+  const matchAllCategories = !category || categoryMatches(category, "All");
+  const matchAllIssuers =
+    !issuer || normalizeIssuer(issuer).toLowerCase() === "all";
+
+  return certs.filter((cert) => {
+    const catMatch =
+      matchAllCategories ||
+      (Array.isArray(cert?.categories) &&
+        cert.categories.some((cat) => categoryMatches(cat, category)));
+    const issMatch = matchAllIssuers || issuerMatches(cert?.issuer, issuer);
+
+    return catMatch && issMatch;
+  });
+}
+
+export function countCerts(certs, options = {}) {
+  return filterCerts(certs, options).length;
 }
