@@ -258,3 +258,59 @@ test("Certification Form & API state machine: clearing and replacing certificati
   assert.strictEqual(payload.imageCleared, true);
   assert.strictEqual(payload.pdfCleared, true);
 });
+
+test("Drag-and-drop helper: prefers DataTransferItem files and falls back to FileList", () => {
+  const getFirstDroppedFile = (e) => {
+    const items = e.dataTransfer?.items;
+    if (items?.length) {
+      for (const item of items) {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file) return file;
+        }
+      }
+    }
+    return e.dataTransfer?.files?.[0] || null;
+  };
+
+  const itemFile = { name: "item-image.jpg", type: "image/jpeg", size: 1000 };
+  const listFile = { name: "list-image.jpg", type: "image/jpeg", size: 1000 };
+
+  const fromItems = getFirstDroppedFile({
+    dataTransfer: {
+      items: [{ kind: "string", getAsFile: () => null }, { kind: "file", getAsFile: () => itemFile }],
+      files: [listFile],
+    },
+  });
+  assert.strictEqual(fromItems, itemFile);
+
+  const fromFiles = getFirstDroppedFile({
+    dataTransfer: { items: [], files: [listFile] },
+  });
+  assert.strictEqual(fromFiles, listFile);
+
+  const emptyDrop = getFirstDroppedFile({ dataTransfer: { items: [], files: [] } });
+  assert.strictEqual(emptyDrop, null);
+});
+
+test("Drop validation: image and PDF dropped files follow the same type/size checks", () => {
+  const validateImage = (file) => {
+    if (!file || !file.type.startsWith("image/")) return "Please select a valid image file";
+    if (file.size > 5 * 1024 * 1024) return "Image must be under 5MB";
+    return null;
+  };
+
+  const validatePdf = (file) => {
+    if (!file || file.type !== "application/pdf") return "Please select a valid PDF";
+    if (file.size > 10 * 1024 * 1024) return "PDF must be under 10MB";
+    return null;
+  };
+
+  assert.strictEqual(validateImage({ type: "image/png", size: 1024 }), null);
+  assert.strictEqual(validateImage({ type: "application/pdf", size: 1024 }), "Please select a valid image file");
+  assert.strictEqual(validateImage({ type: "image/jpeg", size: 6 * 1024 * 1024 }), "Image must be under 5MB");
+
+  assert.strictEqual(validatePdf({ type: "application/pdf", size: 1024 }), null);
+  assert.strictEqual(validatePdf({ type: "image/png", size: 1024 }), "Please select a valid PDF");
+  assert.strictEqual(validatePdf({ type: "application/pdf", size: 11 * 1024 * 1024 }), "PDF must be under 10MB");
+});

@@ -62,6 +62,19 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
+  const getFirstDroppedFile = (e) => {
+    const items = e.dataTransfer?.items;
+    if (items?.length) {
+      for (const item of items) {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file) return file;
+        }
+      }
+    }
+    return e.dataTransfer?.files?.[0] || null;
+  };
+
   const toggleCat = (cat) => {
     setFormData((p) => ({
       ...p,
@@ -79,9 +92,9 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
     setCustomCatInput("");
   };
 
-  const handleImage = (e) => {
-    const file = e.target.files[0];
+  const handleImageFile = (file) => {
     if (!file) return;
+    if (loading) return;
     if (!file.type.startsWith("image/"))
       return setMsgErr("Please select a valid image file");
     if (file.size > 5 * 1024 * 1024)
@@ -92,6 +105,15 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target.result);
     reader.readAsDataURL(file);
+  };
+
+  const handleImage = (e) => {
+    handleImageFile(e.target.files[0]);
+  };
+
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    handleImageFile(getFirstDroppedFile(e));
   };
 
   const clearImage = () => {
@@ -335,7 +357,11 @@ function ProjectForm({ editProject, onSuccess, onCancelEdit }) {
                 </button>
               </div>
             ) : (
-              <label className="pf-upload-zone">
+              <label
+                className="pf-upload-zone"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleImageDrop}
+              >
                 <input
                   type="file"
                   accept="image/*"
