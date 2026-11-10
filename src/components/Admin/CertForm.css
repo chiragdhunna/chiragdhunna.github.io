@@ -76,6 +76,81 @@
   cursor: not-allowed;
 }
 
+.cf-cats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cf-cat {
+  background: #1d1f21;
+  border: 1px solid #2a2c2f;
+  border-radius: 4px;
+  color: #9aa0a8;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.cf-cat:hover:not(:disabled) {
+  border-color: #35383c;
+  color: #e8eaed;
+}
+
+.cf-cat--on {
+  background: rgba(240, 165, 0, 0.1);
+  border-color: #c8891a;
+  color: #f0a500;
+}
+
+.cf-cat--custom {
+  background: rgba(91, 156, 246, 0.1);
+  border-color: #5b9cf6;
+  color: #5b9cf6;
+}
+
+.cf-cat:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-cat-add {
+  display: flex;
+  align-items: center;
+}
+
+.cf-cat-input {
+  background: #1d1f21;
+  border: 1px dashed #35383c;
+  border-radius: 4px;
+  color: #e8eaed;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  outline: none;
+  width: 120px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.cf-cat-input:focus {
+  border-color: #c8891a;
+  border-style: solid;
+  box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.08);
+}
+
+.cf-cat-input::placeholder {
+  color: #5f6368;
+}
+
+.cf-cat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Date input dark mode fix */
 .cf-input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.5);
