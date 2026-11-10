@@ -9,6 +9,13 @@ import {
   getItemCount,
 } from "../../utils/categories";
 import {
+  countCerts,
+  filterCerts,
+  getPublicIssuers,
+  issuerMatches,
+  normalizeIssuer,
+} from "../../utils/issuers";
+import {
   AiFillGithub,
   AiFillInstagram,
   AiOutlineTwitter,
@@ -178,6 +185,7 @@ function Portfolio() {
   const [certs, setCerts] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [selectedCertFilter, setSelectedCertFilter] = useState("All");
+  const [selectedCertIssuer, setSelectedCertIssuer] = useState("All");
   const [typewriterText, setTypewriterText] = useState("");
   const [activeSection, setActiveSection] = useState("hero");
   const [contributions, setContributions] = useState([]);
@@ -338,7 +346,9 @@ function Portfolio() {
     contributions,
     selectedFilter,
     selectedCertFilter,
+    selectedCertIssuer,
   ]);
+  // [prefersReducedMotion, projects, certs, contributions, selectedFilter, selectedCertFilter]
 
   const defaultProjectCategories = useMemo(
     () => FILTERS.filter((f) => f !== "All"),
@@ -367,7 +377,9 @@ function Portfolio() {
   );
 
   const certCategories = useMemo(() => getAvailableCategories(certs), [certs]);
-  const showCertFilterBar = certCategories.length > 0;
+  const certIssuers = useMemo(() => getPublicIssuers(certs), [certs]);
+  const showIssuerFilter = certIssuers.length >= 2;
+  const showCertFilterBar = certCategories.length > 0 || showIssuerFilter;
 
   useEffect(() => {
     if (categoryMatches(selectedCertFilter, "All")) return;
@@ -379,11 +391,27 @@ function Portfolio() {
     }
   }, [certCategories, selectedCertFilter]);
 
-  const getCertCount = (category) => getItemCount(certs, category);
+  useEffect(() => {
+    if (
+      !selectedCertIssuer ||
+      normalizeIssuer(selectedCertIssuer).toLowerCase() === "all"
+    )
+      return;
+    const exists = certIssuers.some((issuer) =>
+      issuerMatches(issuer, selectedCertIssuer),
+    );
+    if (!exists) {
+      setSelectedCertIssuer("All");
+    }
+  }, [certIssuers, selectedCertIssuer]);
 
   const filteredCerts = useMemo(
-    () => filterItemsByCategory(certs, selectedCertFilter),
-    [certs, selectedCertFilter],
+    () =>
+      filterCerts(certs, {
+        category: selectedCertFilter,
+        issuer: selectedCertIssuer,
+      }),
+    [certs, selectedCertFilter, selectedCertIssuer],
   );
 
   const scrollToSection = (event, sectionId) => {
@@ -858,24 +886,67 @@ function Portfolio() {
                 <div
                   className="filter-bar"
                   role="group"
-                  aria-label="Filter certifications by category"
+                  aria-label="Filter certifications by category and issuer"
                 >
                   <button
                     type="button"
-                    className={`filter-pill ${categoryMatches(selectedCertFilter, "All") ? "active" : ""}`}
-                    onClick={() => setSelectedCertFilter("All")}
-                    aria-pressed={categoryMatches(selectedCertFilter, "All")}
+                    className={`filter-pill ${
+                      categoryMatches(selectedCertFilter, "All") &&
+                      (!selectedCertIssuer ||
+                        normalizeIssuer(selectedCertIssuer).toLowerCase() === "all")
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedCertFilter("All");
+                      setSelectedCertIssuer("All");
+                    }}
+                    aria-pressed={
+                      categoryMatches(selectedCertFilter, "All") &&
+                      (!selectedCertIssuer ||
+                        normalizeIssuer(selectedCertIssuer).toLowerCase() === "all")
+                    }
                   >
                     <span>All</span>
-                    <span className="filter-count">{getCertCount("All")}</span>
+                    <span className="filter-count">
+                      {countCerts(certs, {
+                        category: "All",
+                        issuer: selectedCertIssuer,
+                      })}
+                    </span>
                   </button>
-                  <CategoryFilterDropdown
-                    categories={certCategories}
-                    selected={selectedCertFilter}
-                    onSelect={setSelectedCertFilter}
-                    getCount={getCertCount}
-                    isActive={!categoryMatches(selectedCertFilter, "All")}
-                  />
+                  {certCategories.length > 0 && (
+                    <CategoryFilterDropdown
+                      categories={certCategories}
+                      selected={selectedCertFilter}
+                      onSelect={setSelectedCertFilter}
+                      getCount={(category) =>
+                        countCerts(certs, {
+                          category,
+                          issuer: selectedCertIssuer,
+                        })
+                      }
+                      isActive={!categoryMatches(selectedCertFilter, "All")}
+                    />
+                  )}
+                  {showIssuerFilter && (
+                    <CategoryFilterDropdown
+                      label="Issuer"
+                      allLabel="All issuers"
+                      categories={certIssuers}
+                      selected={selectedCertIssuer}
+                      onSelect={setSelectedCertIssuer}
+                      getCount={(issuer) =>
+                        countCerts(certs, {
+                          category: selectedCertFilter,
+                          issuer,
+                        })
+                      }
+                      isActive={
+                        normalizeIssuer(selectedCertIssuer).toLowerCase() !== "all"
+                      }
+                    />
+                  )}
                 </div>
 
                 <p className="projects-meta" aria-live="polite">
@@ -887,6 +958,12 @@ function Portfolio() {
                     <>
                       {" "}
                       in <strong>{selectedCertFilter}</strong>
+                    </>
+                  ) : null}
+                  {normalizeIssuer(selectedCertIssuer).toLowerCase() !== "all" ? (
+                    <>
+                      {" "}
+                      by <strong>{selectedCertIssuer}</strong>
                     </>
                   ) : null}
                 </p>

@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import CertCard from "./CertCard";
 import Particle from "../Particle";
 import "../Projects/Projects.css";
 import CategoryFilterDropdown from "../common/CategoryFilterDropdown";
 import { categoryMatches, getAvailableCategories } from "../../utils/categories";
+import {
+  countCerts,
+  filterCerts,
+  getPublicIssuers,
+  issuerMatches,
+  normalizeIssuer,
+} from "../../utils/issuers";
 
 const certsDataUrl = `${import.meta.env.BASE_URL}data/certs.json`;
 
 function Certifications() {
   const [certs, setCerts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedIssuer, setSelectedIssuer] = useState("All");
 
   useEffect(() => {
     fetch(certsDataUrl)
@@ -19,11 +27,19 @@ function Certifications() {
       .catch(() => setCerts([]));
   }, []);
 
-  const availableCategories = getAvailableCategories(certs);
-  const showFilterBar = availableCategories.length > 0;
+  const availableCategories = useMemo(
+    () => getAvailableCategories(certs),
+    [certs],
+  );
+  const availableIssuers = useMemo(
+    () => getPublicIssuers(certs),
+    [certs],
+  );
+  const showIssuerFilter = availableIssuers.length >= 2;
+  const showFilterBar = availableCategories.length > 0 || showIssuerFilter;
 
   useEffect(() => {
-    if (selectedCategory === "All") return;
+    if (categoryMatches(selectedCategory, "All")) return;
     const exists = availableCategories.some((category) =>
       categoryMatches(category, selectedCategory),
     );
@@ -32,21 +48,39 @@ function Certifications() {
     }
   }, [availableCategories, selectedCategory]);
 
-  const filteredCerts =
-    selectedCategory === "All"
-      ? certs
-      : certs.filter((cert) =>
-          cert.categories?.some((category) =>
-            categoryMatches(category, selectedCategory),
-          ),
-        );
+  useEffect(() => {
+    if (
+      !selectedIssuer ||
+      normalizeIssuer(selectedIssuer).toLowerCase() === "all"
+    )
+      return;
+    const exists = availableIssuers.some((issuer) =>
+      issuerMatches(issuer, selectedIssuer),
+    );
+    if (!exists) {
+      setSelectedIssuer("All");
+    }
+  }, [availableIssuers, selectedIssuer]);
 
-  const getCount = (label) =>
-    label === "All"
-      ? certs.length
-      : certs.filter((cert) =>
-          cert.categories?.some((category) => categoryMatches(category, label)),
-        ).length;
+  const filteredCerts = useMemo(
+    () =>
+      filterCerts(certs, {
+        category: selectedCategory,
+        issuer: selectedIssuer,
+      }),
+    [certs, selectedCategory, selectedIssuer],
+  );
+
+  const getCategoryCount = (cat) =>
+    countCerts(certs, { category: cat, issuer: selectedIssuer });
+
+  const getIssuerCount = (iss) =>
+    countCerts(certs, { category: selectedCategory, issuer: iss });
+
+  const isAllActive =
+    categoryMatches(selectedCategory, "All") &&
+    (!selectedIssuer ||
+      normalizeIssuer(selectedIssuer).toLowerCase() === "all");
 
   return (
     <Container fluid className="project-section" style={{ minHeight: "100vh" }}>
@@ -64,34 +98,61 @@ function Certifications() {
             <div className="filter-bar">
               <div className="filter-track">
                 <button
-                  className={`filter-pill ${selectedCategory === "All" ? "filter-pill--active" : ""}`}
-                  onClick={() => setSelectedCategory("All")}
-                  aria-pressed={selectedCategory === "All"}
+                  className={`filter-pill ${isAllActive ? "filter-pill--active" : ""}`}
+                  onClick={() => {
+                    setSelectedCategory("All");
+                    setSelectedIssuer("All");
+                  }}
+                  aria-pressed={isAllActive}
                 >
                   <span className="filter-pill__icon" aria-hidden="true">
                     ⬡
                   </span>
                   <span className="filter-pill__label">All</span>
-                  <span className="filter-pill__count">{getCount("All")}</span>
+                  <span className="filter-pill__count">
+                    {getCategoryCount("All")}
+                  </span>
                 </button>
 
-                <CategoryFilterDropdown
-                  categories={availableCategories}
-                  selected={selectedCategory}
-                  onSelect={setSelectedCategory}
-                  getCount={getCount}
-                  isActive={selectedCategory !== "All"}
-                />
+                {availableCategories.length > 0 && (
+                  <CategoryFilterDropdown
+                    categories={availableCategories}
+                    selected={selectedCategory}
+                    onSelect={setSelectedCategory}
+                    getCount={getCategoryCount}
+                    isActive={!categoryMatches(selectedCategory, "All")}
+                  />
+                )}
+
+                {showIssuerFilter && (
+                  <CategoryFilterDropdown
+                    label="Issuer"
+                    allLabel="All issuers"
+                    categories={availableIssuers}
+                    selected={selectedIssuer}
+                    onSelect={setSelectedIssuer}
+                    getCount={getIssuerCount}
+                    isActive={
+                      normalizeIssuer(selectedIssuer).toLowerCase() !== "all"
+                    }
+                  />
+                )}
               </div>
             </div>
 
             <p className="filter-meta">
               Showing <span className="filter-meta__num">{filteredCerts.length}</span>{" "}
               {filteredCerts.length === 1 ? "certification" : "certifications"}
-              {selectedCategory !== "All" && (
+              {!categoryMatches(selectedCategory, "All") && (
                 <>
                   {" "}
                   in <span className="filter-meta__cat">{selectedCategory}</span>
+                </>
+              )}
+              {normalizeIssuer(selectedIssuer).toLowerCase() !== "all" && (
+                <>
+                  {" "}
+                  by <span className="filter-meta__cat">{selectedIssuer}</span>
                 </>
               )}
             </p>
