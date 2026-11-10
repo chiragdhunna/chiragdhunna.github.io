@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Particle from "../Particle";
 import "./Portfolio.css";
+import CategoryFilterDropdown from "../common/CategoryFilterDropdown";
+import {
+  categoryMatches,
+  filterItemsByCategory,
+  getAvailableCategories,
+  getItemCount,
+} from "../../utils/categories";
 import {
   AiFillGithub,
   AiFillInstagram,
@@ -325,27 +332,31 @@ function Portfolio() {
     return () => observer.disconnect();
   }, [prefersReducedMotion, projects, certs, contributions, selectedFilter]);
 
-  const filterCounts = useMemo(() => {
-    const counts = Object.fromEntries(FILTERS.map((filter) => [filter, 0]));
-    projects.forEach((project) => {
-      counts.All += 1;
-      (project.categories || []).forEach((category) => {
-        if (Object.prototype.hasOwnProperty.call(counts, category)) {
-          counts[category] += 1;
-        }
-      });
-    });
-    return counts;
-  }, [projects]);
+  const defaultProjectCategories = useMemo(
+    () => FILTERS.filter((f) => f !== "All"),
+    [],
+  );
+  const availableCategories = useMemo(
+    () => getAvailableCategories(projects, defaultProjectCategories),
+    [projects, defaultProjectCategories],
+  );
 
-  const filteredProjects = useMemo(() => {
-    if (selectedFilter === "All") return projects;
-    return projects.filter((project) =>
-      Array.isArray(project.categories)
-        ? project.categories.includes(selectedFilter)
-        : false,
+  useEffect(() => {
+    if (categoryMatches(selectedFilter, "All")) return;
+    const exists = availableCategories.some((category) =>
+      categoryMatches(category, selectedFilter),
     );
-  }, [projects, selectedFilter]);
+    if (!exists) {
+      setSelectedFilter("All");
+    }
+  }, [availableCategories, selectedFilter]);
+
+  const getProjectCount = (category) => getItemCount(projects, category);
+
+  const filteredProjects = useMemo(
+    () => filterItemsByCategory(projects, selectedFilter),
+    [projects, selectedFilter],
+  );
 
   const scrollToSection = (event, sectionId) => {
     event.preventDefault();
@@ -698,7 +709,7 @@ function Portfolio() {
               aria-label="Filter projects by category"
             >
               {FILTERS.map((filter) => {
-                const active = selectedFilter === filter;
+                const active = categoryMatches(selectedFilter, filter);
                 return (
                   <button
                     key={filter}
@@ -709,17 +720,29 @@ function Portfolio() {
                   >
                     <span>{filter}</span>
                     <span className="filter-count">
-                      {filterCounts[filter] || 0}
+                      {getProjectCount(filter)}
                     </span>
                   </button>
                 );
               })}
+              <CategoryFilterDropdown
+                categories={availableCategories}
+                selected={selectedFilter}
+                onSelect={setSelectedFilter}
+                getCount={getProjectCount}
+                isActive={
+                  !categoryMatches(selectedFilter, "All") &&
+                  !defaultProjectCategories.some((cat) =>
+                    categoryMatches(cat, selectedFilter),
+                  )
+                }
+              />
             </div>
 
             <p className="projects-meta" aria-live="polite">
               Showing <strong>{filteredProjects.length}</strong>{" "}
               {filteredProjects.length === 1 ? "project" : "projects"}
-              {selectedFilter !== "All" ? (
+              {!categoryMatches(selectedFilter, "All") ? (
                 <>
                   {" "}
                   in <strong>{selectedFilter}</strong>

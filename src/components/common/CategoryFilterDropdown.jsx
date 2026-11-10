@@ -8,6 +8,7 @@ function CategoryFilterDropdown({
   getCount,
   label = "Filter",
   isActive = false,
+  toggleClassName = "",
 }) {
   const [open, setOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -108,7 +109,7 @@ function CategoryFilterDropdown({
       <button
         ref={buttonRef}
         type="button"
-        className={`filter-pill filter-dropdown__toggle ${isActive ? "filter-pill--active" : ""}`}
+        className={`filter-pill filter-dropdown__toggle ${isActive ? "filter-pill--active active" : ""} ${toggleClassName}`.trim()}
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={handleButtonKeyDown}
         aria-haspopup="menu"
