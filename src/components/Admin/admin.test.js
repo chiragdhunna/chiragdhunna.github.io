@@ -1,5 +1,11 @@
 import test from "node:test";
 import assert from "node:assert";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 1. Slug generation tests
 function generateSlug(name) {
@@ -313,4 +319,69 @@ test("Drop validation: image and PDF dropped files follow the same type/size che
   assert.strictEqual(validatePdf({ type: "application/pdf", size: 1024 }), null);
   assert.strictEqual(validatePdf({ type: "image/png", size: 1024 }), "Please select a valid PDF");
   assert.strictEqual(validatePdf({ type: "application/pdf", size: 11 * 1024 * 1024 }), "PDF must be under 10MB");
+});
+
+test("Admin CMS CSS: .proj-main and form bodies are constrained so form panels scroll", () => {
+  const adminDashboardCss = fs.readFileSync(
+    path.resolve(__dirname, "AdminDashboard.css"),
+    "utf8",
+  );
+  const certFormCss = fs.readFileSync(
+    path.resolve(__dirname, "CertForm.css"),
+    "utf8",
+  );
+  const projectFormCss = fs.readFileSync(
+    path.resolve(__dirname, "ProjectForm.css"),
+    "utf8",
+  );
+
+  // 1. .cms-shell grid-template-rows & .proj-main min-height: 0
+  assert.match(
+    adminDashboardCss,
+    /\.cms-shell\s*\{[^}]*grid-template-rows:\s*minmax\(0,\s*1fr\)/,
+    "AdminDashboard.css: .cms-shell must have grid-template-rows: minmax(0, 1fr)",
+  );
+  assert.match(
+    adminDashboardCss,
+    /\.proj-main\s*\{[^}]*min-height:\s*0/,
+    "AdminDashboard.css: .proj-main must have min-height: 0",
+  );
+  assert.match(
+    adminDashboardCss,
+    /\.proj-main\s*\{[^}]*overflow:\s*hidden/,
+    "AdminDashboard.css: .proj-main must have overflow: hidden",
+  );
+
+  // 2. CertForm & ProjectForm body min-height: 0, overflow-y: auto, overscroll-behavior: contain
+  assert.match(
+    certFormCss,
+    /\.cf-body\s*\{[^}]*min-height:\s*0/,
+    "CertForm.css: .cf-body must have min-height: 0",
+  );
+  assert.match(
+    certFormCss,
+    /\.cf-body\s*\{[^}]*overflow-y:\s*auto/,
+    "CertForm.css: .cf-body must have overflow-y: auto",
+  );
+  assert.match(
+    certFormCss,
+    /\.cf-footer\s*\{[^}]*flex-shrink:\s*0/,
+    "CertForm.css: .cf-footer must have flex-shrink: 0",
+  );
+
+  assert.match(
+    projectFormCss,
+    /\.pf-body\s*\{[^}]*min-height:\s*0/,
+    "ProjectForm.css: .pf-body must have min-height: 0",
+  );
+  assert.match(
+    projectFormCss,
+    /\.pf-body\s*\{[^}]*overflow-y:\s*auto/,
+    "ProjectForm.css: .pf-body must have overflow-y: auto",
+  );
+  assert.match(
+    projectFormCss,
+    /\.pf-footer\s*\{[^}]*flex-shrink:\s*0/,
+    "ProjectForm.css: .pf-footer must have flex-shrink: 0",
+  );
 });

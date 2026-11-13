@@ -1,13 +1,35 @@
 .cf-form {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .cf-body {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #35383c transparent;
   padding: 20px;
+}
+
+.cf-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cf-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cf-body::-webkit-scrollbar-thumb {
+  background: #35383c;
+  border-radius: 3px;
+}
+
+.cf-body::-webkit-scrollbar-thumb:hover {
+  background: #484c52;
 }
 
 .cf-grid {
@@ -319,6 +341,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .cf-hint {
@@ -383,4 +406,14 @@
 
 .cf-btn--save:hover:not(:disabled) {
   background: rgba(91, 156, 246, 0.18);
+}
+
+@media (max-width: 768px) {
+  .cf-form {
+    min-height: auto;
+  }
+  .cf-body {
+    min-height: auto;
+    overflow-y: visible;
+  }
 }

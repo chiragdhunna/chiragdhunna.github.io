@@ -1,13 +1,35 @@
 .pf-form {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .pf-body {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #35383c transparent;
   padding: 20px;
+}
+
+.pf-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pf-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pf-body::-webkit-scrollbar-thumb {
+  background: #35383c;
+  border-radius: 3px;
+}
+
+.pf-body::-webkit-scrollbar-thumb:hover {
+  background: #484c52;
 }
 
 .pf-grid {
@@ -198,6 +220,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .pf-hint {
@@ -303,4 +326,14 @@
 .pf-cat-input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .pf-form {
+    min-height: auto;
+  }
+  .pf-body {
+    min-height: auto;
+    overflow-y: visible;
+  }
 }
