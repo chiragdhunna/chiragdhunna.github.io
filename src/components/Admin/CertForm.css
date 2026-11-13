@@ -407,3 +407,13 @@
 .cf-btn--save:hover:not(:disabled) {
   background: rgba(91, 156, 246, 0.18);
 }
+
+@media (max-width: 768px) {
+  .cf-form {
+    min-height: auto;
+  }
+  .cf-body {
+    min-height: auto;
+    overflow-y: visible;
+  }
+}

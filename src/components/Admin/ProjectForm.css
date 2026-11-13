@@ -327,3 +327,13 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .pf-form {
+    min-height: auto;
+  }
+  .pf-body {
+    min-height: auto;
+    overflow-y: visible;
+  }
+}
