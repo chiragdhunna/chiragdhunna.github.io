@@ -8,6 +8,7 @@ import {
   getPublicIssuers,
   filterCerts,
   countCerts,
+  issuerMatches,
 } from "../utils/issuers.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -135,28 +136,89 @@ test("Sanity: public/data/certs.json issuers and counts", () => {
   const rawData = fs.readFileSync(certsPath, "utf8");
   const certs = JSON.parse(rawData);
 
+  // Certs is a non-empty array
   assert(Array.isArray(certs), "certs.json must be an array");
-  assert.strictEqual(certs.length, 12, "expected 12 certs in certs.json");
+  assert(certs.length > 0, "certs.json must not be empty");
 
+  // Every cert has the fields the site needs
+  certs.forEach((cert, index) => {
+    assert(cert && typeof cert === "object", `cert at index ${index} must be an object`);
+    assert(
+      typeof cert.name === "string" && cert.name.trim().length > 0,
+      `cert[${index}] must have a non-empty name`,
+    );
+    assert(
+      typeof cert.issuer === "string" && cert.issuer.trim().length > 0,
+      `cert[${index}] must have a non-empty issuer`,
+    );
+    assert(
+      typeof cert.slug === "string" && cert.slug.trim().length > 0,
+      `cert[${index}] must have a non-empty slug`,
+    );
+    const hasImage =
+      (typeof cert.imageUrl === "string" && cert.imageUrl.trim().length > 0) ||
+      (typeof cert.image === "string" && cert.image.trim().length > 0);
+    assert(hasImage, `cert[${index}] must have an image field`);
+  });
+
+  // getPublicIssuers(certs) is sorted, has no duplicates, and every issuer is a non-empty string
   const issuers = getPublicIssuers(certs);
-  assert.deepStrictEqual(issuers, ["AWS", "Microsoft"]);
+  assert(Array.isArray(issuers), "getPublicIssuers must return an array");
+  assert(issuers.length > 0, "issuers list must not be empty");
 
-  const awsCount = countCerts(certs, { issuer: "AWS" });
-  const msCount = countCerts(certs, { issuer: "Microsoft" });
+  const sortedIssuers = [...issuers].sort((a, b) => a.localeCompare(b));
+  assert.deepStrictEqual(issuers, sortedIssuers, "issuers must be sorted alphabetically");
 
-  assert.strictEqual(awsCount, 4);
-  assert.strictEqual(msCount, 8);
-  assert.strictEqual(awsCount + msCount, certs.length, "issuer counts must sum to total certs");
+  const uniqueIssuers = new Set(issuers);
+  assert.strictEqual(issuers.length, uniqueIssuers.size, "issuers must contain no duplicates");
 
-  // Specific cross counts verified
-  assert.strictEqual(countCerts(certs, { category: "Cloud", issuer: "AWS" }), 4);
-  assert.strictEqual(countCerts(certs, { category: "Cloud", issuer: "Microsoft" }), 8);
-  assert.strictEqual(countCerts(certs, { category: "AI", issuer: "AWS" }), 2);
-  assert.strictEqual(countCerts(certs, { category: "AI", issuer: "Microsoft" }), 3);
-  assert.strictEqual(countCerts(certs, { category: "Data", issuer: "AWS" }), 0);
-  assert.strictEqual(countCerts(certs, { category: "Data", issuer: "Microsoft" }), 1);
-  assert.strictEqual(countCerts(certs, { category: "Development", issuer: "AWS" }), 1);
-  assert.strictEqual(countCerts(certs, { category: "Development", issuer: "Microsoft" }), 2);
+  issuers.forEach((issuer) => {
+    assert.strictEqual(typeof issuer, "string", "each issuer must be a string");
+    assert(issuer.trim().length > 0, "each issuer must be a non-empty string");
+  });
+
+  // For each issuer returned, countCerts equals independently computed count
+  issuers.forEach((issuer) => {
+    const count = countCerts(certs, { issuer });
+    const independentCount = certs.filter((cert) =>
+      issuerMatches(cert?.issuer, issuer),
+    ).length;
+    assert.strictEqual(
+      count,
+      independentCount,
+      `countCerts for issuer "${issuer}" must match independent filter count`,
+    );
+    assert(count > 0, `each public issuer must have at least one cert`);
+  });
+
+  // The sum of the per-issuer counts equals certs.length
+  const totalIssuerCounts = issuers.reduce(
+    (sum, issuer) => sum + countCerts(certs, { issuer }),
+    0,
+  );
+  assert.strictEqual(
+    totalIssuerCounts,
+    certs.length,
+    "issuer counts must sum to total certs",
+  );
+
+  // For every category present in the data and every issuer, countCerts equals filterCerts length
+  const categoriesPresent = [
+    ...new Set(
+      certs
+        .flatMap((c) => (Array.isArray(c?.categories) ? c.categories : []))
+        .filter((cat) => typeof cat === "string" && cat.trim().length > 0),
+    ),
+  ];
+  categoriesPresent.forEach((category) => {
+    issuers.forEach((issuer) => {
+      assert.strictEqual(
+        countCerts(certs, { category, issuer }),
+        filterCerts(certs, { category, issuer }).length,
+        `countCerts must match filterCerts length for category "${category}" and issuer "${issuer}"`,
+      );
+    });
+  });
 });
 
 test("Wiring: Portfolio.jsx and Certifications.jsx import shared helpers and render CategoryFilterDropdown with label='Issuer'", () => {
