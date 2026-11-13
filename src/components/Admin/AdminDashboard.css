@@ -418,7 +418,8 @@
 .cms-shell {
   display: grid;
   grid-template-columns: 260px 1fr;
-  height: 620px; /* fixed height so sidebar can scroll within it */
+  grid-template-rows: minmax(0, 1fr);
+  height: clamp(560px, calc(100vh - 260px), 760px);
   border: 1px solid #2a2c2f;
   border-radius: 12px;
   overflow: hidden;
@@ -681,6 +682,9 @@
   background: #0e0f11;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .main-topbar {
